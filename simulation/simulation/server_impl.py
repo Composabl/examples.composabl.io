@@ -1,53 +1,17 @@
-# examples.composabl.io
+#!/usr/bin/env python3
+from typing import Any, Dict, SupportsFloat, Tuple
+import numpy as np
+import random
 
----
-sidebar_position: 1
----
+import composabl_ray.utils.logger as logger_util
+from composabl_ray.server.server_composabl import EnvSpec, ServerComposabl, Space
+from composabl.agent.scenario import Scenario
 
-# Creating a Simulator
+import gymnasium as gym
+from gymnasium.envs.registration import EnvSpec
 
-A simulator (or environment) can be easily integrated with the Composabl SDK. To do so, we have to follow the following outline:
+logger = logger_util.get_logger(__name__)
 
-1. Create a new Simulation Package
-2. Implement the Composabl Communication Interface
-3. Build a docker container
-
-## The Composabl Specification
-
-> 💡 The below gives a highlight of how the Composabl SDK communicates with the SDK. To create your own simulator, you can follow the steps in **"Creating a Simulator"**
-
-To interact with the simulators, Composabl depends on the gRPC protocol.
-
-> We use a gRPC communication layer due its low overhead, but practical implementation
-
-Currently we support the following calls:
-
-```protobuf
-service Composabl {
-    rpc Make(MakeRequest) returns (MakeResponse) {}
-    rpc State(StateRequest) returns (StateResponse) {}
-    rpc Step(stream StepRequest) returns (stream StepResponse) {}
-    rpc Reset(ResetRequest) returns (ResetResponse) {}
-    rpc Close(CloseRequest) returns (CloseResponse) {}
-    rpc ActionSpaceSample(ActionSpaceSampleRequest) returns (ActionSpaceSampleResponse) {}
-    rpc ActionSpaceInfo(ActionSpaceInfoRequest) returns (ActionSpaceInfoResponse) {}
-    rpc ObservationSpaceInfo(ObservationSpaceInfoRequest) returns (ObservationSpaceInfoResponse) {}
-    rpc SetScenario(SetScenarioRequest) returns (SetScenarioResponse) {}
-    rpc GetScenario(GetScenarioRequest) returns (GetScenarioResponse) {}
-    rpc SetRewardFunc(SetRewardFuncRequest) returns (SetRewardFuncResponse) {}
-    rpc GetRewardFunc(GetRewardFuncRequest) returns (Stringified) {}
-}
-```
-
-Due to the complicated nature of how gRPC works, we package all of this into our core SDK and make it available for you to integrate through an easy to understand Python file.
-
-## Creating a Simulator
-
-The simulator can be written in python using the gym framework, or can be integrate to any other external simulator following the same structure.
-
-You can find an example in the folder `simulation\server_impl.py`
-
-```python
 class SimEnv(gym.Env):
     def __init__(self):
         #  Define Observation Space
@@ -131,24 +95,9 @@ class SimEnv(gym.Env):
         pass
 
 
-```
-
-### The Simulator Interface
-
-The SDK can be found on the [PyPI registry](https://pypi.org/project/composabl/) and installed with `pip install composabl`. When downloaded, the simulator interface is available through the `composabl.server.server_composabl` path providing a `ServerComposabl` class to extend from which offers all the required methods.
-
-```python
-#!/usr/bin/env python3
-from typing import Any, Dict, SupportsFloat, Tuple
-
-import composabl.utils.logger as logger_util
-from composabl.server.server_composabl import EnvSpec, Space, ServerComposabl
-
-logger = logger_util.get_logger(__name__)
 
 class ServerImpl(ServerComposabl):
     def __init__(self):
-        #  Calls your SimEnv class
         self.env = SimEnv()
 
     def Make(self, env_id: str) -> EnvSpec:
@@ -183,22 +132,7 @@ class ServerImpl(ServerComposabl):
             return Scenario({"dummy": 0})
 
         return self.env.scenario
-```
 
-### Creating a new Package
+    def SetRewardFunc(self, reward_func):
+        self.env.set_reward_func(reward_func)
 
-This is step is to create a new package that encapsulate all dependencies to run your simulator. To provide a easier way of creating a package, we recommend to:
-1 . Create a `project.toml`file
-TODO
-
-## Running the Simulator
-
-Once a simulator package has been created, you can run it either locally, or package it as a docker container and run it through docker.
-
-### Locally
-
-TODO
-
-### As Docker Container
-
-TODO
