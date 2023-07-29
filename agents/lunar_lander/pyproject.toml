@@ -11,7 +11,9 @@ python = "~3.8"
 composabl = "^0.2.7"
 composabl-ray = "^0.2.7"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+main = "lunar_lander.main:start"
