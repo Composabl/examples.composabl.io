@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from typing import Any, Dict, SupportsFloat, Tuple
+from typing import Any, Dict, SupportsFloat, Tuple, Optional
 import numpy as np
 import random
 
-import composabl_ray.utils.logger as logger_util
-from composabl_ray.server.server_composabl import EnvSpec, ServerComposabl, Space
+import composabl.utils.logger as logger_util
 from composabl.agent.scenario import Scenario
+from composabl.grpc.server.server_composabl import ServerComposabl
 
 import gymnasium as gym
 from gymnasium.envs.registration import EnvSpec
@@ -16,9 +16,8 @@ class SimEnv(gym.Env):
     def __init__(self):
         #  Define Observation Space
         self.obs_space_constraints = {
-            'state1': {'low': 1, 'high': 10},
-            'state2': {'low': -5, 'high': 0},
-            'state3': {'low': 20, 'high': 100}
+            'state1': {'low': -1e12, 'high': 1e12},
+            'time_counter': {'low': 0, 'high': 1e12}
         }
 
         low_list = [x['low'] for x in self.obs_space_constraints.values()]
@@ -28,8 +27,7 @@ class SimEnv(gym.Env):
 
         #  Define Action Space
         self.action_constraints = {
-            'action1': {'low': -0.1, 'high': 0.1},
-            'action2': {'low': -0.5, 'high': 0.5},
+            'action1': {'low': -1e3, 'high': 1e3}
         }
 
         low_act_list = [x['low'] for x in self.action_constraints.values()]
@@ -38,9 +36,13 @@ class SimEnv(gym.Env):
         self.action_space = gym.spaces.Box(low=np.array(low_act_list), high=np.array(high_act_list))
 
         self.scenario: Scenario = None
+        print(type(self.observation_space))
 
     def reset(self):
+        #initial values
         self.cnt = 0
+        self.value = 0
+
         """
         ****** Define scenario in the simulation ******
         """
@@ -49,14 +51,12 @@ class SimEnv(gym.Env):
 
             self.obs = {
                 'state1': sample["state1"],
-                'state2': sample["state2"],
-                'state3': sample["state3"]
+                'time_counter': self.cnt,
                 }
         else:
             self.obs = {
-                'state1': random.uniform(self.obs_space_constraints['state1']['low'], self.obs_space_constraints['state1']['high']),
-                'state2': random.uniform(self.obs_space_constraints['state2']['low'], self.obs_space_constraints['state2']['high']),
-                'state3': random.uniform(self.obs_space_constraints['state3']['low'], self.obs_space_constraints['state3']['high'])
+                'state1': self.value,
+                'time_counter': self.cnt
                 }
 
 
@@ -71,21 +71,17 @@ class SimEnv(gym.Env):
         done = False
         #  Increase time counting
         self.cnt += 1
-        
         #  Run Simulation
+        self.value += action[0]
+        
         #  Update obs with new state values (dummy function)
-        self.obs = {}
-        for key in list(self.obs.keys()):
-            self.obs[key] = np.clip(self.obs[key] + action[0] + action[1],
-                                    self.obs_space_constraints[key]['low'],
-                                    self.obs_space_constraints[key]['high'] )
+        self.obs = {
+            'state1': self.value,
+            'time_counter': self.cnt
+        }
 
         #  Reward variable definition
         reward = 0
-
-        #  Define rules to end the simulation
-        if self.cnt == 80:
-            done = True
 
         self.obs = np.array(list(self.obs.values()))
         info = {}
@@ -101,7 +97,7 @@ class ServerImpl(ServerComposabl):
         self.env = SimEnv()
 
     def Make(self, env_id: str) -> EnvSpec:
-        spec = {'id': 'simulation_example', 'max_episode_steps': 80}
+        spec = {'id': 'my_simulator', 'max_episode_steps': 1000}
         return spec
 
     def ObservationSpaceInfo(self) -> gym.Space:
@@ -135,4 +131,14 @@ class ServerImpl(ServerComposabl):
 
     def SetRewardFunc(self, reward_func):
         self.env.set_reward_func(reward_func)
+
+    def SetRenderMode(self, render_mode):
+        self.env.render_mode = render_mode
+
+    def GetRenderMode(self):
+        return self.env.render_mode
+
+    def GetRender(self):
+        return self.env.get_render_frame()
+
 

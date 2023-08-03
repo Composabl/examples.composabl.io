@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "my_agent"
+version = "0.1.0"
+description = ""
+authors = ["Hunter Park <hunter@composabl.ai>"]
+readme = "README.md"
+packages = [{include = "my_agent"}]
+
+[tool.poetry.dependencies]
+python = "~3.8.13"
+composabl = {path = "../../../sdk.composabl.ai/composabl", develop = true}
+composabl-core = {path = "../../../sdk.composabl.ai/composabl_core", develop = true}
+composabl-ray = {path = "../../../sdk.composabl.ai/composabl_ray", develop = true}
+
+torch = "2.0.0" # Latest version (2.0.1) has an issue with cuda installation (https://github.com/pytorch/pytorch/issues/100974)
+
+[tool.poetry.scripts]
+main = "my_agent.main:start"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
