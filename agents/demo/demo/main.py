@@ -1,8 +1,10 @@
-from composabl.core import Agent, Skill, Sensor, Scenario
 from composabl.ray import Runtime
-#from .teaching import LandTeacher, MoveToCenterTeacher, SelectorTeacher, StabilizeTeacher
 
-from composabl_core.agent import Teacher
+# from composabl.core import Agent, Skill, Sensor, Scenario, Teacher
+
+from composabl import Agent, Skill, Sensor, Scenario, Teacher
+
+# from composabl.core.agent import Teacher
 
 
 class ReachTeacher(Teacher):
@@ -18,7 +20,7 @@ class ReachTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return ['state1', 'time_counter']
+        return ["state1", "time_counter"]
 
     def compute_reward(self, transformed_obs, action):
         print(transformed_obs)
@@ -41,31 +43,22 @@ class ReachTeacher(Teacher):
         return False
 
 
-#LICENSE_KEY = os.environ.get("LICENSE_KEY", None)
+# LICENSE_KEY = os.environ.get("LICENSE_KEY", None)
 
 
 def start():
     # Observation Space
     # The state is an 8-dimensional vector: the coordinates of the lander in `x` & `y`, its linear
-    
-    state1 = Sensor("state1", "dummy variable taht accumulate action value")
+
+    state1 = Sensor("state1", "dummy variable that accumulates an action value")
     time_counter = Sensor("time_counter", "")
 
     sensors = [state1, time_counter]
 
     reach_scenarios = [
-        {
-            state1: 0,
-            time_counter: 0
-        },
-        {
-            state1: -100,
-            time_counter: 0
-        },
-        {
-            state1: 100,
-            time_counter: 0
-        },
+        {state1: 0, time_counter: 0},
+        {state1: -100, time_counter: 0},
+        {state1: 100, time_counter: 0},
     ]
 
     reach_skill = Skill("reach", ReachTeacher, trainable=True)
@@ -83,7 +76,7 @@ def start():
                 # "image": "composabl/sim-lunar-lander:latest"
             },
         },
-        "license": "GWLZ5B-JB4X03-KB65G6-XGK84T-OZAPVZ",
+        "license": "",
         "training": {},
     }
     runtime = Runtime(config)
@@ -91,5 +84,5 @@ def start():
     agent.add_sensors(sensors)
 
     agent.add_skill(reach_skill)
-    #agent.add_selector_skill(selector_skill, [stabilize_skill, move_to_center_skill, land_skill], fixed_order=True, repeat=False)
+    # agent.add_selector_skill(selector_skill, [stabilize_skill, move_to_center_skill, land_skill], fixed_order=True, repeat=False)
     agent.train(train_iters=5)
