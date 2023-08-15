@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "agents"
+version = "0.1.0"
+description = ""
+authors = ["Octavio Santiaog <octavio@composabl.io>"]
+readme = "README.md"
+packages = [{include = "train_agent"}]
+
+[tool.poetry.dependencies]
+python = "~3.8.13"
+torch = "2.0.0" # Latest version (2.0.1) has an issue with cuda installation (https://github.com/pytorch/pytorch/issues/100974)
+composabl-dev = "^0.4.3.dev5"
+
+[tool.poetry.scripts]
+main = "train_agent.main:start"
+starship = "train_agent.main_starship:start"
+filament_extruder = "train_agent.main_filament_extruder:start"
+cstr = "train_agent.main_cstr:start"
+ddm = "train_agent.main_ddm:start"
+airplane = "train_agent.main_airplane:start"
+inventory = "train_agent.main_inventory:start"
+boiler = "train_agent.main_boiler:start"
+maintenance = "train_agent.main_maintenance:start"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
