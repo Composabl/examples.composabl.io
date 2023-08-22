@@ -75,6 +75,6 @@ def start():
     agent.add_skill(ss1_skill)
     agent.add_skill(ss2_skill)
     agent.add_skill(transition_skill)
-    agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, repeat=False)
+    agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
     agent.train(train_iters=3)

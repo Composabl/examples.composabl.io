@@ -9,7 +9,7 @@ packages = [{include = "train_agent"}]
 [tool.poetry.dependencies]
 python = "~3.8.13"
 torch = "2.0.0" # Latest version (2.0.1) has an issue with cuda installation (https://github.com/pytorch/pytorch/issues/100974)
-composabl-dev = "^0.4.3.dev5"
+composabl-dev = "0.4.5.dev1"
 
 [tool.poetry.scripts]
 main = "train_agent.main:start"
