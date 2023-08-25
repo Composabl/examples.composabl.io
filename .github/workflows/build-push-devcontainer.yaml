@@ -25,6 +25,11 @@ on:
       - v*
     paths:
       - docker/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - docker/**
 
 env:
   IMAGE_NAME: "devcontainer"
