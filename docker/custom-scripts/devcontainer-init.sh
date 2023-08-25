@@ -53,4 +53,5 @@ else
     exec /usr/local/share/docker-init.sh "$@"
 fi
 
-# TODO: Do we want to install composabl here?
+echo "Upgrading our Python Packages"
+pip install composabl --upgrade
