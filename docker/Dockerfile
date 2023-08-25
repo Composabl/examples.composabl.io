@@ -47,6 +47,9 @@ RUN apt-get update \
     && echo "Installing Python Tools" \
     && bash /tmp/staging/python-debian.sh "none" "/usr/local" "${PIPX_HOME}" "${USERNAME}" \
     #
+    && echo "Installing Python Dependencies" \
+    && bash /tmp/staging/python-dependencies.sh \
+    #
     # Copy our init scripts to /usr/local/share.
     && mv -f -t /usr/local/share/ /tmp/staging/docker-bind-mount.sh /tmp/staging/devcontainer-init.sh /tmp/staging/setup-docker-multiarch.sh \
     && chmod +x /usr/local/share/docker-bind-mount.sh /usr/local/share/devcontainer-init.sh  /usr/local/share/setup-docker-multiarch.sh \
