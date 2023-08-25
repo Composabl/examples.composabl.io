@@ -6,16 +6,16 @@
   // https://containers.dev/features
   // https://code.visualstudio.com/blogs/2022/09/15/dev-container-features#_adding-features-to-your-dev-container
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/devcontainers/features/sshd:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/azure-cli:1": {},
-    "ghcr.io/devcontainers/features/anaconda:1": {},
-    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
-    "ghcr.io/devcontainers/features/nvidia-cuda:1": {},
-    "ghcr.io/devcontainers/features/python:1": {
-      "installJupyterlab": true
-    }
+    // "ghcr.io/devcontainers/features/common-utils:2": {},
+    // "ghcr.io/devcontainers/features/sshd:1": {},
+    // "ghcr.io/devcontainers/features/github-cli:1": {},
+    // "ghcr.io/devcontainers/features/azure-cli:1": {},
+    // "ghcr.io/devcontainers/features/anaconda:1": {},
+    // "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+    // "ghcr.io/devcontainers/features/nvidia-cuda:1": {},
+    // "ghcr.io/devcontainers/features/python:1": {
+    //   "installJupyterlab": true
+    // }
   },
   "forwardPorts": [
     8265, // Ray
