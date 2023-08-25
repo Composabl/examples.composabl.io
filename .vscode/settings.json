@@ -1,6 +1,28 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=100",
+
+    // E203: whitespace before ':'
+    // E501: line too long
+    // W503: line break before binary operator
+    "--ignore=E203,E501,W503"
+  ],
+  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.autoImportCompletions": true,
+  "editor.rulers": [100],
+  "editor.tabSize": 4,
+
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.python"
   },
   "python.formatting.provider": "none"
 }

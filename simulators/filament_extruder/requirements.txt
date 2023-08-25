@@ -1,0 +1,5 @@
+composabl-core==0.3.6
+scipy
+casadi==3.5.5
+control==0.9.4
+pandas

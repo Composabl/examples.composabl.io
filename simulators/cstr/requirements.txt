@@ -1,0 +1,2 @@
+composabl-core==0.3.6
+scipy

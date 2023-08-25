@@ -1,0 +1,17 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: historian
+  namespace: default
+spec:
+  type: pubsub.mqtt
+  version: v1
+  metadata:
+  - name: url
+    value: "tcp://admin:admin@localhost:1883"
+  - name: qos
+    value: 0
+  - name: cleanSession
+    value: "true"
+  - name: backOffMaxRetries
+    value: "0"
