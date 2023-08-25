@@ -1,0 +1,71 @@
+{
+  "name": "Composabl Dev Environment",
+  // "image": "image-url",
+  "dockerFile": "./Dockerfile",
+  "containerEnv": {},
+  // https://containers.dev/features
+  // https://code.visualstudio.com/blogs/2022/09/15/dev-container-features#_adding-features-to-your-dev-container
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/sshd:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/anaconda:1": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
+    "ghcr.io/devcontainers/features/nvidia-cuda:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "installJupyterlab": true
+    }
+  },
+  "mounts": [
+    // Mount docker-in-docker library volume
+    "type=volume,source=dind-var-lib-docker,target=/var/lib/docker",
+
+    // Bind mount docker socket under an alias to support docker-from-docker
+    "type=bind,source=/var/run/docker.sock,target=/var/run/docker-host.sock"
+
+    // Uncomment to clone local .kube/config into devcontainer
+    // "type=bind,source=${env:HOME}${env:USERPROFILE}/.kube,target=/home/dapr/.kube-localhost",
+
+    // Uncomment to additionally clone minikube certs into devcontainer for use with .kube/config
+    // "type=bind,source=${env:HOME}${env:USERPROFILE}/.minikube,target=/home/dapr/.minikube-localhost"
+  ],
+  // Always run image-defined default command
+  "overrideCommand": false,
+  // On Linux, this will prevent new files getting created as root, but you
+  // may need to update the USER_UID and USER_GID in docker/Dockerfile-dev
+  // to match your user if not 1000.
+  "remoteUser": "composabl",
+  "runArgs": [
+    // Enable ptrace-based debugging for go
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined",
+
+    // Uncomment to bind to host network for local devcontainer; this is necessary if using the
+    // bind-mounted /var/run/docker-host.sock directly.
+    // "--net=host",
+
+    // Enable docker-in-docker configuration. Comment out if not using for better security.
+    "--privileged",
+
+    // Run the entrypoint defined in container image.
+    "--init"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "davidanson.vscode-markdownlint",
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-python.python"
+      ],
+      "settings": {
+        "git.alwaysSignOff": true,
+        "terminal.integrated.env.linux": {}
+      }
+    }
+  },
+  "workspaceFolder": "/workspaces/composabl",
+  "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspaces/composabl"
+}
