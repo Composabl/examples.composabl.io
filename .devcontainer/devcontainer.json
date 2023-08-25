@@ -1,7 +1,7 @@
 {
   "name": "Composabl Dev Environment",
-  // "image": "image-url",
-  "dockerFile": "./Dockerfile",
+  "image": "composabl/devcontainer:latest",
+  //   "dockerFile": "./Dockerfile",
   "containerEnv": {},
   // https://containers.dev/features
   // https://code.visualstudio.com/blogs/2022/09/15/dev-container-features#_adding-features-to-your-dev-container
