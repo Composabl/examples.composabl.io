@@ -17,6 +17,12 @@
       "installJupyterlab": true
     }
   },
+  "forwardPorts": [
+    8265, // Ray
+    8888, // JupyterLab
+    6006, // Tensorboard
+    5432 // TimescaleDB
+  ],
   "mounts": [
     // Mount docker-in-docker library volume
     "type=volume,source=dind-var-lib-docker,target=/var/lib/docker",
