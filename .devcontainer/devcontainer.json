@@ -1,6 +1,10 @@
 {
   "name": "Composabl Dev Environment",
   "image": "composabl/devcontainer:latest",
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": 16384
+  },
   //   "dockerFile": "./Dockerfile",
   "containerEnv": {},
   // https://containers.dev/features
