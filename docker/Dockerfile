@@ -29,7 +29,7 @@ COPY library-scripts/* custom-scripts/* first-run-notice.txt /tmp/staging/
 
 RUN apt-get update \
     #
-    && echo "Configuring noninteractive mode" \
+    && echo "Configuring non interactive mode" \
     && export DEBIAN_FRONTEND=noninteractive \
     #
     && echo "Installing needed packages and setup the environment and non-root user" \
