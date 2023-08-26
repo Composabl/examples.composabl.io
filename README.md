@@ -17,10 +17,13 @@ You can get started with an example by following the commands below:
 composabl historian start
 
 # Start a sim
-composabl sim start sim-demo
+# e.g., composabl sim start sim-demo
+composabl sim start sim-NAME
 
 # Train an agent
-python agents/demo/demo/main.py
+# e.g., poetry run demo
+cd agents/
+poetry run AGENT_NAME
 ```
 
 ## Codespaces (Devcontainer)

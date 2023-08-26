@@ -3,14 +3,23 @@
 In this folder you can find all the different example agents we support:
 
 - **Airplane:** Learn how to implement an autopilot on an airplane
+  - `composabl sim start sim-airplane`
 - **Boiler:**
+  - `composabl sim start sim-boiler`
 - **CSTR:**
+  - `composabl sim start sim-cstr`
 - **Demo:**
+  - `composabl sim start sim-demo`
 - **Filament Extruder:**
+  - `composabl sim start sim-filament-extruder`
 - **Inventory:**
+  - `composabl sim start sim-inventory`
 - **Lunar Lander:**
+  - `composabl sim start sim-lunar-lander`
 - **Maintenance:**
+  - `composabl sim start sim-maintenance`
 - **Starship:**
+  - `composabl sim start sim-starship`
 
 ## Prerequisites
 
