@@ -1,0 +1,17 @@
+#!/bin/bash
+/usr/bin/screenfetch
+echo ""
+echo "===================================================================="
+echo "          ____                                      _     _"
+echo "         / ___|___  _ __ ___  _ __   ___  ___  __ _| |__ | |"
+echo "        | |   / _ \| '_ ` _ \| '_ \ / _ \/ __|/ _` | '_ \| |"
+echo "        | |__| (_) | | | | | | |_) | (_) \__ \ (_| | |_) | |"
+echo "         \____\___/|_| |_| |_| .__/ \___/|___/\__,_|_.__/|_|"
+echo "                             |_|"
+echo "===================================================================="
+echo ""
+echo "👋 Welcome to the Composabl dev container! You are on our Demo image."
+echo "It includes everything to provide demonstrations around the Composabl SDK."
+echo ""
+echo "🎓 If you are looking to run the Composabl quickstarts and tutorials, head over to"
+echo "https://github.com/Composabl/examples.composabl.io instead."
