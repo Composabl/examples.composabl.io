@@ -50,3 +50,11 @@ wsl --unregister Composabl
 ```
 
 > More info: https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro
+
+### Creating
+
+We can easily unregister and import through the following:
+
+```bash
+wsl --unregister Composabl; wsl --import Composabl E:\wsl-composabl .\composabl.tar; wsl -d Composabl
+```

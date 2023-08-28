@@ -7,9 +7,24 @@ packer {
   }
 }
 
+locals {
+  image_folder            = "/packer"
+  helper_script_folder    = "/packer/helpers"
+  installer_script_folder = "/packer/installers"
+  imagedata_file          = "/packer/imagedata.json"
+}
+
+variables {
+    ssh_username = "composabl"
+    ssh_password = "composabl"
+
+    version_nvm = "0.39.5"
+    version_python = "3.8.17"
+}
+
 
 source "docker" "ubuntu" {
-    image = "python:3.8-bullseye"
+    image = "ubuntu:22.04"
     export_path = "composabl.tar" # This is the path where the image will be exported as a tar file
 }
 
@@ -18,105 +33,93 @@ build {
         "source.docker.ubuntu"
     ]
 
-    // Update Sources
+    // Add base packages
     provisioner "shell" {
-        inline = [
-            "apt-get update"
-        ]
+        script          = "${path.root}/scripts/base/apt.sh"
     }
 
-    // Make the Docker Image suitable for WSL Usage
+    // Configure User and set is as the active user
     provisioner "shell" {
-        inline = [
-            // Install required applications
-            "apt-get install -y iputils-ping iproute2 curl wget vim passwd sudo apt-transport-https ca-certificates software-properties-common",
-
-            // Add the 'composabl' user and add it to the sudoers group
-            "useradd -m composabl",
-            "echo \"composabl\" ALL=(ALL) NOPASSWD:ALL >> /etc/sudoers",
-
-            // Add WSL Settings to change the mount point and default user
-            "echo \"[user]\ndefault=composabl\" >> /etc/wsl.conf",
-        ]
+        environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}", "SSH_USER=${var.ssh_username}"]
+        script          = "${path.root}/scripts/base/configure-user.sh"
     }
 
-
-
-    // Install screenfetch
+    // Create a folder to store temporary data
     provisioner "shell" {
-        inline = [
-            "apt-get update",
-            "apt-get install -y screenfetch"
-        ]
+        inline          = ["mkdir ${local.image_folder}", "chmod 777 ${local.image_folder}"]
     }
 
-    // Create a script /etc/updated-motd.d/01-custom that runs screenfetch and add +x permissions
+    // Configure limits
+    provisioner "shell" {
+        script          = "${path.root}/scripts/base/limits.sh"
+    }
+
+    // Configure Environment
+    provisioner "shell" {
+        environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}"]
+        script           = "${path.root}/scripts/base/configure-environment.sh"
+    }
+
+    // Install helpers and installer scripts
     provisioner "file" {
-        source      = "./scripts/motd.sh"
-        destination = "/etc/update-motd.d/01-custom"
+        destination = "${local.helper_script_folder}"
+        source      = "${path.root}/scripts/helpers"
     }
 
+    provisioner "file" {
+        destination = "${local.installer_script_folder}"
+        source      = "${path.root}/scripts/installers"
+    }
+
+    // Run installers (as root)
     provisioner "shell" {
-        inline = [
-            "chmod +x /etc/update-motd.d/01-custom"
+        execute_command = "sudo sh -c '{{ .Vars }} {{ .Path }}'" // Switch to the sudo user
+        environment_vars = [
+            "DEBIAN_FRONTEND=noninteractive",
+            "HELPER_SCRIPTS=${local.helper_script_folder}",
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
+        ]
+        scripts         = [
+            "${path.root}/scripts/installers/root/wsl.sh",
+            "${path.root}/scripts/installers/root/motd.sh",
+            "${path.root}/scripts/installers/root/docker.sh",
+            "${path.root}/scripts/installers/root/kubernetes-tools.sh",
         ]
     }
 
-    // Install docker
+    // Run installers (as user)
     provisioner "shell" {
-        inline = [
-            "apt-get update",
-            "apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common",
-            "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
-            "add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
-            "apt-get update",
-            "apt-get install -y docker-ce docker-ce-cli containerd.io"
+        execute_command = "sudo -u ${var.ssh_username} sh -c '{{ .Vars }} {{ .Path }}'" // Switch to the sudo user
+        environment_vars = [
+            "DEBIAN_FRONTEND=noninteractive",
+            "HELPER_SCRIPTS=${local.helper_script_folder}",
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
+            "VERSION_PYTHON=${var.version_python}",
+        ]
+        scripts         = [
+            "${path.root}/scripts/installers/user/zsh.sh",
+            "${path.root}/scripts/installers/user/pyenv.sh",
+            "${path.root}/scripts/installers/user/python-packages.sh",
         ]
     }
 
-    // Install composabl as a pip library
-    provisioner "shell" {
-        inline = [
-            "pip3 install composabl"
-        ]
-    }
+    // // Install docker
+    // provisioner "shell" {
+    //     execute_command = "sudo sh -c '{{ .Vars }} {{ .Path }}'" // Switch to the sudo user
+    //     inline = [
+    //         "apt-get update",
+    //         "apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common",
+    //         "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+    //         "add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+    //         "apt-get update",
+    //         "apt-get install -y docker-ce docker-ce-cli containerd.io"
+    //     ]
+    // }
 
-
-
-//   // Create a MOTD from the ./first-run-notice.txt file
-//     provisioner "file" {
-//         source      = "./first-run-notice.txt"
-//         destination = "/etc/motd"
-//     }
-
-//   provisioner "shell" {
-//     inline = [
-//       "sudo apt-get update",
-//       "sudo apt-get install -y python3-pip git"
-//     ]
-//   }
-
-//   provisioner "shell" {
-//     inline = [
-//       "pip3 install pyenv",
-//       "pyenv install 3.8.0",
-//       "pyenv global 3.8.0"
-//     ]
-//   }
-
-//   provisioner "shell" {
-//     inline = [
-//       "sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common",
-//       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
-//       "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
-//       "sudo apt-get update",
-//       "sudo apt-get install -y docker-ce docker-ce-cli containerd.io"
-//     ]
-//   }
-
-//   provisioner "shell" {
-//     inline = [
-//       "sudo tar -C / -cvf /composabl.tar --exclude=/composabl.tar ."
-//     ]
-//   }
+    // // Install composabl as a pip library
+    // provisioner "shell" {
+    //     inline = [
+    //         "pip install composabl"
+    //     ]
+    // }
 }
