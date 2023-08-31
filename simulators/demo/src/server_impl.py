@@ -17,7 +17,7 @@ class ServerImpl(ServerComposabl):
     def __init__(self):
         self.env = SimEnv()
 
-    def Make(self, env_id: str) -> EnvSpec:
+    def Make(self, env_id: str, env_init: dict) -> EnvSpec:
         return {
             "id": "my_simulator",
             "max_episode_steps": 1000

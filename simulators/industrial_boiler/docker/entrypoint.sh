@@ -45,8 +45,6 @@ is_set() {
 IS_DEBUG=$(to_boolean "$IS_DEBUG")
 IS_HISTORIAN_ENABLED=$(is_set "$HISTORIAN_MONIKER_MQTT")
 
-echo "is set? $IS_HISTORIAN_ENABLED"
-
 # Generate SIM ID
 SIM_ID=${SIM_ID:-"sim-$(uuidgen)"}
 APP_NAME=$SIM_ID

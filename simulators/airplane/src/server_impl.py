@@ -16,7 +16,7 @@ class ServerImpl(ServerComposabl):
     def __init__(self):
         self.env = AirplaneEnv()
 
-    def Make(self, env_id: str) -> EnvSpec:
+    def Make(self, env_id: str, env_init: dict) -> EnvSpec:
         spec = {'id': 'airplane', 'max_episode_steps': 20}
         return spec
 

@@ -16,7 +16,7 @@ class ServerImpl(ServerComposabl):
     def __init__(self):
         self.env = Env()
 
-    def Make(self, env_id: str) -> EnvSpec:
+    def Make(self, env_id: str, env_init: dict) -> EnvSpec:
         spec = {'id': 'inventory_management', 'max_episode_steps': 1000}
         return spec
 
