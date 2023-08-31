@@ -1,5 +1,6 @@
 ######################################################
-# Composabl Sim Dockerfile - Version 1.0.0
+# Composabl Sim Dockerfile - Version 1.1.0
+# IMPORTANT: This has `build-essential g++ swig` added on apt install
 ######################################################
 # Build stage
 FROM python:3.8-slim
@@ -10,20 +11,7 @@ WORKDIR /app
 # Install system dependencies for protobuf
 RUN apt-get update \
     && apt-get install --yes protobuf-compiler wget curl gettext-base uuid-runtime \
-    build-essential g++ swig
-
-######################################################
-# Install Dapr
-# note: this adds 258MB to the image size
-######################################################
-# Install dapr CLI
-RUN wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
-
-# Install daprd to /opt/dapr
-# ARG DAPR_BUILD_DIR
-# COPY $DAPR_BUILD_DIR /opt/dapr
-# ENV PATH="/opt/dapr/:${PATH}"
-RUN dapr init --slim
+       build-essential g++ swig
 
 ######################################################
 # Install Python Dependencies
