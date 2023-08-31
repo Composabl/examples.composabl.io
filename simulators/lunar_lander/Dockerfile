@@ -1,5 +1,6 @@
 ######################################################
 # Composabl Sim Dockerfile - Version 1.1.0
+# IMPORTANT: This has `build-essential g++ swig` added on apt install
 ######################################################
 # Build stage
 FROM python:3.8-slim
@@ -9,7 +10,8 @@ WORKDIR /app
 
 # Install system dependencies for protobuf
 RUN apt-get update \
-    && apt-get install --yes protobuf-compiler wget curl gettext-base uuid-runtime
+    && apt-get install --yes protobuf-compiler wget curl gettext-base uuid-runtime \
+       build-essential g++ swig
 
 ######################################################
 # Install Python Dependencies
