@@ -7,11 +7,11 @@ echo "Installing zsh..."
 sudo apt-get install -y zsh
 sudo chsh -s /bin/zsh $SSH_USER
 
-# Install Oh-My-Zsh and enable the "agnoster" theme
+# Install Oh-My-Zsh and enable the "gnzh" theme
 echo "Installing Oh-My-Zsh..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # cp /root/.zshrc /home/$SSH_USER/.zshrc
-sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"agnoster\"/g' /home/$SSH_USER/.zshrc
+sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"gnzh\"/g' /home/$SSH_USER/.zshrc
 
 # Add Autosuggestions and Syntax Highlighting
 echo "Installing zsh plugins..."

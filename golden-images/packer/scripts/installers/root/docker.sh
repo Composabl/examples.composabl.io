@@ -25,3 +25,6 @@ chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
 # Enable docker.service
 systemctl is-enabled --quiet docker.service || systemctl enable docker.service
+
+# Allow docker access without sudo
+usermod -aG docker $SSH_USER

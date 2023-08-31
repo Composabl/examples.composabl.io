@@ -18,26 +18,31 @@ libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
 
 # Install PyEnv to /home/$SSH_USER/.pyenv
 # https://github.com/pyenv/pyenv-installer/blob/master/bin/pyenv-installer
-# export PYENV_ROOT=/home/${SSH_USER}/.pyenv
+export PYENV_ROOT=/home/${SSH_USER}/.pyenv
+
 curl https://pyenv.run | bash
 
 # Add pyenv to PATH and declare the PYENV_ROOT variable
 setEtcEnvironmentVariable "PYENV_ROOT" $PYENV_ROOT
-prependEtcEnvironmentPath '$PYENV_ROOT/bin:$PYENV_ROOT/shims'
+prependEtcEnvironmentPath "$PYENV_ROOT/bin:$PYENV_ROOT/shims"
 reloadEtcEnvironment
 
-# Add eval "$(pyenv init -)" to shell profile
-# so that pyenv will be loaded automatically
-echo 'eval "$(pyenv init -)"' | tee -a /etc/profile.d/pyenv.sh
+# Configure the shell environment
+cat << 'EOF' > "$HOME"/.pyenvrc
+export PATH="$HOME"/.pyenv/bin:"$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+EOF
 
-# Reload the shell
-source /etc/profile.d/pyenv.sh
-
-# # Load PyEnv (from absolute path)
-# # this way we can initialize it
-# export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
-# eval "$(pyenv init -)"
+cat << EOF >> "$HOME"/.bash_profile
+if [ -f ~/.pyenvrc ]; then
+        . ~/.pyenvrc
+fi
+EOF
 
 # Install Python versions
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
 pyenv install $VERSION_PYTHON
 pyenv global $VERSION_PYTHON

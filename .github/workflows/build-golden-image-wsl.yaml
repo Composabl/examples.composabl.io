@@ -1,0 +1,52 @@
+#
+# Copyright 2023 Composabl
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: 🪙 Golden Image - WSL
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PACKER_PATH: ./golden-images/packer/wsl.pkr.hcl
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: 🏗️ Set up Packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          packer_version: latest
+
+      - name: Packer Init
+        run: packer init ${{ env.PACKER_PATH }}
+
+      # Build the packer image, this outputs as export_path = `composabl.tar`
+      - name: 🛠️ Packer Build
+        run: packer build -color=false -on-error=abort ${{ env.PACKER_PATH }}
+
+      - name: 🚀 Upload Packer Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: composabl-wsl.tar
+          path: composabl.tar
