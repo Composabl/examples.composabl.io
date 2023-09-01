@@ -10,6 +10,6 @@ TZ=America/Los_Angeles
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install base packages
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common git curl sudo jq tzdata vim nano language-pack-en
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common git curl sudo jq tzdata vim nano language-pack-en wget
 apt-get -yq dist-upgrade
 update-locale
