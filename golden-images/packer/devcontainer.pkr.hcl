@@ -25,6 +25,7 @@ variables {
 
 source "docker" "ubuntu" {
     image = "ubuntu:22.04"
+    commit = true
     // export_path = "composabl.tar" # This is the path where the image will be exported as a tar file
 }
 
