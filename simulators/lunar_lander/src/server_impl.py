@@ -739,7 +739,7 @@ class ServerImpl(ServerComposabl):
     def __init__(self):
         self.env = LunarLander()
 
-    def Make(self, env_id: str) -> EnvSpec:
+    def Make(self, env_id: str, env_init: dict) -> EnvSpec:
         spec = {'id': 'lunar_lander', 'max_episode_steps': 90}
         return spec
 

@@ -45,8 +45,6 @@ is_set() {
 IS_DEBUG=$(to_boolean "$IS_DEBUG")
 IS_HISTORIAN_ENABLED=$(is_set "$HISTORIAN_MONIKER_MQTT")
 
-echo "is set? $IS_HISTORIAN_ENABLED"
-
 # Generate SIM ID
 SIM_ID=${SIM_ID:-"sim-$(uuidgen)"}
 APP_NAME=$SIM_ID
@@ -56,6 +54,7 @@ HISTORIAN_MONIKER_MQTT_CONSUMER_ID=$SIM_ID
 echo "- SIM_ID: $SIM_ID"
 echo "- MODE: $MODE"
 echo "- IS_HISTORIAN_ENABLED: $IS_HISTORIAN_ENABLED"
+echo "- V_COMPOSABL_CORE: $(pip show "composabl-core-dev" | grep '^Version:' | awk '{print $2}')"
 echo "- V_COMPOSABL_SIM: $V_COMPOSABL_SIM"
 echo "- APP_NAME: $APP_NAME"
 echo "- APP_PATH: $APP_PATH"

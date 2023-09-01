@@ -1,2 +1,2 @@
-composabl-core-dev==0.4.6.dev6
+composabl-core-dev==0.4.6.dev10
 gymnasium[box2d]==0.26.3
