@@ -13,4 +13,4 @@ pip install --upgrade pip
 pip install --upgrade composabl
 
 # Install the composabl examples repo
-git clone https://github.com/Composabl/examples.composabl.io.git
+git clone https://github.com/Composabl/examples.composabl.io.git /home/${SSH_USER}/examples.composabl.io

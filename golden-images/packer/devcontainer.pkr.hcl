@@ -80,7 +80,7 @@ build {
             "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
         ]
         scripts         = [
-            "${path.root}/scripts/installers/root/wsl.sh",
+            // "${path.root}/scripts/installers/root/wsl.sh",
             "${path.root}/scripts/installers/root/motd.sh",
             "${path.root}/scripts/installers/root/docker.sh",
             "${path.root}/scripts/installers/root/kubernetes-tools.sh",
@@ -106,12 +106,12 @@ build {
 
     post-processors {
         post-processor "docker-tag" {
-            repository = "composabl/golden-image-wsl"
+            repository = "composabl/golden-image-devcontainer"
             tags       = ["latest"]
         }
 
         post-processor "docker-tag" {
-            repository = "ghcr.io/composabl/golden-image-wsl"
+            repository = "ghcr.io/composabl/golden-image-devcontainer"
             tags       = ["latest"]
         }
 
