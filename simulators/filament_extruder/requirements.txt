@@ -1,4 +1,4 @@
-composabl-core-dev==0.4.6.dev8
+composabl-core-dev==0.4.6.dev10
 scipy
 casadi==3.5.5
 control==0.9.4
