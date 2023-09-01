@@ -76,3 +76,6 @@ jobs:
       # Build the packer image, this will upload to Docker Hub as well
       - name: 🛠️ Packer Build
         run: packer build -color=false -on-error=abort ${{ env.PACKER_PATH }}
+        env:
+          docker_username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          docker_password: ${{ secrets.DOCKER_HUB_PASSWORD }}

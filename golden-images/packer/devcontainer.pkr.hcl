@@ -22,6 +22,15 @@ variables {
     version_python = "3.8.17"
 }
 
+variable "docker_username" {
+  type        = string
+  description = "The username to access Docker HUB to push images."
+}
+
+variable "docker_password" {
+  type        = string
+  description = "The password to access Docker HUB to push images."
+}
 
 source "docker" "ubuntu" {
     image = "ubuntu:22.04"
@@ -116,6 +125,10 @@ build {
         //     tags       = ["latest"]
         // }
 
-        post-processor "docker-push" {}
+
+        post-processor "docker-push" {
+            login_username = "${var.DOCKER_HUB_USERNAME}"
+            login_password = "${var.DOCKER_HUB_PASSWORD}"
+        }
     }
 }
