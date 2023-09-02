@@ -18,9 +18,6 @@ on:
   # Run weekly on Mondays
   # schedule:
   #   - cron: "0 0 * * 1"
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
@@ -53,25 +50,6 @@ jobs:
 
       - name: ⚙️ Packer Init
         run: packer init ${{ env.PACKER_PATH }}
-
-      # - name: 🚀 Upload Packer Artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: composabl-wsl.tar
-      #     path: composabl.tar
-
-      - name: 🔑 Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🔑 Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       # Build the packer image, this will upload to Docker Hub as well
       - name: 🛠️ Packer Build

@@ -114,11 +114,6 @@ build {
             tags       = ["latest"]
         }
 
-        // post-processor "docker-tag" {
-        //     repository = "ghcr.io/composabl/golden-image-wsl"
-        //     tags       = ["latest"]
-        // }
-
         post-processor "docker-push" {
             login = true
             login_username = "${var.docker_username}"
