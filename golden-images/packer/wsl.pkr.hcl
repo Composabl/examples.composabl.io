@@ -21,6 +21,7 @@ variables {
     version_nvm = "0.39.5"
     version_python = "3.8.17"
 
+    docker_repository = ""
     docker_username = ""
     docker_password = ""
 }
@@ -109,7 +110,7 @@ build {
 
     post-processors {
         post-processor "docker-tag" {
-            repository = "composabl/golden-image-wsl"
+            repository = "${var.docker_repository}"
             tags       = ["latest"]
         }
 
@@ -119,8 +120,10 @@ build {
         // }
 
         post-processor "docker-push" {
+            login = true
             login_username = "${var.docker_username}"
             login_password = "${var.docker_password}"
+            login_server = "docker.io"
         }
     }
 }

@@ -79,10 +79,12 @@ jobs:
           packer build \
             -color=false \
             -on-error=abort \
+            -var docker_repository=$docker_repository \
             -var docker_username=$docker_username \
             -var docker_password=$docker_password \
             ${{ env.PACKER_PATH }}
         # https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#environment-variables
         env:
+          docker_repository: composabl/golden-image-devcontainer
           docker_username: ${{ secrets.DOCKER_HUB_USERNAME }}
           docker_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
