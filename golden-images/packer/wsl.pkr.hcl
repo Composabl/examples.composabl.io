@@ -20,16 +20,9 @@ variables {
 
     version_nvm = "0.39.5"
     version_python = "3.8.17"
-}
 
-variable "docker_username" {
-  type        = string
-  description = "The username to access Docker HUB to push images."
-}
-
-variable "docker_password" {
-  type        = string
-  description = "The password to access Docker HUB to push images."
+    docker_username = ""
+    docker_password = ""
 }
 
 source "docker" "ubuntu" {
@@ -126,8 +119,8 @@ build {
         // }
 
         post-processor "docker-push" {
-            login_username = "${var.DOCKER_HUB_USERNAME}"
-            login_password = "${var.DOCKER_HUB_PASSWORD}"
+            login_username = "${var.docker_username}"
+            login_password = "${var.docker_password}"
         }
     }
 }
