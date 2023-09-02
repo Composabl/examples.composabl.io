@@ -3,10 +3,7 @@
 ##  File:  bashrc.sh
 ##  Desc:  Configure bashrc for on-boot behavior
 ################################################################################
-# Enable MOTD
-echo "run-parts /etc/update-motd.d" >> /home/${SSH_USER}/.zshrc
-echo "run-parts /etc/update-motd.d" >> /home/${SSH_USER}/.bashrc
-
+# Enable Custom MOTD
 echo "cat /etc/update-motd.d/01-custom.txt" >> /home/${SSH_USER}/.zshrc
 echo "cat /etc/update-motd.d/01-custom.txt" >> /home/${SSH_USER}/.bashrc
 

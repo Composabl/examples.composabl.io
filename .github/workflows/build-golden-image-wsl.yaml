@@ -14,26 +14,33 @@
 name: 🪙 Golden Image - WSL
 
 on:
+  workflow_dispatch:
+  # Run weekly on Mondays
+  # schedule:
+  #   - cron: "0 0 * * 1"
   push:
     branches:
       - main
+    tags:
+      - v*
+    paths:
+      - golden-images/packer/wsl.pkr.hcl
 
 env:
   PACKER_PATH: ./golden-images/packer/wsl.pkr.hcl
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Make extra space on the GitHub runner
+      - name: 🔎 Make extra space on the GitHub runner
         run: |
           df -h
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/hostedtoolcache/boost /opt/hostedtoolcache/swift /opt/hostedtoolcache/go /opt/hostedtoolcache/nuget /opt/hostedtoolcache/Python /opt/hostedtoolcache/Java /opt/hostedtoolcache/ocaml /opt/hostedtoolcache/erlang /opt/hostedtoolcache/elixir /opt/hostedtoolcache/rebar3 /opt/hostedtoolcache/dotnet-sdk
           df -h
 
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v2
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v3
 
       - name: 🏗️ Set up Packer
         uses: hashicorp/setup-packer@main
@@ -41,15 +48,21 @@ jobs:
         with:
           packer_version: latest
 
-      - name: Packer Init
+      - name: ⚙️ Packer Init
         run: packer init ${{ env.PACKER_PATH }}
 
-      # Build the packer image, this outputs as export_path = `composabl.tar`
+      # Build the packer image, this will upload to Docker Hub as well
       - name: 🛠️ Packer Build
-        run: packer build -color=false -on-error=abort ${{ env.PACKER_PATH }}
-
-      - name: 🚀 Upload Packer Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: composabl-wsl.tar
-          path: composabl.tar
+        run: |
+          packer build \
+            -color=false \
+            -on-error=abort \
+            -var docker_repository=$docker_repository \
+            -var docker_username=$docker_username \
+            -var docker_password=$docker_password \
+            ${{ env.PACKER_PATH }}
+        # https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#environment-variables
+        env:
+          docker_repository: composabl/golden-image-wsl
+          docker_username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          docker_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
