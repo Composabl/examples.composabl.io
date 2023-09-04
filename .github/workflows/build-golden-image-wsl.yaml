@@ -74,6 +74,9 @@ jobs:
           curl -L https://aka.ms/downloadazcopy-v10-linux -o azcopy_linux_amd64.tar.gz
           tar -xf azcopy_linux_amd64.tar.gz --strip-components=1
 
+          ls -la
+          ls -la golden-images/packer
+
           ./azcopy --version
 
-          ./azcopy copy ./composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
+          ./azcopy copy ./golden-images/packer/composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
