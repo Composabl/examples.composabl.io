@@ -76,4 +76,4 @@ jobs:
 
           ./azcopy --version
 
-          ./azcopy copy ${{ env.PACKER_PATH }}/composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
+          ./azcopy copy ./composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
