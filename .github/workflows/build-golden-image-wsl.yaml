@@ -69,8 +69,11 @@ jobs:
         #   docker_username: ${{ secrets.DOCKER_HUB_USERNAME }}
         #   docker_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Upload tar (composabl.tar) to CDN (Azure Storage account) with azcopy using the secret CDN_CONNECTION_STRING
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            azcopy copy ${{ env.PACKER_PATH }}/composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
+      - name: Install AZCOPY through CLI (https://aka.ms/downloadazcopy-v10-linux)
+        run: |
+          curl -L https://aka.ms/downloadazcopy-v10-linux -o azcopy_linux_amd64.tar.gz
+          tar -xf azcopy_linux_amd64.tar.gz --strip-components=1
+
+          ./azcopy --version
+
+          ./azcopy copy ${{ env.PACKER_PATH }}/composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
