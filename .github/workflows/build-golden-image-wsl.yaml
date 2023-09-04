@@ -79,4 +79,5 @@ jobs:
 
           ./azcopy --version
 
-          ./azcopy copy ./golden-images/packer/composabl.tar ${{ secrets.CDN_CONNECTION_STRING }}/golden-image-wsl.tar
+
+          ./azcopy copy ./composabl.tar "https://${{ secrets.CDN_SA_NAME }}.blob.core.windows.net/public/golden-image-wsl.tar?${{ secrets.CDN_SA_ACCESS_KEY }} "
