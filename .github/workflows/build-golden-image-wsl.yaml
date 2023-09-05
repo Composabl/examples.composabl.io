@@ -25,11 +25,6 @@ on:
       - v*
     paths:
       - golden-images/packer/wsl.pkr.hcl
-  pull_request:
-    branches:
-      - main
-    paths:
-      - golden-images/packer/wsl.pkr.hcl
 
 env:
   PACKER_PATH: ./golden-images/packer/wsl.pkr.hcl
