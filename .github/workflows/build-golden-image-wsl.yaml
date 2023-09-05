@@ -79,5 +79,5 @@ jobs:
 
           ./azcopy --version
           SAS_TOKEN_EXPIRY=$(date -u -d '+1 hour' +%Y-%m-%dT%H:%M:%SZ)
-          SAS_TOKEN=$(az storage container generate-sas --account-name ${{ secrets.CDN_SA_NAME }} --name public --expiry $SAS_TOKEN_EXPIRY --permissions racwdl --https-only --full-uri --key ${{ secrets.CDN_SA_ACCESS_KEY }})
+          SAS_TOKEN=$(az storage container generate-sas --account-name ${{ secrets.CDN_SA_NAME }} --name public --expiry $SAS_TOKEN_EXPIRY --permissions racwdl --account-key ${{ secrets.CDN_SA_ACCESS_KEY }})
           ./azcopy copy ./composabl.tar "https://${{ secrets.CDN_SA_NAME }}.blob.core.windows.net/public/golden-image-wsl.tar?$SAS_TOKEN"
