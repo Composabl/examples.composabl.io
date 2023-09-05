@@ -20,16 +20,13 @@ variables {
 
     version_nvm = "0.39.5"
     version_python = "3.8.17"
-
-    docker_repository = ""
-    docker_username = ""
-    docker_password = ""
 }
 
 source "docker" "ubuntu" {
     image = "ubuntu:22.04"
-    commit = true
-    // export_path = "composabl.tar" # This is the path where the image will be exported as a tar file
+
+    # Also export as tar
+    export_path = "composabl.tar"
 }
 
 build {
@@ -106,19 +103,5 @@ build {
             "${path.root}/scripts/installers/user/composabl.sh",
             "${path.root}/scripts/installers/user/bashrc.sh",
         ]
-    }
-
-    post-processors {
-        post-processor "docker-tag" {
-            repository = "${var.docker_repository}"
-            tags       = ["latest"]
-        }
-
-        post-processor "docker-push" {
-            login = true
-            login_username = "${var.docker_username}"
-            login_password = "${var.docker_password}"
-            login_server = "docker.io"
-        }
     }
 }
