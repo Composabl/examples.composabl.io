@@ -87,4 +87,4 @@ jobs:
           echo $SAS_TOKEN
 
           # Copy to CDN (overwrite when needed)
-          ./azcopy copy ./composabl.tar "https://${{ secrets.CDN_SA_NAME }}.blob.core.windows.net/public/golden-image-wsl.tar?$SAS_TOKEN" --overwrite=true
+          azcopy copy ./composabl.tar "https://${{ secrets.CDN_SA_NAME }}.blob.core.windows.net/public/golden-image-wsl.tar?$SAS_TOKEN" --overwrite=true
