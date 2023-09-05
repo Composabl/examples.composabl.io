@@ -69,15 +69,22 @@ jobs:
         #   docker_username: ${{ secrets.DOCKER_HUB_USERNAME }}
         #   docker_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Install AZCOPY through CLI (https://aka.ms/downloadazcopy-v10-linux)
+      - name: 🏗️ Install AZCopy
         run: |
-          curl -L https://aka.ms/downloadazcopy-v10-linux -o azcopy_linux_amd64.tar.gz
-          tar -xf azcopy_linux_amd64.tar.gz --strip-components=1
+          wget -O - https://aka.ms/downloadazcopy-v10-linux | tar zx --strip-components 1 --wildcards */azcopy
+          sudo mv azcopy /usr/local/bin/
 
-          ls -la
-          ls -la golden-images/packer
+      - name: 📦 Upload the Packer Image to our CDN with AZCopy
+        run: |
+          # # Install AZCopy
+          # curl -L https://aka.ms/downloadazcopy-v10-linux -o azcopy_linux_amd64.tar.gz
+          # tar -xf azcopy_linux_amd64.tar.gz --strip-components=1
 
-          ./azcopy --version
+          # Generate a SAS Token
           SAS_TOKEN_EXPIRY=$(date -u -d '+1 hour' +%Y-%m-%dT%H:%M:%SZ)
-          SAS_TOKEN=$(az storage container generate-sas --account-name ${{ secrets.CDN_SA_NAME }} --name public --expiry $SAS_TOKEN_EXPIRY --permissions racwdl --account-key ${{ secrets.CDN_SA_ACCESS_KEY }})
-          ./azcopy copy ./composabl.tar "https://${{ secrets.CDN_SA_NAME }}.blob.core.windows.net/public/golden-image-wsl.tar?$SAS_TOKEN"
+          SAS_TOKEN=$(az storage container generate-sas --account-name ${{ secrets.CDN_SA_NAME }} --account-key ${{ secrets.CDN_SA_ACCESS_KEY }} --name public --expiry $SAS_TOKEN_EXPIRY --permissions rwd --output tsv)
+
+          echo $SAS_TOKEN
+
+          # Copy to CDN (overwrite when needed)
+          ./azcopy copy ./composabl.tar "https://${{ secrets.CDN_SA_NAME }}.blob.core.windows.net/public/golden-image-wsl.tar?$SAS_TOKEN" --overwrite=true
