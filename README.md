@@ -23,7 +23,8 @@ composabl sim start sim-NAME
 # Train an agent
 # e.g., poetry run demo
 cd agents/
-poetry run AGENT_NAME
+export COMPOSABL_KEY="<YOUR_KEY>"
+python cstr/agent.py
 ```
 
 ## Codespaces (Devcontainer)

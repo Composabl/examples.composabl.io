@@ -2,16 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import NavigationTeacher
+from teacher import NavigationTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Airplane Agent")
-
     y1 = Sensor("y1", "air speed")
     y2 = Sensor("y2", "climb rate")
     u1 = Sensor("u1", "horizontal velocity")
@@ -58,3 +54,7 @@ def start():
     agent.add_skill(Navigation_skill)
 
     agent.train(train_iters=10)
+
+
+if __name__ == "__main__":
+    start()

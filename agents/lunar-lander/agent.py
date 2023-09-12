@@ -2,17 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import (LandTeacher, MoveToCenterTeacher, SelectorTeacher,
-                      StabilizeTeacher)
+from teacher import (LandTeacher, MoveToCenterTeacher, SelectorTeacher, StabilizeTeacher)
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Lunar Lander")
-
     # Observation Space
     # The state is an 8-dimensional vector: the coordinates of the lander in `x` & `y`, its linear
     # velocities in `x` & `y`, its angle, its angular velocity, and two booleans
@@ -203,3 +198,7 @@ def start():
     agent.add_skill(land_skill)
     agent.add_selector_skill(selector_skill, [stabilize_skill, move_to_center_skill, land_skill], fixed_order=True, repeat=False)
     agent.train(train_iters=100)
+
+
+if __name__ == "__main__":
+    start()

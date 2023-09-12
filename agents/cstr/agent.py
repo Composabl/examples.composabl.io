@@ -2,16 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import CSTRTeacher
+from teacher import CSTRTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the CSTR Agent")
-
     T = Sensor("T", "")
     Tc = Sensor("Tc", "")
     Ca = Sensor("Ca", "")
@@ -83,3 +79,7 @@ def start():
     agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
     agent.train(train_iters=3)
+
+
+if __name__ == "__main__":
+    start()

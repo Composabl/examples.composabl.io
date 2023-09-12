@@ -2,8 +2,7 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher,
-                      StabilizationTeacher)
+from teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher, StabilizationTeacher)
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -23,10 +22,6 @@ def selector(x, y, angle, angle_speed):
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Starship Agent")
-
     x = Sensor("x", "")
     x_speed = Sensor("x_speed", "")
     y = Sensor("y", "")
@@ -85,3 +80,7 @@ def start():
     # agent.add_selector_skill(selector_skill, [Navigation_skill, Alignment_skill], fixed_order=True, repeat=False)
 
     agent.train(train_iters=5)
+
+
+if __name__ == "__main__":
+    start()

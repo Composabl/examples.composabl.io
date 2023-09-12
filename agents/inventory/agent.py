@@ -2,16 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import BalanceTeacher
+from teacher import BalanceTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Inventory Agent")
-
     inventory_sensor = Sensor("inventory", "")
     balance_sensor = Sensor("balance", "")
     num_ordered_sensor = Sensor("num_ordered", "")
@@ -62,3 +58,7 @@ def start():
     agent.add_skill(Balance_skill)
 
     agent.train(train_iters=3)
+
+
+if __name__ == "__main__":
+    start()

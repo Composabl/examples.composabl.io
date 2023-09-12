@@ -2,16 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import MinimizeCostTeacher
+from teacher import MinimizeCostTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Maintenance Agent")
-
     machines = Sensor("machines", "")
     repairer_hourly_rate = Sensor("repairer_hourly_rate", "")
     spare_cost = Sensor("spare_cost", "")
@@ -59,3 +55,7 @@ def start():
     agent.add_skill(MinimizeCost_skill)
 
     agent.train(train_iters=3)
+
+
+if __name__ == "__main__":
+    start()

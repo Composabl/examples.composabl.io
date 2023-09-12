@@ -2,16 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import LevelTeacher, PressureTeacher, TemperatureTeacher
+from teacher import LevelTeacher, PressureTeacher, TemperatureTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Boiler Agent")
-
     y1 = Sensor("y1", "drum level")
     y2 = Sensor("y2", "drum pressure")
     y3 = Sensor("y3", "drum temperature")
@@ -85,3 +81,7 @@ def start():
     agent.add_skill(Temperature_skill)
 
     agent.train(train_iters=3)
+
+
+if __name__ == "__main__":
+    start()

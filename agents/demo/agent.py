@@ -1,13 +1,9 @@
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import ReachTeacher
+from teacher import ReachTeacher
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Demo Agent")
-
     # Observation Space
     # The state is an 8-dimensional vector: the coordinates of the lander in `x` & `y`, its linear
 
@@ -47,3 +43,7 @@ def start():
     agent.add_skill(reach_skill)
     # agent.add_selector_skill(selector_skill, [stabilize_skill, move_to_center_skill, land_skill], fixed_order=True, repeat=False)
     agent.train(train_iters=5)
+
+
+if __name__ == "__main__":
+    start()

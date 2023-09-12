@@ -9,19 +9,7 @@ packages = [{include = "src"}]
 [tool.poetry.dependencies]
 python = "~3.8.13"
 torch = "2.0.0" # Latest version (2.0.1) has an issue with cuda installation (https://github.com/pytorch/pytorch/issues/100974)
-composabl-dev = "0.4.6.dev1"
-
-[tool.poetry.scripts]
-demo = "src.demo.agent:start"
-starship = "src.starship.agent:start"
-filament-extruder = "src.filament-extruder.agent:start"
-lunar-lander = "src.lunar-lander.agent:start"
-cstr = "src.cstr.agent:start"
-ddm = "src.ddm.agent:start"
-airplane = "src.airplane.agent:start"
-inventory = "src.inventory.agent:start"
-boiler = "src.boiler.agent:start"
-maintenance = "src.maintenance.agent:start"
+composabl-dev = "0.4.8.dev2"
 
 [build-system]
 requires = ["poetry-core"]

@@ -2,16 +2,12 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from .teacher import TemperatureControlTeacher
+from teacher import TemperatureControlTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
-    print("composabl_core|====================================================================")
-    print("composabl_core|")
-    print("composabl_core|Running the Filament Extruder Agent")
-
     y1 = Sensor("y1", "Temperature")
     y1ref = Sensor("y1ref", "")
     u1 = Sensor("u1", "")
@@ -52,3 +48,7 @@ def start():
     agent.add_skill(TemperatureControl_skill)
 
     agent.train(train_iters=3)
+
+
+if __name__ == "__main__":
+    start()
