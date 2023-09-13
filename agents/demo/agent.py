@@ -1,7 +1,10 @@
+import os
+
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
 from teacher import ReachTeacher
 
+license_key = os.environ["COMPOSABL_KEY"]
 
 def start():
     # Observation Space
@@ -29,11 +32,10 @@ def start():
             "compute": "local",  # "docker", "kubernetes", "local"
             "config": {
                 "address": "localhost:1337",
-                # "use_gpu": False,  # @todo: doesn't do anything yet
-                # "image": "composabl/sim-lunar-lander:latest"
-            },
+                # "image": "composabl/sim-cstr:latest"
+            }
         },
-        "license": "FPWZ0N-AA478X-7KBZW4-SBRUZ2-S9203L",
+        "license": license_key,
         "training": {},
     }
     runtime = Runtime(config)
