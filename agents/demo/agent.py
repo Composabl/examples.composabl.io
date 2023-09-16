@@ -53,7 +53,7 @@ def start():
                 "image": "composabl/sim-demo:latest",
             }
         },
-        "license": "GWLZ5B-JB4X03-KB65G6-XGK84T-OZAPVZ",
+        "license": license_key,
         "training": {},
         "flags": {"print_debug_info": True},
     }
@@ -88,19 +88,20 @@ def start():
         fixed_order_repeat=False,
     )
 
-    directory = "/home/hunter/Documents/checkpoint_test"
+    # let's train the agent!
     agent.train(train_iters=3)
-    agent.export(directory)
-    import pickle
-    with open("/home/hunter/Documents/checkpoint_test/increment/algorithm_state.pkl", "rb") as f:
-        data = pickle.load(f)
-        print(data, "=====================")
 
+    # Export the agent to the speciifed directory then re-load it and resume training
+    directory = os.path.join(os.getcwd(), "model")
+    agent.export(directory)
     agent.load(directory)
+
     agent.train(train_iters=5)
 
+    # Create a callable agent that can be used to execute the agent skill heirarchy
     trained_agent = agent.prepare()
 
+    # Run the trained_agent on the sim
     sim = SimEnv()
     for _episode_idx in range(5):
         print(f"episode {_episode_idx}")
