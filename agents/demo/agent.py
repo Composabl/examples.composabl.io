@@ -1,10 +1,10 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
 from teacher import ReachTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
+
 
 def start():
     # Observation Space
@@ -27,12 +27,11 @@ def start():
         reach_skill.add_scenario(scenario)
 
     config = {
-        "env": {
-            "name": "sim-demo",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                # "image": "composabl/sim-cstr:latest"
+        "target": {
+            "kubernetes": {
+                # "namespace": "composabl-sims",
+                "image": "composabl/sim-cstr:latest",
+                "regcred": "composabl-registry",
             }
         },
         "license": license_key,
