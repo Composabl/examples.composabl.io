@@ -44,16 +44,41 @@ def start():
         target_skill_sos.add_scenario(scenario)
 
     config = {
+        "license": license_key,
         "target": {
-            "kubernetes": {
-                # "namespace": "composabl-sims",
-                "image": "composabl/sim-cstr:latest",
-                "regcred": "composabl-registry",
+            # One of the below
+            # "kubernetes": {
+            #     "image": "composabl/sim-cstr:latest",
+            #     "regcred": "composabl-registry",
+            #     "namespace": "composabl-sims",
+            # },
+            # "docker": {
+            #     "image": "composabl/sim-cstr:latest",
+            #     "registry": {
+            #         "username": "composabl",
+            #         "password": "composabl",
+            #         "url": "https://index.docker.io/v1/",
+            #     }
+            # },
+            "local": {
+                "address": "localhost:1337"
             }
         },
-        "license": license_key,
-        "training": {},
-        "flags": {"print_debug_info": True},
+        "env": {
+            "name": "composabl",
+            "init": {
+                "hello": "world"
+            }
+        },
+        "runtime": {
+            "ray": {
+                "address": "127.0.0.1:10001",
+                "workers": 1
+            }
+        },
+        "flags": {
+            "print_debug_info": True,
+        },
     }
 
     runtime = Runtime(config)
@@ -87,9 +112,9 @@ def start():
     )
 
     # let's train the agent!
-    agent.train(train_iters=3)
+    agent.train(train_iters=1)
 
-    # Export the agent to the speciifed directory then re-load it and resume training
+    # Export the agent to the specified directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
     agent.export(directory)
     agent.load(directory)
