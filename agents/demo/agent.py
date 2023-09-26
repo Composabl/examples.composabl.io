@@ -88,19 +88,13 @@ def start():
         fixed_order_repeat=False,
     )
 
-    # let's train the agent!
-    # agent.train(train_iters=0)
+
+    agent.train(train_iters=3)
 
     # Export the agent to the speciifed directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
-    # agent.export(directory)
-    # agent.load(directory)
-
-    import pickle
-    with open(directory+ "/increment/algorithm_state.pkl", "rb") as f:
-        data = pickle.load(f)
-        print(data, "=====================")
-
+    agent.export(directory)
+    agent.load(directory)
 
     agent.train(train_iters=5)
 
