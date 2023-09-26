@@ -9,7 +9,7 @@ class IncrementTeacher(Teacher):
         self.counter = 0
         pass
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         self.counter += 1
         if self.past_obs is None:
             self.past_obs = transformed_obs
@@ -45,7 +45,7 @@ class DecrementTeacher(Teacher):
         self.counter = 0
         pass
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         self.counter += 1
         if self.past_obs is None:
             self.past_obs = transformed_obs
@@ -82,7 +82,7 @@ class SelectorTeacher(Teacher):
         self.target = 15
         pass
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         self.counter += 1
         if self.past_obs is None:
             self.past_obs = transformed_obs

@@ -28,7 +28,7 @@ class MinimizeCostTeacher(Teacher):
                 "spares_level",
                 ]
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0

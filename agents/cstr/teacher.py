@@ -10,13 +10,13 @@ class CSTRTeacher(Teacher):
     def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    def transform_action(self, transformed_obs, action, sim_reward):
         return action
 
     def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0
