@@ -1,10 +1,11 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
-from controller import DecrementController, IncrementController, SelectorController
+from controller import (DecrementController, IncrementController,
+                        SelectorController)
 from perceptors import perceptors
-from scenarios import decrement_scenarios, increment_scenarios, target_scenarios
+from scenarios import (decrement_scenarios, increment_scenarios,
+                       target_scenarios)
 from sim import SimEnv
 from teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
 
@@ -52,17 +53,17 @@ def start():
             #     "regcred": "composabl-registry",
             #     "namespace": "composabl-sims",
             # },
-            # "docker": {
-            #     "image": "composabl/sim-cstr:latest",
-            #     "registry": {
-            #         "username": "composabl",
-            #         "password": "composabl",
-            #         "url": "https://index.docker.io/v1/",
-            #     }
-            # },
-            "local": {
-                "address": "localhost:1337"
-            }
+            "docker": {
+                "image": "composabl/sim-demo:latest",
+                # "registry": {
+                #     "username": "composabl",
+                #     "password": "composabl",
+                #     "url": "https://index.docker.io/v1/",
+                # }
+            },
+            # "local": {
+            #     "address": "localhost:1337"
+            # }
         },
         "env": {
             "name": "composabl",
@@ -70,12 +71,12 @@ def start():
                 "hello": "world"
             }
         },
-        "runtime": {
-            "ray": {
-                "address": "127.0.0.1:10001",
-                "workers": 1
-            }
-        },
+        # "runtime": {
+        #     "ray": {
+        #         "address": "127.0.0.1:10001",
+        #         "workers": 1
+        #     }
+        # },
         "flags": {
             "print_debug_info": True,
         },
