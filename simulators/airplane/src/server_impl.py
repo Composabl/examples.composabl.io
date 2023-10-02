@@ -7,7 +7,7 @@ from composabl_core.agent.scenario import Scenario
 from composabl_core.grpc.server.server_composabl import ServerComposabl
 from gymnasium.envs.registration import EnvSpec
 
-from .sim import AirplaneEnv
+from sim import AirplaneEnv
 
 logger = logger_util.get_logger(__name__)
 
