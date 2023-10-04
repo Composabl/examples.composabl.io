@@ -16,7 +16,7 @@ class NavigationTeacher(Teacher):
     def filtered_observation_space(self):
         return ["y1", "y2", "u1", "u2", "u3", "u4"]
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0

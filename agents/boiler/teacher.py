@@ -17,7 +17,7 @@ class LevelTeacher(Teacher):
     def filtered_observation_space(self):
         return ['y1', 'y2', 'y3', 'y1ref', 'y2ref', 'y3ref', 'u1', 'u2', 'u3']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
             return 0
@@ -58,7 +58,7 @@ class PressureTeacher(Teacher):
     def filtered_observation_space(self):
         return ['y1', 'y2', 'y3', 'y1ref', 'y2ref', 'y3ref', 'u1', 'u2', 'u3']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
             return 0
@@ -99,7 +99,7 @@ class TemperatureTeacher(Teacher):
     def filtered_observation_space(self):
         return ['y1', 'y2', 'y3', 'y1ref', 'y2ref', 'y3ref', 'u1', 'u2', 'u3']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
             return 0

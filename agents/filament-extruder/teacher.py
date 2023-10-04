@@ -17,7 +17,7 @@ class TemperatureControlTeacher(Teacher):
     def filtered_observation_space(self):
         return ["y1", "y1ref", "u1", "rms"]
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
             return 0

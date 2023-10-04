@@ -88,7 +88,7 @@ def start():
         fixed_order_repeat=False,
     )
 
-    # let's train the agent!
+
     agent.train(train_iters=3)
 
     # Export the agent to the speciifed directory then re-load it and resume training
