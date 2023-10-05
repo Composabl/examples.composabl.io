@@ -1,9 +1,11 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from controller import (DecrementController, IncrementController, SelectorController)
+from controller import (DecrementController, IncrementController,
+                        SelectorController)
 from perceptors import perceptors
-from scenarios import (decrement_scenarios, increment_scenarios, target_scenarios)
+from scenarios import (decrement_scenarios, increment_scenarios,
+                       target_scenarios)
 from sim import SimEnv
 from teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
 
