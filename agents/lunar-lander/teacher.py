@@ -12,7 +12,7 @@ class StabilizeTeacher(Teacher):
         self.error_tolerance = 0.01
         self.last_reward = 0
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0
@@ -62,7 +62,7 @@ class MoveToCenterTeacher(Teacher):
         self.scale = 30
         self.error_tolerance = 0.01
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0
@@ -119,7 +119,7 @@ class LandTeacher(Teacher):
         self.scale = 30
         self.error_tolerance = 0.01
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0
@@ -176,7 +176,7 @@ class SelectorTeacher(Teacher):
         self.scale = 30
         self.error_tolerance = 0.01
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0

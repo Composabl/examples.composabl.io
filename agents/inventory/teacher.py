@@ -24,7 +24,7 @@ class BalanceTeacher(Teacher):
                 "customer_demand_max",
                 "selling_price"]
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0

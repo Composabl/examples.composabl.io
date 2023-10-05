@@ -3,7 +3,7 @@ import os
 
 import grpc
 from composabl_core.grpc.server.server import Server
-from .server_impl import ServerImpl
+from server_impl import ServerImpl
 
 
 def start():
