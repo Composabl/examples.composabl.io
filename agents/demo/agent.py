@@ -47,22 +47,22 @@ def start():
         "license": license_key,
         "target": {
             # One of the below
-            # "kubernetes": {
-            #     "image": "composabl/sim-cstr:latest",
-            #     "regcred": "composabl-registry",
-            #     "namespace": "composabl-sims",
-            # },
+            "kubernetes": {
+                "image": "composabl/sim-demo:latest",
+                # "regcred": "composabl-registry",
+                # "namespace": "composabl-sims",
+            },
             # "docker": {
             #     "image": "composabl/sim-cstr:latest",
-            #     "registry": {
-            #         "username": "composabl",
-            #         "password": "composabl",
-            #         "url": "https://index.docker.io/v1/",
-            #     }
+            #     # "registry": {
+            #     #     "username": "composabl",
+            #     #     "password": "composabl",
+            #     #     "url": "https://index.docker.io/v1/",
+            #     # }
             # },
-            "local": {
-                "address": "localhost:1337"
-            }
+            # "local": {
+            #     "address": "localhost:1337"
+            # }
         },
         "env": {
             "name": "composabl",
@@ -72,12 +72,9 @@ def start():
         },
         "runtime": {
             "ray": {
-                "address": "127.0.0.1:10001",
+                # "address": "ray://127.0.0.1:10001",
                 "workers": 1
             }
-        },
-        "flags": {
-            "print_debug_info": True,
         },
     }
 
