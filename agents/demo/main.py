@@ -1,13 +1,13 @@
 import os
 
+from agent.controller import (DecrementController, IncrementController,
+                              SelectorController)
+from agent.perceptors import perceptors
+from agent.scenarios import (decrement_scenarios, increment_scenarios,
+                             target_scenarios)
+from agent.teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from controller import (DecrementController, IncrementController,
-                        SelectorController)
-from perceptors import perceptors
-from scenarios import (decrement_scenarios, increment_scenarios,
-                       target_scenarios)
-from sim import SimEnv
-from teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
+from sim.sim import SimEnv
 
 license_key = os.environ["COMPOSABL_KEY"]
 
