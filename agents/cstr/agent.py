@@ -58,15 +58,15 @@ def start():
         selector_skill.add_scenario(Scenario(scenario_dict))
 
     config = {
-        "env": {
-            "name": "sim-cstr",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                # "image": "composabl/sim-cstr:latest"
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl.ai/sim-cstr"
             }
         },
-        "license": license_key,
+        "env": {
+            "name": "cstr",
+        },
         "training": {}
     }
     runtime = Runtime(config)

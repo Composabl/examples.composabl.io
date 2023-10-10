@@ -177,17 +177,16 @@ def start():
         selector_skill.add_scenario(scenario)
 
     config = {
-        "env": {
-            "name": "lunar_lander_sim",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                # "use_gpu": False,
-                # "image": "composabl/sim-lunar-lander:latest"
-            },
-        },
         "license": license_key,
-        "training": {},
+        "target": {
+            "docker": {
+                "image": "composabl.ai/sim-lunar-lander"
+            }
+        },
+        "env": {
+            "name": "lunar-lander",
+        },
+        "training": {}
     }
     runtime = Runtime(config)
     agent = Agent(runtime, config)
