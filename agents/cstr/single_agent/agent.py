@@ -8,6 +8,14 @@ license_key = os.environ["COMPOSABL_KEY"]
 
 
 def start():
+    # delete old history files
+    dir = './cstr/single_agent'
+    files = os.listdir(dir)
+    pkl_files = [file for file in files if file.endswith('.pkl')]
+    for file in pkl_files:
+        file_path = os.path.join(dir, file)
+        os.remove(file_path)
+        
     T = Sensor("T", "")
     Tc = Sensor("Tc", "")
     Ca = Sensor("Ca", "")
@@ -30,10 +38,10 @@ def start():
     config = {
         "env": {
             "name": "sim-cstr",
-            "compute": "docker",  # "docker", "kubernetes", "local"
+            "compute": "local",  # "docker", "kubernetes", "local"
             "config": {
-                #"address": "localhost:1337",
-                "image": "composabl/sim-cstr:latest"
+                "address": "localhost:1337",
+                #"image": "composabl/sim-cstr:latest"
             }
         },
         "license": license_key,
@@ -45,7 +53,7 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    agent.train(train_iters=10)
+    agent.train(train_iters=1000)
 
 
 if __name__ == "__main__":
