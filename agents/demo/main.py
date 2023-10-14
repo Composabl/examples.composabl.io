@@ -1,14 +1,16 @@
 import os
 
+from agent.controller import (DecrementController, IncrementController,
+                              SelectorController)
+from agent.perceptors import perceptors
+from agent.scenarios import (decrement_scenarios, increment_scenarios,
+                             target_scenarios)
+from agent.teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
-from controller import DecrementController, IncrementController, SelectorController
-from perceptors import perceptors
-from scenarios import decrement_scenarios, increment_scenarios, target_scenarios
-from sim import SimEnv
-from teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
+from sim.sim import SimEnv
 
 license_key = os.environ["COMPOSABL_KEY"]
+
 
 def start():
     os.environ["COMPOSABL_EULA_AGREED"] = "1"
@@ -43,19 +45,41 @@ def start():
         target_skill_sos.add_scenario(scenario)
 
     config = {
-        "env": {
-            "init": {
-                "test": "test"
-            },
-            "name": "sim-demo",
-            "compute": "docker",  # "docker", "kubernetes", "local"
-            "config": {
+        "license": license_key,
+        "target": {
+            # One of the below
+            "kubernetes": {
                 "image": "composabl/sim-demo:latest",
+                # "regcred": "composabl-registry",
+                # "namespace": "composabl-sims",
+            },
+            # "docker": {
+            #     "image": "composabl/sim-cstr:latest",
+            #     # "registry": {
+            #     #     "username": "composabl",
+            #     #     "password": "composabl",
+            #     #     "url": "https://index.docker.io/v1/",
+            #     # }
+            # },
+            # "local": {
+            #     "address": "localhost:1337"
+            # }
+        },
+        "env": {
+            "name": "composabl",
+            "init": {
+                "hello": "world"
             }
         },
-        "license": license_key,
-        "training": {},
-        "flags": {"print_debug_info": True},
+        "runtime": {
+            "ray": {
+                # "address": "ray://127.0.0.1:10001",
+                "workers": 5
+            },
+            "model": {
+                "checkpoint_path": "/mnt/data"
+            }
+        },
     }
 
     runtime = Runtime(config)
@@ -88,10 +112,10 @@ def start():
         fixed_order_repeat=False,
     )
 
+    # let's train the agent!
+    agent.train(train_iters=1)
 
-    agent.train(train_iters=3)
-
-    # Export the agent to the speciifed directory then re-load it and resume training
+    # Export the agent to the specified directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
     agent.export(directory)
     agent.load(directory)

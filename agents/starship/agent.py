@@ -57,16 +57,15 @@ def start():
         # selector_skill.add_scenario(scenario)
 
     config = {
-        "env": {
-            "name": "starship",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "strategy": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                # "image": "composabl.ai/sim-gymnasium:latest"
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl.ai/sim-starship"
             }
         },
-        "license": license_key,
+        "env": {
+            "name": "starship",
+        },
         "training": {}
     }
     runtime = Runtime(config)

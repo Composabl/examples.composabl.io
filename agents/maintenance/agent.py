@@ -36,16 +36,15 @@ def start():
         MinimizeCost_skill.add_scenario(scenario)
 
     config = {
-        "env": {
-            "name": "maitenance_management",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "strategy": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                # "image": "composabl.ai/sim-gymnasium:latest"
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl.ai/sim-maintenance-management"
             }
         },
-        "license": license_key,
+        "env": {
+            "name": "maintenance-management",
+        },
         "training": {}
     }
     runtime = Runtime(config)
