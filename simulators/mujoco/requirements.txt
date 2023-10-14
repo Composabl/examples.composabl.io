@@ -1,0 +1,6 @@
+composabl-core==0.4.0
+scipy
+pandas
+mujoco
+mujoco-python-viewer
+opencv-python # on mac, `brew install opencv`
