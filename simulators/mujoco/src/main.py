@@ -1,12 +1,12 @@
 import argparse
+import asyncio
 import os
 
-import grpc
-from composabl_core.grpc.server.server import Server
+from composabl_core.grpc.server import ServerAsync
 from server_impl import ServerImpl
 
 
-def start():
+async def start():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default=os.environ.get("HOST") or "[::]")
     parser.add_argument("--port", default=os.environ.get("PORT") or 1337, type=int)
@@ -18,17 +18,12 @@ def start():
     print(f"Starting with arguments {args}")
 
     try:
-        server = Server(ServerImpl, args.host, args.port, args.timeout)
-        server.start()
-    except KeyboardInterrupt:
-        print("KeyboardInterrupt, Gracefully stopping the server")
-        server.stop()
-    except grpc.RpcError as e:
-        print(f"gRPC error: {e}, Gracefully stopping the server")
-        server.stop()
+        server = ServerAsync(ServerImpl, args.host, args.port, args.timeout)
+        await server.start()
     except Exception as e:
         print(f"Unknown error: {e}, Gracefully stopping the server")
         server.stop()
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start())

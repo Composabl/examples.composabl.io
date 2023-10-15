@@ -17,13 +17,11 @@ def _import_egl(width, height):
 
 def _import_glfw(width, height):
     from mujoco.glfw import GLContext
-
     return GLContext(width, height)
 
 
 def _import_osmesa(width, height):
     from mujoco.osmesa import GLContext
-
     return GLContext(width, height)
 
 
@@ -181,6 +179,7 @@ class OffScreenViewer(BaseRender):
                     break
                 except:  # noqa:E722
                     pass
+
             if self.backend is None:
                 raise RuntimeError(
                     "No OpenGL backend could be imported. Attempting to create a "
@@ -367,6 +366,7 @@ class WindowViewer(BaseRender):
             6. Swap front and back buffer, https://www.glfw.org/docs/3.3/quick.html.
             7. Poll events like mouse clicks or keyboard input.
         """
+        print("RENDERING")
 
         # mjv_updateScene, mjr_render, mjr_overlay
         def update():
@@ -672,7 +672,6 @@ class MujocoRenderer:
         Returns:
             If render_mode is "rgb_array" or "depth_arra" it returns a numpy array in the specified format. "human" render mode does not return anything.
         """
-
         viewer = self._get_viewer(render_mode=render_mode)
 
         if render_mode in {
@@ -708,6 +707,7 @@ class MujocoRenderer:
         - `OffScreenViewer` class for "rgb_array" or "depth_array" render mode
         """
         self.viewer = self._viewers.get(render_mode)
+
         if self.viewer is None:
             if render_mode == "human":
                 self.viewer = WindowViewer(
@@ -721,6 +721,7 @@ class MujocoRenderer:
                 raise AttributeError(
                     f"Unexpected mode: {render_mode}, expected modes: human, rgb_array, or depth_array"
                 )
+
             # Add default camera parameters
             self._set_cam_config()
             self._viewers[render_mode] = self.viewer

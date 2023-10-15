@@ -46,8 +46,17 @@ class ServerImpl(ServerComposabl):
         if env_id not in envs_supported_keys:
             raise Exception("Env ID not supported, supported envs: {}".format(envs_supported_keys))
 
-        # TODO: Check if env_init keys are in the kwargs of the env and then add them
-        self.env = self.envs_supported[env_id]()
+        # Check if env_init keys are in the kwargs of the env and then add them
+        # to the env_init dict
+        env_kwargs = {}
+
+        for key in env_init.keys():
+            if hasattr(self.envs_supported[env_id], key):
+                env_kwargs[key] = env_init[key]
+
+        print(env_kwargs)
+        self.env = self.envs_supported[env_id](**env_kwargs)
+
         return self.env.spec
 
     def ObservationSpaceInfo(self) -> gym.Space:
@@ -64,8 +73,8 @@ class ServerImpl(ServerComposabl):
         return obs, {}
 
     def Step(self, action) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
-        obs, reward, done, info = self.env.step(action)
-        return obs, reward, done, False, info
+        obs, reward, is_terminated, is_truncated, info = self.env.step(action)
+        return obs, reward, is_terminated, is_truncated, info
 
     def Close(self):
         if self.env:
@@ -84,11 +93,11 @@ class ServerImpl(ServerComposabl):
         self.env.set_reward_func(reward_func)
 
     def GetRender(self):
-        pass
+        return self.env.render()
 
     def GetRenderMode(self):
-        pass
+        return self.env.render_mode
 
     def SetRenderMode(self, mode):
-        pass
+        self.env.render_mode = mode
 
