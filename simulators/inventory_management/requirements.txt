@@ -1,4 +1,4 @@
-composabl-core-dev==0.4.6.dev11
+composabl-core-dev==0.5.0.dev1
 scipy
 simpy==4.0.2
 matplotlib
