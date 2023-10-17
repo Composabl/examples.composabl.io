@@ -46,3 +46,6 @@ eval "$(pyenv virtualenv-init -)"
 
 pyenv install $VERSION_PYTHON
 pyenv global $VERSION_PYTHON
+
+# Upgrade pip
+pip install --upgrade pip
