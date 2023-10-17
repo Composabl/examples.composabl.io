@@ -18,3 +18,6 @@ echo "sudo service docker start" >> /home/${SSH_USER}/.bashrc
 # Init PyEnv
 echo "source ~/.pyenvrc" >> /home/${SSH_USER}/.zshrc
 echo "source ~/.pyenvrc" >> /home/${SSH_USER}/.bashrc
+
+# Install Composabl
+pip install --upgrade composabl
