@@ -117,10 +117,11 @@ def start():
 
     # Export the agent to the specified directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
-    agent.export(directory)
+    # agent.export(directory)
+
     agent.load(directory)
 
-    agent.train(train_iters=5)
+    agent.train(train_iters=1)
 
     # Create a callable agent that can be used to execute the agent skill heirarchy
     trained_agent = agent.prepare()
@@ -132,7 +133,7 @@ def start():
         obs, _info = sim.reset()
         for _step_index in range(100):
             action = trained_agent.execute(obs)
-            obs, _reward, done, _truncated, _info = sim.step(action)
+            obs, _reward, done, _truncated, _info = sim.step(action[0])
 
 if __name__ == "__main__":
     start()

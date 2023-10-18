@@ -24,8 +24,8 @@ on:
       - simulators/demo/**
 
 env:
-  IMAGE_NAME: "sim-demo"
-  IMAGE_PATH: "simulators/demo"
+  IMAGE_NAME: "sim-demo-discrete"
+  IMAGE_PATH: "simulators/demo_discrete"
 
 jobs:
   build-and-push:
