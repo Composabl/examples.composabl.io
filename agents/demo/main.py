@@ -1,6 +1,5 @@
 import os
 
-<<<<<<< Updated upstream:agents/demo/main.py
 from agent.controller import (DecrementController, IncrementController,
                               SelectorController)
 from agent.perceptors import perceptors
@@ -9,15 +8,6 @@ from agent.scenarios import (decrement_scenarios, increment_scenarios,
 from agent.teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sim.sim import SimEnv
-=======
-from composabl import Agent, Runtime, Scenario, Sensor, Skill, SkillGroup
-
-from controller import DecrementController, IncrementController, SelectorController
-from perceptors import perceptors
-from scenarios import decrement_scenarios, increment_scenarios, target_scenarios
-from sim import SimEnv
-from teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
->>>>>>> Stashed changes:agents/demo/agent.py
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -98,7 +88,6 @@ def start():
     agent.add_perceptors(perceptors)
 
     agent.add_skill(increment_skill)
-<<<<<<< Updated upstream:agents/demo/main.py
     agent.add_skill(decrement_skill)
     agent.add_skill(increment_skill_controller)
     agent.add_skill(decrement_skill_controller)
@@ -127,37 +116,6 @@ def start():
     agent.train(train_iters=1)
 
     # Export the agent to the specified directory then re-load it and resume training
-=======
-    # agent.add_skill(decrement_skill)
-    # agent.add_skill(increment_skill_controller)
-    # agent.add_skill(decrement_skill_controller)
-    # agent.add_selector_skill(
-    #     target_skill_controller,
-    #     [increment_skill, decrement_skill_controller],
-    #     fixed_order=True,
-    #     fixed_order_repeat=False,
-    # )
-
-    # agent.add_selector_skill(
-    #     target_skill,
-    #     [increment_skill_controller, decrement_skill],
-    #     fixed_order=True,
-    #     fixed_order_repeat=False,
-    # )
-
-    # agent.add_selector_skill(
-    #     target_skill_sos,
-    #     [target_skill, target_skill_controller],
-    #     fixed_order=False,
-    #     fixed_order_repeat=False,
-    # )
-
-    # skill_group = SkillGroup(increment_skill_controller, increment_skill)
-    # agent.add_skill_group(skill_group)
-    # agent.train(train_iters=3)
-
-    # Export the agent to the speciifed directory then re-load it and resume training
->>>>>>> Stashed changes:agents/demo/agent.py
     directory = os.path.join(os.getcwd(), "model")
     # agent.export(directory)
 
