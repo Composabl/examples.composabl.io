@@ -36,16 +36,19 @@ def start():
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
     config = {
-        "env": {
-            "name": "sim-cstr",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                #"image": "composabl/sim-cstr:latest"
+        "license": license_key,
+        "target": {
+            "local": {
+            "address": "localhost:1337"
             }
         },
-        "license": license_key,
-        "training": {}
+        "env": {
+            "name": "sim-cstr",
+        },
+
+        "flags": {
+            "print_debug_info": True
+        },
     }
     runtime = Runtime(config)
     agent = Agent(runtime, config)
@@ -53,7 +56,17 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    agent.train(train_iters=1000)
+    checkpoint_path = './cstr/single_agent/saved_agents/'
+
+    #agent.train(train_iters=3)
+    files = os.listdir(checkpoint_path)
+    if len(files) > 0:
+        #load agent
+        agent.load(checkpoint_path)
+    agent.train(train_iters=5)
+
+    #save agent
+    agent.export(checkpoint_path)
 
 
 if __name__ == "__main__":
