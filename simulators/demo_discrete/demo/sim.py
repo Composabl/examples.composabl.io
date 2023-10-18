@@ -16,18 +16,10 @@ class SimEnv(gym.Env):
             "time_counter": {"low": 0, "high": 1e12},
         })
 
-        self.action_space = self._get_space({
-            "action1": {"low": -1e3, "high": 1e3},
-        })
+        self.action_space = spaces.Discrete(3)
 
         # Define the scenario
         self.scenario: Scenario = None
-
-    @staticmethod
-    def _get_space(constraints):
-        low_list = [x["low"] for x in constraints.values()]
-        high_list = [x["high"] for x in constraints.values()]
-        return gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
 
     def _get_observation(self):
         obs = {"state1": self.value, "time_counter": self.time_ticks}
@@ -54,7 +46,7 @@ class SimEnv(gym.Env):
         self.time_ticks += 1
 
         # Run Simulation
-        self.value += action[0]
+        self.value += action
 
         #  Update obs with new state values (dummy function)
         obs = self._get_observation()
