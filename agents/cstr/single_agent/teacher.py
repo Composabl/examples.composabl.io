@@ -13,14 +13,7 @@ class CSTRTeacher(Teacher):
         self.rms_history = []
         self.last_reward = 0
         self.count = 0
-        self.plot = False
         self.metrics = 'fast' #standard, fast, none
-
-        if self.plot:
-            plt.close("all")
-            plt.figure(figsize=(7,5))
-            plt.title('CSTR Live Control')
-            plt.ion()
         
         # create metrics db
         try:
@@ -73,9 +66,6 @@ class CSTRTeacher(Teacher):
         if self.obs_history is None:
             success = False
         else:
-            #if self.plot:
-            #    self.plot_obs()
- 
             success = len(self.obs_history) > 100
             if self.metrics == 'standard':
                 try:

@@ -4,6 +4,9 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
 from teacher import CSTRTeacher
 
+from cstr.external_sim.sim import CSTREnv
+import pandas as pd
+
 license_key = os.environ["COMPOSABL_KEY"]
 
 
@@ -49,7 +52,7 @@ def start():
         "flags": {
             "print_debug_info": True
         },
-    }
+}
     runtime = Runtime(config)
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
@@ -58,15 +61,28 @@ def start():
 
     checkpoint_path = './cstr/single_agent/saved_agents/'
 
-    files = os.listdir(checkpoint_path)
-    if len(files) > 0:
-        #load agent
-        agent.load(checkpoint_path)
-    agent.train(train_iters=3)
+    #load agent
+    agent.load(checkpoint_path)
+    agent.train(1)
 
     #save agent
-    agent.export(checkpoint_path)
+    trained_agent = agent.prepare()
 
+    # Inference
+    sim = CSTREnv()
+    df = pd.DataFrame()
+    obs, info= sim.reset()
+    for i in range(90):
+        action = trained_agent.execute(obs)
+        obs, reward, done, truncated, info = sim.step(action)
+        df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
+        df = pd.concat([df, df_temp])
+
+        if done:
+            break
+    
+    # save history data
+    df.to_pickle("./cstr/single_agent/inference_data.pkl")  
 
 if __name__ == "__main__":
     start()
