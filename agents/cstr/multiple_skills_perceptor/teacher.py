@@ -20,12 +20,11 @@ class BaseCSTR(Teacher):
         self.count = 0
         self.title = 'CSTR Live Control'
         self.history_path = './cstr/multiple_skills_perceptor/history.pkl'
-        self.plot = True
-        self.metrics = 'fast' #standard, fast, none
+        self.plot = False
+        self.metrics = 'none' #standard, fast, none
 
         self.y = 0
-        self.thermal_run = 0
-        self.ml_model = pickle.load(open('./cstr/multiple_skills_perceptor/ml_models/ml_predict_temperature.pkl', 'rb'))
+        #self.ml_model = pickle.load(open('./cstr/multiple_skills_perceptor/ml_models/ml_predict_temperature.pkl', 'rb'))
         self.ML_list = []
 
         self.sim = CSTREnv()
@@ -61,7 +60,6 @@ class BaseCSTR(Teacher):
             # Smart Constraints - ML
             if y == 1 :
                 self.ML_list.append(self.count)
-                #print('ML Action')
                 self.ΔTc -= 0.1 * abs(self.ΔTc) * np.sign(self.ΔTc)
             
             action = [self.ΔTc]
@@ -154,8 +152,6 @@ class BaseCSTR(Teacher):
         '''if len(self.ML_list) > 0:
             for kx in self.ML_list:
                 plt.axvspan(kx, kx-1, facecolor='r',alpha=0.8, label='ML actuation')'''
-        plt.title(self.title)
-        
 
         plt.subplot(3,1,2)
         plt.plot([ x["Ca"] for x in self.obs_history],'b.-',lw=3)
@@ -186,8 +182,8 @@ class SS1Teacher(BaseCSTR):
         self.count = 0
         self.title = 'CSTR Live Control - SS1 skill'
         self.history_path = './cstr/multiple_skills_perceptor/ss1_history.pkl'
-        self.plot = True
-        self.metrics = 'fast' #standard, fast, none
+        self.plot = False
+        self.metrics = 'none' #standard, fast, none
 
         if self.plot:
             plt.close("all")
@@ -219,8 +215,8 @@ class SS2Teacher(BaseCSTR):
         self.count = 0
         self.title = 'CSTR Live Control - SS2 skill'
         self.history_path = './cstr/multiple_skills_perceptor/ss2_history.pkl'
-        self.plot = True
-        self.metrics = 'fast' #standard, fast, none
+        self.plot = False
+        self.metrics = 'none' #standard, fast, none
 
         if self.plot:
             plt.close("all")
@@ -251,8 +247,8 @@ class TransitionTeacher(BaseCSTR):
         self.count = 0
         self.title = 'CSTR Live Control - Transition skill'
         self.history_path = './cstr/multiple_skills_perceptor/transition_history.pkl'
-        self.plot = True
-        self.metrics = 'fast' #standard, fast, none
+        self.plot = False
+        self.metrics = 'none' #standard, fast, none
 
         if self.plot:
             plt.close("all")
@@ -280,7 +276,7 @@ class CSTRTeacher(BaseCSTR):
         self.count = 0
         self.title = 'CSTR Live Control - Selector skill'
         self.history_path = './cstr/multiple_skills_perceptor/selector_history.pkl'
-        self.plot = True
+        self.plot = False
         self.metrics = 'none' #standard, fast, none
 
         if self.plot:
