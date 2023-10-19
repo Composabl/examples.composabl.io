@@ -54,7 +54,19 @@ def start():
 
     agent.add_skill(control_skill)
 
-    agent.train(train_iters=5)
+    #agent.train(train_iters=5)
+
+    checkpoint_path = './cstr/skill_group_drl_mpc/saved_agents/'
+
+    files = os.listdir(checkpoint_path)
+    if len(files) > 0:
+        #load agent
+        agent.load(checkpoint_path)
+
+    agent.train(train_iters=1)
+
+    #save agent
+    agent.export(checkpoint_path)
 
 if __name__ == "__main__":
     start()

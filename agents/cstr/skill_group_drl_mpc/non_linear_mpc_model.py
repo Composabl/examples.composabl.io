@@ -68,6 +68,8 @@ def non_lin_mpc(noise, CrSP, Ca0, T0, Tc0):
     }
 
     mpc.set_param(**setup_mpc)
+    surpress_ipopt = {'ipopt.print_level':0, 'ipopt.sb': 'yes', 'print_time':0}
+    mpc.set_param(nlpsol_opts = surpress_ipopt)
 
     mpc.scaling['_x', 'T'] = 100
     mpc.scaling['_u', 'Tc'] = 100
@@ -143,6 +145,7 @@ def non_lin_mpc(noise, CrSP, Ca0, T0, Tc0):
     }
 
     simulator.set_param(**params_simulator)
+    
 
     #uncertain parameters
     p_num = simulator.get_p_template()
