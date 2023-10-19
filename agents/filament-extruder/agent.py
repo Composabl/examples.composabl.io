@@ -1,7 +1,6 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
 from teacher import TemperatureControlTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -32,7 +31,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-filament-extruder"
+                "image": "composabl/sim-filament-extruder"
             }
         },
         "env": {

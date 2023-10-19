@@ -1,7 +1,6 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
 from teacher import CSTRTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -61,7 +60,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-cstr"
+                "image": "composabl/sim-cstr"
             }
         },
         "env": {

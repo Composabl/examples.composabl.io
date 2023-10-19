@@ -1,8 +1,8 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
-from teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher, StabilizationTeacher)
+from teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher,
+                     StabilizationTeacher)
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -60,7 +60,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-starship"
+                "image": "composabl/sim-starship"
             }
         },
         "env": {

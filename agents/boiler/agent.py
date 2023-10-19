@@ -1,7 +1,6 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
 from teacher import LevelTeacher, PressureTeacher, TemperatureTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -63,7 +62,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-industrial-boiler"
+                "image": "composabl/sim-industrial-boiler"
             }
         },
         "env": {
