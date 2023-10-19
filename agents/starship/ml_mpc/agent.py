@@ -2,7 +2,7 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
-from teacher import (AlignmentTeacher, SelectorTeacher, SpeedControlTeacher, StabilizationTeacher,DRLMPCTeacher)
+from teacher import (DRLMPCTeacher)
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -36,22 +36,10 @@ def start():
         }
     ]
 
-    Stabilization_skill = Skill("Stabilization", StabilizationTeacher, trainable=True)
-    #Navigation_skill = Skill("Navigation", NavigationTeacher, trainable=True)
-    Alignment_skill = Skill("Alignment", AlignmentTeacher, trainable=True)
-    SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher, trainable=True)
-    
-    selector_skill = Skill("selector", SelectorTeacher, trainable=True) #using the same reward
-
     mpc_skill = Skill('mpc', DRLMPCTeacher, trainable=True)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
-        #Navigation_skill.add_scenario(scenario)
-        Alignment_skill.add_scenario(scenario)
-        SpeedControl_skill.add_scenario(scenario)
-        Stabilization_skill.add_scenario(scenario)
-        selector_skill.add_scenario(scenario)
         mpc_skill.add_scenario(scenario)
 
     config = {
@@ -71,12 +59,7 @@ def start():
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
 
-    #agent.add_skill(Navigation_skill)
     agent.add_skill(mpc_skill)
-    #agent.add_skill(Stabilization_skill)
-    #agent.add_skill(Alignment_skill)
-    #agent.add_skill(SpeedControl_skill)
-    #agent.add_selector_skill(selector_skill, [Stabilization_skill, Alignment_skill], fixed_order=False, fixed_order_repeat=False)
 
     agent.train(train_iters=20)
 

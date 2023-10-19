@@ -182,8 +182,10 @@ class Env(gym.Env):
         angle = action[1]
 
         actuator_noise = 0
-        self.t += thrust + random.uniform(-actuator_noise * thrust, actuator_noise * thrust)
-        self.a += angle + random.uniform(-actuator_noise * angle, actuator_noise * angle)
+        #self.t += thrust + random.uniform(-actuator_noise * thrust, actuator_noise * thrust)
+        #self.a += angle + random.uniform(-actuator_noise * angle, actuator_noise * angle)
+        self.t = thrust + random.uniform(-actuator_noise * thrust, actuator_noise * thrust)
+        self.a = angle + random.uniform(-actuator_noise * angle, actuator_noise * angle)
 
         self.t = np.clip(self.t, 0.4, 1)
         self.a = np.clip(self.a, self.min_gimble, self.max_gimble)
@@ -228,8 +230,14 @@ class Env(gym.Env):
         # end the simulation
         if self.y_obs < 0:
             terminated = True
-        elif not self.obs_space_constraints['x']['low'] <= self.x_obs <= self.obs_space_constraints['x']['high']:
+
+        if self.cnt >= 400:
             terminated = True
+        
+        for key in list(self.obs.keys()):
+            if not self.obs_space_constraints[key]['low'] <= self.obs[key] <= self.obs_space_constraints[key]['high']:
+                terminated = True
+                self.obs[key] = np.clip(self.obs[key], self.obs_space_constraints[key]['low'], self.obs_space_constraints[key]['high'])
 
         self.obs = np.array(list(self.obs.values()))
         info = {}
