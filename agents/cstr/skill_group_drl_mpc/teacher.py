@@ -2,7 +2,7 @@ import math
 import numpy as np 
 
 from composabl_core.agent import Teacher
-from .non_linear_mpc_model import non_lin_mpc
+from non_linear_mpc_model import non_lin_mpc
 
 import matplotlib.pyplot as plt
 
@@ -25,10 +25,18 @@ class CSTRTeacher(Teacher):
 
     def transform_action(self, transformed_obs, action):
         if type(transformed_obs) == dict:
-            #Import MPC
-            MPC_Tc = non_lin_mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
-                                                    transformed_obs['T'], transformed_obs['Tc'] + action)
-            dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
+            if 'observation' in list(transformed_obs.keys()):
+                transformed_obs = transformed_obs['observation'][0]
+                #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
+                MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2], 
+                                                        transformed_obs[0], transformed_obs[1] + action[0])
+                dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
+            else:
+                #Import MPC
+                MPC_Tc = non_lin_mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
+                                                        transformed_obs['T'], transformed_obs['Tc'] + action)
+                dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
+
             #limit MPC actions between -10 and 10 degrees Celsius
             dTc_MPC = np.clip(dTc_MPC,-10,10)
             action = dTc_MPC
@@ -37,7 +45,7 @@ class CSTRTeacher(Teacher):
     def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0

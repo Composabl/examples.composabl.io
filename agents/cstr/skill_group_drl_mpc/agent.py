@@ -1,6 +1,6 @@
 from composabl.core import Agent, Skill, Sensor, Scenario
 from composabl.ray import Runtime
-from .cstr_mpc_teacher import CSTRTeacher
+from teacher import CSTRTeacher
 
 from composabl import Controller
 
@@ -33,17 +33,21 @@ def start():
         control_skill.add_scenario(Scenario(scenario_dict))
 
     config = {
-        "env": {
-            "name": "sim-cstr", #"composabl/sim-cstr",
-            "compute": "local",  # "docker", "kubernetes", "local"
-            "config": {
-                "address": "localhost:1337",
-                #"image": "composabl/sim-cstr:latest"
+        "license": license_key,
+        "target": {
+            "local": {
+            "address": "localhost:1337"
             }
         },
-        "license": license_key,
-        "training": {}
+        "env": {
+            "name": "sim-cstr",
+        },
+
+        "flags": {
+            "print_debug_info": True
+        },
     }
+
     runtime = Runtime(config)
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
@@ -51,3 +55,6 @@ def start():
     agent.add_skill(control_skill)
 
     agent.train(train_iters=5)
+
+if __name__ == "__main__":
+    start()
