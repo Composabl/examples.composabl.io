@@ -1,7 +1,6 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
 from teacher import MinimizeCostTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -39,7 +38,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-maintenance-management"
+                "image": "composabl/sim-maintenance-management"
             }
         },
         "env": {

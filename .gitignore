@@ -126,6 +126,5 @@ __pypackages__/
 *.pyc
 
 # Project Specific
-target
 .DS_Store
 .DS_Store

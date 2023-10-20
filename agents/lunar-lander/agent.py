@@ -1,8 +1,8 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
-from teacher import (LandTeacher, MoveToCenterTeacher, SelectorTeacher, StabilizeTeacher)
+from teacher import (LandTeacher, MoveToCenterTeacher, SelectorTeacher,
+                     StabilizeTeacher)
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -180,7 +180,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-lunar-lander"
+                "image": "composabl/sim-lunar-lander"
             }
         },
         "env": {

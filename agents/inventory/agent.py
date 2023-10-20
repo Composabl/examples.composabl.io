@@ -1,7 +1,6 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
 from teacher import BalanceTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -42,7 +41,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl.ai/sim-inventory-management"
+                "image": "composabl/sim-inventory-management"
             }
         },
         "env": {
