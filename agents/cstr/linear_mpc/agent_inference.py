@@ -76,8 +76,8 @@ def start():
         #action = trained_agent.execute(obs)
         action = cont.compute_action(obs)
         obs, reward, done, truncated, info = sim.step(action)
-        #df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
-        #df = pd.concat([df, df_temp])
+        df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
+        df = pd.concat([df, df_temp])
 
         if done:
             break
