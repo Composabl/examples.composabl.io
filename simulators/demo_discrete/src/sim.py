@@ -16,9 +16,7 @@ class SimEnv(gym.Env):
             "time_counter": {"low": 0, "high": 1e12},
         })
 
-        self.action_space = self._get_space({
-            "action1": {"low": -1e3, "high": 1e3},
-        })
+        self.action_space = gym.spaces.Discrete(3)
 
         # Define the scenario
         self.scenario: Scenario = None
