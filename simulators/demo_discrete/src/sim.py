@@ -15,10 +15,7 @@ class SimEnv(gym.Env):
             "state1": {"low": -1e12, "high": 1e12},
             "time_counter": {"low": 0, "high": 1e12},
         })
-
-        self.action_space = self._get_space({
-            "action1": {"low": -1e3, "high": 1e3},
-        })
+        self.action_space = gym.spaces.Discrete(3)
 
         # Define the scenario
         self.scenario: Scenario = None
@@ -53,7 +50,15 @@ class SimEnv(gym.Env):
         self.time_ticks += 1
 
         # Run Simulation
-        self.value += action[0]
+        # 0 - decrement by 1
+        # 1 - keep the same
+        # 2 - increment by 1
+        if action == 0:
+            self.value -= 1
+        elif action == 1:
+            pass
+        elif action == 2:
+            self.value += 1
 
         #  Update obs with new state values (dummy function)
         obs = self._get_observation()
