@@ -72,7 +72,7 @@ def start():
     sim = CSTREnv()
     df = pd.DataFrame()
     obs, info= sim.reset()
-    for i in range(90):
+    for i in range(90-1):
         #action = trained_agent.execute(obs)
         action = cont.compute_action(obs)
         obs, reward, done, truncated, info = sim.step(action)
