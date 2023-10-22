@@ -35,13 +35,11 @@ class CSTREnv(gym.Env):
     def reset(self):
         # Define scenario in the simulation
         if isinstance(self.scenario, Scenario):
+            #print("SCENARIO")
             sample = self.scenario.sample()
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        else:
-            self.Cref_signal = "complete"
-            self.noise_percentage = 0
 
         noise_percentage = self.noise_percentage
 
@@ -83,6 +81,8 @@ class CSTREnv(gym.Env):
 
     def step(self, action):
         action = float(action[0])
+        if self.cnt >= 90:
+            self.cnt = 90
         if self.Cref_signal == "transition":
             # update Cref an Tref
             time = 90
