@@ -76,9 +76,10 @@ def start():
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
 
+    agent.add_skill(Temperature_skill)
     agent.add_skill(Level_skill)
     agent.add_skill(Pressure_skill)
-    agent.add_skill(Temperature_skill)
+    
 
     agent.train(train_iters=3)
 
