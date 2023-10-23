@@ -104,6 +104,9 @@ def start():
 
     # Inference
     sim = CSTREnv()
+    sim.scenario = Scenario({
+            "Cref_signal": "complete"
+        })
     df = pd.DataFrame()
     obs, info= sim.reset()
     for i in range(90):

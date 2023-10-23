@@ -4,15 +4,42 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
-from cstr.external_sim.sim import CSTREnv
-import pandas as pd
-
 license_key = os.environ["COMPOSABL_KEY"]
+
+from composabl import Controller
+
+class ProgrammedSelector(Controller):
+    def __init__(self):
+        self.counter = 0
+        
+    def compute_action(self, obs):
+        if obs['Cref'] >= 8.56 and obs['Cref'] <= 8.58:
+            action = [0]
+        elif obs['Cref'] == 2.0:
+            action = [1]
+        else:
+            action = [1]
+            
+        return action
+
+    def transform_obs(self, obs):
+        return obs
+
+    def filtered_observation_space(self):
+        return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
+    
+    def compute_success_criteria(self, transformed_obs, action):
+        if self.counter > 100:
+            return True
+
+    def compute_termination(self, transformed_obs, action):
+        return False
+
 
 
 def start():
     # delete old history files
-    dir = './cstr/multiple_skills_perceptor'
+    dir = './cstr/multiple_learned_skills_programmed'
     files = os.listdir(dir)
     pkl_files = [file for file in files if file.endswith('.pkl')]
     for file in pkl_files:
@@ -64,7 +91,7 @@ def start():
     for scenario_dict in transition_scenarios:
         transition_skill.add_scenario(Scenario(scenario_dict))
 
-    selector_skill = Skill("selector", CSTRTeacher, trainable=True)
+    selector_skill = Skill("selector", ProgrammedSelector, trainable=False)
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
@@ -91,35 +118,22 @@ def start():
     agent.add_skill(ss1_skill)
     agent.add_skill(ss2_skill)
     agent.add_skill(transition_skill)
-    agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
+    agent.add_selector_skill(selector_skill, [ss2_skill, transition_skill, ss1_skill], fixed_order=False, fixed_order_repeat=False)
 
-    checkpoint_path = './cstr/multiple_skills_perceptor/saved_agents/'
+    checkpoint_path = './cstr/multiple_learned_skills_programmed/saved_agents/'
 
-    #load agent
-    agent.load(checkpoint_path)
-    agent.train(1)
+    #agent.train(0)
 
-    #save agent
-    trained_agent = agent.prepare()
-
-    # Inference
-    sim = CSTREnv()
-    sim.scenario = Scenario({
-            "Cref_signal": "complete"
-        })
-    df = pd.DataFrame()
-    obs, info= sim.reset()
-    for i in range(90):
-        action = trained_agent.execute(obs)
-        obs, reward, done, truncated, info = sim.step(action)
-        df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
-        df = pd.concat([df, df_temp])
-
-        if done:
-            break
+    files = os.listdir(checkpoint_path)
+    if len(files) > 0:
+        # load agent
+        agent.load(checkpoint_path)
     
-    # save history data
-    df.to_pickle("./cstr/multiple_skills_perceptor/inference_data.pkl")  
+    # train agent
+    agent.train(train_iters=2)
+
+    # save agent
+    agent.export(checkpoint_path)
 
 
 if __name__ == "__main__":

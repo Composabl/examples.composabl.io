@@ -29,7 +29,8 @@ def start():
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     reaction_scenarios = [
         {
-            "Cref_signal": "complete"
+            "Cref_signal": "complete",
+            "noise_percentage": 0.01
         }
     ]
 
@@ -58,22 +59,14 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    checkpoint_path = './cstr/linear_mpc/saved_agents/'
-
-    #load agent
-    #agent.load(checkpoint_path)
-    #agent.train(1)
-
-    #save agent
-    #trained_agent = agent.prepare()
-
     # Inference
     cont = MPCController()
     sim = CSTREnv()
+    sim.scenario = Scenario(reaction_scenarios[0])
     df = pd.DataFrame()
     obs, info= sim.reset()
+    
     for i in range(90-1):
-        #action = trained_agent.execute(obs)
         action = cont.compute_action(obs)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])

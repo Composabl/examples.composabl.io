@@ -9,10 +9,42 @@ import pandas as pd
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+from composabl import Controller
+
+class ProgrammedSelector(Controller):
+    def __init__(self):
+        self.counter = 0
+        
+    def compute_action(self, obs):
+        if self.counter < 22:
+            action = [0]
+        elif self.counter < 74 : #transition
+            action = [1]
+        else:
+            action = [2]
+
+        self.counter += 1
+            
+        return action
+
+    def transform_obs(self, obs):
+        return obs
+
+    def filtered_observation_space(self):
+        return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
+    
+    def compute_success_criteria(self, transformed_obs, action):
+        if self.counter > 100:
+            return True
+
+    def compute_termination(self, transformed_obs, action):
+        return False
+
+
 
 def start():
     # delete old history files
-    dir = './cstr/multiple_skills_perceptor'
+    dir = './cstr/multiple_learned_skills_programmed'
     files = os.listdir(dir)
     pkl_files = [file for file in files if file.endswith('.pkl')]
     for file in pkl_files:
@@ -64,7 +96,7 @@ def start():
     for scenario_dict in transition_scenarios:
         transition_skill.add_scenario(Scenario(scenario_dict))
 
-    selector_skill = Skill("selector", CSTRTeacher, trainable=True)
+    selector_skill = Skill("selector", ProgrammedSelector, trainable=False)
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
@@ -91,9 +123,9 @@ def start():
     agent.add_skill(ss1_skill)
     agent.add_skill(ss2_skill)
     agent.add_skill(transition_skill)
-    agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
+    agent.add_selector_skill(selector_skill, [ss2_skill, transition_skill, ss1_skill], fixed_order=False, fixed_order_repeat=False)
 
-    checkpoint_path = './cstr/multiple_skills_perceptor/saved_agents/'
+    checkpoint_path = './cstr/multiple_learned_skills_programmed/saved_agents/'
 
     #load agent
     agent.load(checkpoint_path)
@@ -119,7 +151,7 @@ def start():
             break
     
     # save history data
-    df.to_pickle("./cstr/multiple_skills_perceptor/inference_data.pkl")  
+    df.to_pickle("./cstr/multiple_learned_skills_programmed/inference_data.pkl")  
 
 
 if __name__ == "__main__":

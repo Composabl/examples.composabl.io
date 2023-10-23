@@ -10,6 +10,7 @@ class ThermalRunawayPredict():
         self.thermal_run = 0
         self.ml_model = pickle.load(open('./cstr/multiple_skills_perceptor/ml_models/ml_predict_temperature.pkl', 'rb'))
         self.ML_list = []
+        self.last_Tc = 0
 
         self.sim = CSTREnv()
         obs, info = self.sim.reset()
@@ -17,7 +18,11 @@ class ThermalRunawayPredict():
     def compute(self, obs):   
         #get the action - add action to perception  
         #self.ΔTc = action[0]
-        self.ΔTc = 5
+        if self.last_Tc == 0:
+            self.ΔTc = 5
+        else:
+            self.ΔTc = obs['Tc'] - self.last_Tc
+            
         y = 0
 
         if obs['T'] >= 340:
@@ -27,6 +32,8 @@ class ThermalRunawayPredict():
             if self.ml_model.predict_proba(X)[0][1] >= 0.3:
                 y = 1
                 self.y = y
+
+        self.last_Tc = obs['Tc']
         
         return {"thermal_runaway_predict": y}
     

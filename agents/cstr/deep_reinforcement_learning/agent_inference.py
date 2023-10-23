@@ -70,6 +70,7 @@ def start():
 
     # Inference
     sim = CSTREnv()
+    sim.scenario = Scenario(reaction_scenarios[0])
     df = pd.DataFrame()
     obs, info= sim.reset()
     for i in range(90):
