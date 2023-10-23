@@ -53,11 +53,14 @@ class Env(gym.Env):
         self.y2 = 6.45  # Drum pressure
         self.y3 = 466.7  # Drum Temperature
 
+        self.u10 = 40.68
+        self.u20 = 2.102 
+        self.u30 = 0 
         self.u1 = 40.68  # Feed Water Flow rate
         self.u2 = 2.102  # Fuel Flow rate
         self.u3 = 0  # Spray Flow rate
         self.eff_nox_red = 0.7
-        self.signal = "y1"
+        self.signal = "y3"
         self.noise_percentage = 0
 
     def plant(self, i, j):
@@ -89,7 +92,6 @@ class Env(gym.Env):
         '''
         self.cnt = 0
 
-
         # Define scenario in the simulation
 
         if isinstance(self.scenario, Scenario):
@@ -100,6 +102,19 @@ class Env(gym.Env):
                     setattr(self, key, sample[key])
 
         self.rms = 1
+
+        # initial conditions
+        self.y1 = 1  # Drum Level
+        self.y2 = 6.45  # Drum pressure
+        self.y3 = 466.7  # Drum Temperature
+
+        self.u10 = 40.68
+        self.u20 = 2.102 
+        self.u30 = 0 
+        self.u1 = 40.68  # Feed Water Flow rate
+        self.u2 = 2.102  # Fuel Flow rate
+        self.u3 = 0  # Spray Flow rate
+        self.eff_nox_red = 0.7
 
         # TODO: include option that user can choose variable and send SP
         if self.signal == "y1":  # Drum level increase 10%
@@ -170,6 +185,10 @@ class Env(gym.Env):
         Δu1 = action[0]
         Δu2 = action[1]
         Δu3 = action[2]
+
+        self.u1 += Δu1
+        self.u2 += Δu2
+        self.u3 += Δu3
 
         # Python Dynamic model
         st = 2  # controler action time (1 step = 20s)

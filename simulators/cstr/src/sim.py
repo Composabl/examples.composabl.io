@@ -39,11 +39,6 @@ class CSTREnv(gym.Env):
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        else:
-            self.Cref_signal = "complete"
-            self.noise_percentage = 0
-
-        noise_percentage = self.noise_percentage
 
         # initial conditions
         Ca0: float = 8.5698  # kmol/m3
@@ -57,7 +52,6 @@ class CSTREnv(gym.Env):
         # time counter
         self.cnt = 0
 
-        self.noise_percentage = noise_percentage
         # validation, if someone sends a noise not in the {0,1} format assume that they sent in pct values
         if self.noise_percentage > 1:
             self.noise_percentage = self.noise_percentage / 100
@@ -83,6 +77,8 @@ class CSTREnv(gym.Env):
 
     def step(self, action):
         action = float(action[0])
+        if self.cnt >= 90:
+            self.cnt = 90
         if self.Cref_signal == "transition":
             # update Cref an Tref
             time = 90
