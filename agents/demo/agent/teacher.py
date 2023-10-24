@@ -103,7 +103,7 @@ class SelectorTeacher(Teacher):
         return obs
 
     def transform_action(self, transformed_obs, action):
-        print("transform_action ======", transformed_obs)
+        # print("transform_action ======", transformed_obs)
         return action
 
     def filtered_observation_space(self):

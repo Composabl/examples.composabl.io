@@ -60,9 +60,12 @@ def start():
             #     #     "url": "https://index.docker.io/v1/",
             #     # }
             # },
-            "local": {
-                "address": "localhost:1337"
+            "docker": {
+                "image": "composabl/sim-demo-discrete:latest"
             }
+            # "local": {
+            #     "address": "localhost:1337"
+            # }
         },
         "env": {
             "name": "composabl",
@@ -132,6 +135,6 @@ def start():
         for _step_index in range(100):
             action = trained_agent.execute(obs)
             obs, _reward, done, _truncated, _info = sim.step(action[0])
-   
+
 if __name__ == "__main__":
     start()
