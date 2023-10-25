@@ -35,10 +35,13 @@ class CSTREnv(gym.Env):
     def reset(self):
         # Define scenario in the simulation
         if isinstance(self.scenario, Scenario):
+            #print("SCENARIO")
             sample = self.scenario.sample()
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
+
+        noise_percentage = self.noise_percentage
 
         # initial conditions
         Ca0: float = 8.5698  # kmol/m3
@@ -52,6 +55,7 @@ class CSTREnv(gym.Env):
         # time counter
         self.cnt = 0
 
+        self.noise_percentage = noise_percentage
         # validation, if someone sends a noise not in the {0,1} format assume that they sent in pct values
         if self.noise_percentage > 1:
             self.noise_percentage = self.noise_percentage / 100
