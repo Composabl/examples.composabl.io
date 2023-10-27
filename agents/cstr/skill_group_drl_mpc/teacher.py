@@ -14,7 +14,7 @@ class CSTRTeacher(Teacher):
         self.error_history = []
         self.last_reward = 0
         self.count = 0
-        self.metrics = 'fast' #standard, fast, none
+        self.metrics = 'none' #standard, fast, none
         
         # create metrics db
         try:
@@ -39,12 +39,20 @@ class CSTRTeacher(Teacher):
             else:
                 #Import MPC
                 MPC_Tc = non_lin_mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
-                                                        transformed_obs['T'], transformed_obs['Tc'] + action)
+                                                        transformed_obs['T'], transformed_obs['Tc'] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
+        
+        else:
+            #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
+            MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2], 
+                                                    transformed_obs[0], transformed_obs[1] + action[0])
+            dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
 
-            #limit MPC actions between -10 and 10 degrees Celsius
-            dTc_MPC = np.clip(dTc_MPC,-10,10)
-            action = dTc_MPC
+            
+        #limit MPC actions between -10 and 10 degrees Celsius
+        dTc_MPC = np.clip(dTc_MPC,-10,10)
+        action = dTc_MPC
+        
         return action
 
     def filtered_observation_space(self):
@@ -59,8 +67,6 @@ class CSTRTeacher(Teacher):
 
         reward = math.e ** (-abs(transformed_obs['Cref'] - transformed_obs['Ca']))
 
-        #error_pct = abs(transformed_obs['Cref'] - transformed_obs['Ca']) / transformed_obs['Cref']
-        #self.error_history.append(error_pct)
         error = (transformed_obs['Cref'] - transformed_obs['Ca'])**2
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))

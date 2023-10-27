@@ -123,7 +123,8 @@ def start():
     # Inference
     sim = CSTREnv()
     sim.scenario = Scenario({
-            "Cref_signal": "complete"
+            "Cref_signal": "complete",
+            "noise_percentage": 0.05
         })
     df = pd.DataFrame()
     obs, info= sim.reset()

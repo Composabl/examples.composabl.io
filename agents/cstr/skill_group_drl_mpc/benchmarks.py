@@ -21,16 +21,16 @@ Tref = Sensor("Tref", "")
 sensors = [T, Tc, Ca, Cref, Tref]
 
 # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-reaction_scenarios = [
+control_scenarios = [
     {
-        "Cref_signal": "complete"
+        "Cref_signal": "complete",
+        "noise_percentage": 0.0
     }
 ]
 
-reaction_skill = Skill("reaction", CSTRTeacher, trainable=True)
-for scenario_dict in reaction_scenarios:
-    reaction_skill.add_scenario(Scenario(scenario_dict))
-
+control_skill = Skill("control", CSTRTeacher, trainable=True)
+for scenario_dict in control_scenarios:
+    control_skill.add_scenario(Scenario(scenario_dict))
 
 
 config = {
@@ -54,9 +54,9 @@ runtime = Runtime(config)
 agent = Agent(runtime, config)
 agent.add_sensors(sensors)
 
-agent.add_skill(reaction_skill)
+agent.add_skill(control_skill)
 
-checkpoint_path = './cstr/deep_reinforcement_learning/saved_agents/'
+checkpoint_path = './cstr/skill_group_drl_mpc/saved_agents/'
 
 #load agent
 agent.load(checkpoint_path)
@@ -77,13 +77,13 @@ for i in range(30):
     obs, info = sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
-        action = np.array((action[0]+10)/20)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
 
         if done:
             break
+
 
 # calculate error
 df['error_temp'] = (df['T'] - df['Tref'])**2
@@ -117,4 +117,4 @@ plt.plot([i for i in range(90)],Cref_list,'k--',lw=2,label=r'$C_{sp}$')
 plt.plot([i for i in range(90)],mean_Cr,'b.-',lw=1,label=r'$C_{sp}$')
 plt.ylabel('Concentration')
 
-plt.savefig('./cstr/deep_reinforcement_learning/benchmark_figure.png')
+plt.savefig('./cstr/skill_group_drl_mpc/benchmark_figure.png')

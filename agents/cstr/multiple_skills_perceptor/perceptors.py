@@ -1,4 +1,4 @@
-from composabl import Perceptor
+from composabl import Perceptor, Scenario
 import pickle
 
 from cstr.external_sim.sim import CSTREnv
@@ -13,6 +13,10 @@ class ThermalRunawayPredict():
         self.last_Tc = 0
 
         self.sim = CSTREnv()
+        self.sim.scenario = Scenario({
+            "Cref_signal": "complete",
+            "noise_percentage": 0.05
+        })
         obs, info = self.sim.reset()
 
     def compute(self, obs):   
@@ -22,7 +26,7 @@ class ThermalRunawayPredict():
             self.ΔTc = 5
         else:
             self.ΔTc = obs['Tc'] - self.last_Tc
-            
+
         y = 0
 
         if obs['T'] >= 340:

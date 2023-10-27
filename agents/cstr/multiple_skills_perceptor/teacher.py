@@ -1,4 +1,4 @@
-from composabl import Teacher
+from composabl import Teacher, Scenario
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -27,8 +27,12 @@ class BaseCSTR(Teacher):
         #self.ml_model = pickle.load(open('./cstr/multiple_skills_perceptor/ml_models/ml_predict_temperature.pkl', 'rb'))
         self.ML_list = []
 
-        self.sim = CSTREnv()
-        obs, info = self.sim.reset()
+        #self.sim = CSTREnv()
+        #self.sim.scenario = Scenario({
+        #    "Cref_signal": "complete",
+        #    "noise_percentage": 0.05
+        #})
+        #obs, info = self.sim.reset()
 
         if self.plot:
             plt.close("all")
@@ -48,22 +52,21 @@ class BaseCSTR(Teacher):
         return obs
 
     def transform_action(self, transformed_obs, action):
-        #receiving only array, not dict
+        self.ΔTc = action[0]
         if type(transformed_obs) == dict:
-            transformed_obs = transformed_obs['observation']
-        transformed_obs = transformed_obs[0]
-
-        if type(transformed_obs) != dict:
-            self.ΔTc = action[0]
+            #file = open('read.txt', 'w') 
+            #file.write(str(transformed_obs)) 
+            #file.close() 
+            y = transformed_obs['thermal_runaway_predict']
+        else:
             y = transformed_obs[0]
-
-            # Smart Constraints - ML
-            if y == 1 :
-                self.ML_list.append(self.count)
-                self.ΔTc -= 0.1 * abs(self.ΔTc) * np.sign(self.ΔTc)
             
-            action = [self.ΔTc]
-            
+        # Smart Constraints - ML
+        if y == 1 :
+            ###self.ML_list.append(self.count)
+            self.ΔTc -= 0.1 * abs(self.ΔTc) * np.sign(self.ΔTc)
+        
+        action = np.array([self.ΔTc])
         return action
 
     def filtered_observation_space(self):
@@ -199,8 +202,7 @@ class SS1Teacher(BaseCSTR):
         except:
             self.df = pd.DataFrame()
             
-    def transform_action(self, transformed_obs, action):
-        return action
+    
 
 
 class SS2Teacher(BaseCSTR):

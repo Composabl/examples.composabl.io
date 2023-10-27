@@ -7,6 +7,38 @@ from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+from composabl import Controller
+
+class ProgrammedSelector(Controller):
+    def __init__(self):
+        self.counter = 0
+        
+    def compute_action(self, obs):
+        if self.counter < 22:
+            action = [0]
+        elif self.counter < 74 : #transition
+            action = [1]
+        else:
+            action = [2]
+
+        self.counter += 1
+            
+        return action
+
+    def transform_obs(self, obs):
+        return obs
+
+    def filtered_observation_space(self):
+        return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
+    
+    def compute_success_criteria(self, transformed_obs, action):
+        if self.counter > 100:
+            return True
+
+    def compute_termination(self, transformed_obs, action):
+        return False
+
+
 
 def start():
     # delete old history files
@@ -62,7 +94,11 @@ def start():
     for scenario_dict in transition_scenarios:
         transition_skill.add_scenario(Scenario(scenario_dict))
 
-    selector_skill = Skill("selector", CSTRTeacher, trainable=True)
+    ##selector_skill = Skill("selector", CSTRTeacher, trainable=True)
+    #for scenario_dict in selector_scenarios:
+    #    selector_skill.add_scenario(Scenario(scenario_dict))
+
+    selector_skill = Skill("selector", ProgrammedSelector, trainable=False)
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
@@ -82,6 +118,27 @@ def start():
         },
     }
 
+    config = {
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl/sim-cstr:latest"
+            }
+        },
+        "env": {
+            "name": "sim-cstr",
+        },
+        "runtime": {
+            "ray": {
+                "workers": 4
+            }
+        },
+
+        "flags": {
+            "print_debug_info": True
+        }
+    }
+
     runtime = Runtime(config)
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
@@ -94,15 +151,13 @@ def start():
 
     checkpoint_path = './cstr/multiple_skills_perceptor/saved_agents/'
 
-    #agent.train(0)
-
     files = os.listdir(checkpoint_path)
-    if len(files) > 0:
+    if len(files) > 2:
         # load agent
         agent.load(checkpoint_path)
     
     # train agent
-    agent.train(train_iters=1)
+    agent.train(train_iters=10)
 
     # save agent
     agent.export(checkpoint_path)

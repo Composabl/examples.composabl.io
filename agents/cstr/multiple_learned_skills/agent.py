@@ -109,15 +109,13 @@ def start():
 
     checkpoint_path = './cstr/multiple_learned_skills/saved_agents/'
 
-    #agent.train(0)
-
     files = os.listdir(checkpoint_path)
     if len(files) > 1:
         # load agent
         agent.load(checkpoint_path)
     
     # train agent
-    agent.train(train_iters=200)
+    agent.train(train_iters=50)
 
     # save agent
     agent.export(checkpoint_path)

@@ -148,6 +148,14 @@ for i in range(30):
         if done:
             break
 
+# calculate error
+df['error_temp'] = (df['T'] - df['Tref'])**2
+df['error_conc'] = (df['Ca'] - df['Cref'])**2
+rmsT = round(np.sqrt(np.mean(df['error_temp'])),2)
+rmsCa = round(np.sqrt(np.mean(df['error_conc'])),2)
+print('RMS T: ', rmsT)
+print('RMS Ca: ', rmsCa)
+
 plt.subplot(2,1,1)
 Tr_list_ = df.set_index('time')['T']
 Tref_list = df.set_index('time')['Tref'][:90]
@@ -159,7 +167,7 @@ plt.plot([i for i in range(90)],Tref_list,'k--',lw=2,label=r'$T_{sp}$')
 plt.plot([i for i in range(90)],mean_Tr,'b.-',lw=1,label=r'$T_{sp}$')
 plt.plot([i for i in range(90)],[400 for x in range(90)],'r--',lw=1)
 plt.ylabel('Temperature')
-plt.title('Benchmarks')
+plt.title('Benchmarks' + f" (RMS T: {rmsT} , RMS Ca: {rmsCa})")
 
 plt.subplot(2,1,2)
 Cr_list_ = df.set_index('time')['Ca']
@@ -171,4 +179,5 @@ plt.fill_between([i for i in range(90)] , min_Cr , max_Cr, alpha = 0.2)
 plt.plot([i for i in range(90)],Cref_list,'k--',lw=2,label=r'$C_{sp}$')
 plt.plot([i for i in range(90)],mean_Cr,'b.-',lw=1,label=r'$C_{sp}$')
 plt.ylabel('Concentration')
-plt.show()
+
+plt.savefig('./cstr/multiple_learned_skills_programmed/benchmark_figure.png')

@@ -61,7 +61,6 @@ def start():
 
     #load agent
     agent.load(checkpoint_path)
-    agent.train(1)
 
     #save agent
     trained_agent = agent.prepare()
@@ -69,7 +68,8 @@ def start():
     # Inference
     sim = CSTREnv()
     sim.scenario = Scenario({
-            "Cref_signal": "complete"
+            "Cref_signal": "complete",
+            "noise_percentage": 0.0
         })
     df = pd.DataFrame()
     obs, info= sim.reset()
