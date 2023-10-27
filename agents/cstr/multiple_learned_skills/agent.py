@@ -81,6 +81,23 @@ def start():
         },
     }
 
+    config = {
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl/sim-cstr:latest"
+            }
+        },
+        "env": {
+            "name": "sim-cstr",
+        },
+        "runtime": {
+            "ray": {
+                "workers": 4
+            }
+        }
+    }
+
     runtime = Runtime(config)
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
@@ -95,12 +112,12 @@ def start():
     #agent.train(0)
 
     files = os.listdir(checkpoint_path)
-    if len(files) > 0:
+    if len(files) > 1:
         # load agent
         agent.load(checkpoint_path)
     
     # train agent
-    agent.train(train_iters=2)
+    agent.train(train_iters=200)
 
     # save agent
     agent.export(checkpoint_path)

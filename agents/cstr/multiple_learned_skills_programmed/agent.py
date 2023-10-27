@@ -18,7 +18,7 @@ class ProgrammedSelector(Controller):
         elif obs['Cref'] == 2.0:
             action = [1]
         else:
-            action = [1]
+            action = [2]
             
         return action
 
@@ -130,7 +130,7 @@ def start():
         agent.load(checkpoint_path)
     
     # train agent
-    agent.train(train_iters=2)
+    agent.train(train_iters=200)
 
     # save agent
     agent.export(checkpoint_path)

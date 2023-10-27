@@ -14,7 +14,7 @@ def start():
     # delete old history files
     dir = './cstr/deep_reinforcement_learning'
     files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
+    pkl_files = [file for file in files if file.endswith('inference_data.pkl')]
     for file in pkl_files:
         file_path = os.path.join(dir, file)
         os.remove(file_path)
@@ -52,7 +52,7 @@ def start():
         "flags": {
             "print_debug_info": True
         },
-}
+    }
     runtime = Runtime(config)
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
@@ -63,7 +63,6 @@ def start():
 
     #load agent
     agent.load(checkpoint_path)
-    agent.train(1)
 
     #save agent
     trained_agent = agent.prepare()

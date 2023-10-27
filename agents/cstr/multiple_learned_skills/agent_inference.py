@@ -6,6 +6,7 @@ from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
+import numpy as np
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -14,7 +15,7 @@ def start():
     # delete old history files
     dir = './cstr/multiple_learned_skills'
     files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
+    pkl_files = [file for file in files if file.endswith('inference_data.pkl')]
     for file in pkl_files:
         file_path = os.path.join(dir, file)
         os.remove(file_path)
@@ -84,6 +85,23 @@ def start():
         },
     }
 
+    config = {
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl/sim-cstr:latest"
+            }
+        },
+        "env": {
+            "name": "sim-cstr",
+        },
+        "runtime": {
+            "ray": {
+                "workers": 1
+            }
+        }
+    }
+
     runtime = Runtime(config)
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
@@ -97,7 +115,7 @@ def start():
 
     #load agent
     agent.load(checkpoint_path)
-    agent.train(1)
+    #agent.train(1)
 
     #save agent
     trained_agent = agent.prepare()
@@ -111,6 +129,8 @@ def start():
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
+        #action = np.array(action[0]*10)
+        action = np.array((action[0]+10)/20)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
