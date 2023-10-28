@@ -115,7 +115,7 @@ def start():
         agent.load(checkpoint_path)
     
     # train agent
-    agent.train(train_iters=50)
+    agent.train(train_iters=500)
 
     # save agent
     agent.export(checkpoint_path)

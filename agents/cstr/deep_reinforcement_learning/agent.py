@@ -45,10 +45,26 @@ def start():
         "env": {
             "name": "sim-cstr",
         },
-
         "flags": {
             "print_debug_info": True
         },
+    }
+
+    config = {
+        "license": license_key,
+        "target": {
+            "docker": {
+                "image": "composabl/sim-cstr:latest"
+            }
+        },
+        "env": {
+            "name": "sim-cstr",
+        },
+        "runtime": {
+            "ray": {
+                "workers": 4
+            }
+        }
     }
     runtime = Runtime(config)
     agent = Agent(runtime, config)
@@ -59,10 +75,14 @@ def start():
     checkpoint_path = './cstr/deep_reinforcement_learning/saved_agents/'
 
     files = os.listdir(checkpoint_path)
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+
     if len(files) > 0:
         #load agent
         agent.load(checkpoint_path)
-    agent.train(train_iters=3)
+
+    agent.train(train_iters=100)
 
     #save agent
     agent.export(checkpoint_path)

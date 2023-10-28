@@ -6,6 +6,7 @@ from teacher import CSTRTeacher
 
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
+import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -68,8 +69,12 @@ def start():
     trained_agent = agent.prepare()
 
     # Inference
+    noise = 0.05
     sim = CSTREnv()
-    sim.scenario = Scenario(reaction_scenarios[0])
+    sim.scenario = Scenario({
+            "Cref_signal": "complete",
+            "noise_percentage": noise
+        })
     df = pd.DataFrame()
     obs, info= sim.reset()
     for i in range(90):
@@ -83,6 +88,31 @@ def start():
     
     # save history data
     df.to_pickle("./cstr/deep_reinforcement_learning/inference_data.pkl")  
+
+    # plot
+    plt.figure(figsize=(10,5))
+    plt.subplot(3,1,1)
+    plt.plot(df.reset_index()['time'],df.reset_index()['Tc'])
+    plt.ylabel('Tc')
+    plt.legend(['reward'],loc='best')
+    plt.title('Agent Inference DRL' + f" - Noise: {noise}")
+
+    plt.subplot(3,1,2)
+    #plt.plot(self.rms_history, 'r.-')
+    plt.plot(df.reset_index()['time'],df.reset_index()['T'])
+    plt.plot(df.reset_index()['time'],df.reset_index()['Tref'],'r--')
+    plt.ylabel('Temp')
+    plt.legend(['T', 'Tref'],loc='best')
+
+    plt.subplot(3,1,3)
+    plt.plot(df.reset_index()['time'],df.reset_index()['Ca'])
+    plt.plot(df.reset_index()['time'],df.reset_index()['Cref'],'r--')
+    plt.legend(['Ca', 'Cref'],loc='best')
+    plt.ylabel('Concentration')
+    plt.xlabel('iteration')
+
+    plt.savefig('./cstr/deep_reinforcement_learning/inference_figure.png')
+
 
 if __name__ == "__main__":
     start()

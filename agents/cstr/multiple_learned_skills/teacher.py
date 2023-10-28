@@ -15,7 +15,7 @@ class BaseCSTR(Teacher):
         self.count = 0
         self.title = 'CSTR Live Control'
         self.history_path = './cstr/multiple_learned_skills/history.pkl'
-        self.metrics = 'fast' #standard, fast, none
+        self.metrics = 'none' #standard, fast, none
         
         # create metrics db
         try:
@@ -139,7 +139,6 @@ class SS1Teacher(BaseCSTR):
         super().__init__()
         self.title = 'CSTR Live Control - SS1 skill'
         self.history_path = './cstr/multiple_learned_skills/ss1_history.pkl'
-        self.metrics = 'fast' #standard, fast, none
         
         # create metrics db
         try:
@@ -155,7 +154,6 @@ class SS2Teacher(BaseCSTR):
         super().__init__()
         self.title = 'CSTR Live Control - SS2 skill'
         self.history_path = './cstr/multiple_learned_skills/ss2_history.pkl'
-        self.metrics = 'fast' #standard, fast, none
         
         # create metrics db
         try:
@@ -170,7 +168,6 @@ class TransitionTeacher(BaseCSTR):
         super().__init__()
         self.title = 'CSTR Live Control - Transition skill'
         self.history_path = './cstr/multiple_learned_skills/transition_history.pkl'
-        self.metrics = 'fast' #standard, fast, none
         
         # create metrics db
         try:

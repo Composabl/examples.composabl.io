@@ -5,6 +5,7 @@ from controller import MPCController
 
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
+import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -60,9 +61,13 @@ def start():
     agent.add_skill(reaction_skill)
 
     # Inference
+    noise = 0.0
     cont = MPCController()
     sim = CSTREnv()
-    sim.scenario = Scenario(reaction_scenarios[0])
+    sim.scenario = Scenario({
+            "Cref_signal": "complete",
+            "noise_percentage": noise
+        })
     df = pd.DataFrame()
     obs, info= sim.reset()
     
@@ -76,7 +81,30 @@ def start():
             break
     
     # save history data
-    df.to_pickle("./cstr/linear_mpc/inference_data.pkl")  
+    df.to_pickle("./cstr/linear_mpc/inference_data.pkl") 
+
+    # plot
+    plt.figure(figsize=(10,5))
+    plt.subplot(3,1,1)
+    plt.plot(df.reset_index()['time'],df.reset_index()['Tc'])
+    plt.ylabel('Tc')
+    plt.legend(['reward'],loc='best')
+    plt.title('Agent Inference Linear MPC' + f" - Noise: {noise}")
+
+    plt.subplot(3,1,2)
+    plt.plot(df.reset_index()['time'],df.reset_index()['T'])
+    plt.plot(df.reset_index()['time'],df.reset_index()['Tref'],'r--')
+    plt.ylabel('Temp')
+    plt.legend(['T', 'Tref'],loc='best')
+
+    plt.subplot(3,1,3)
+    plt.plot(df.reset_index()['time'],df.reset_index()['Ca'])
+    plt.plot(df.reset_index()['time'],df.reset_index()['Cref'],'r--')
+    plt.legend(['Ca', 'Cref'],loc='best')
+    plt.ylabel('Concentration')
+    plt.xlabel('iteration')
+
+    plt.savefig('./cstr/linear_mpc/inference_figure.png') 
 
 
 if __name__ == "__main__":

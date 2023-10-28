@@ -7,6 +7,7 @@ from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -152,16 +153,18 @@ def start():
     trained_agent = agent.prepare()
 
     # Inference
+    noise = 0.05
     sim = CSTREnv()
     sim.scenario = Scenario({
             "Cref_signal": "complete",
-            "noise_percentage": 0.05
+            "noise_percentage": noise
         })
     df = pd.DataFrame()
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
-        action = np.array((action[0]+10)/20)
+        #action = np.array((action[0]+10)/20)
+        #action = np.array((action[0]*10))
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
@@ -169,8 +172,32 @@ def start():
         if done:
             break
     
-    # save history data
+    # save inference data
     df.to_pickle("./cstr/multiple_learned_skills_programmed/inference_data.pkl")  
+
+    # plot
+    plt.figure(figsize=(10,5))
+    plt.subplot(3,1,1)
+    plt.plot(df.reset_index()['time'],df.reset_index()['Tc'])
+    plt.ylabel('Tc')
+    plt.legend(['reward'],loc='best')
+    plt.title('Agent Inference Multi Skill Program Selector' + f" - Noise: {noise}")
+
+    plt.subplot(3,1,2)
+    #plt.plot(self.rms_history, 'r.-')
+    plt.plot(df.reset_index()['time'],df.reset_index()['T'])
+    plt.plot(df.reset_index()['time'],df.reset_index()['Tref'],'r--')
+    plt.ylabel('Temp')
+    plt.legend(['T', 'Tref'],loc='best')
+
+    plt.subplot(3,1,3)
+    plt.plot(df.reset_index()['time'],df.reset_index()['Ca'])
+    plt.plot(df.reset_index()['time'],df.reset_index()['Cref'],'r--')
+    plt.legend(['Ca', 'Cref'],loc='best')
+    plt.ylabel('Concentration')
+    plt.xlabel('iteration')
+
+    plt.savefig('./cstr/multiple_learned_skills_programmed/inference_figure.png')
 
 
 if __name__ == "__main__":
