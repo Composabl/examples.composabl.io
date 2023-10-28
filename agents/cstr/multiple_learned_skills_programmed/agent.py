@@ -127,7 +127,7 @@ def start():
     checkpoint_path = './cstr/multiple_learned_skills_programmed/saved_agents/'
 
     files = os.listdir(checkpoint_path)
-    if len(files) > 0:
+    if len(files) > 1:
         # load agent
         agent.load(checkpoint_path)
 
