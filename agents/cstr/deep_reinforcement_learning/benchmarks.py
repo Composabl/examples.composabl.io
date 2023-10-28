@@ -64,20 +64,20 @@ agent.load(checkpoint_path)
 #save agent
 trained_agent = agent.prepare()
 
+noise = 0.05
 sim = CSTREnv()
 sim.scenario = Scenario({
         "Cref_signal": "complete",
-        "noise_percentage": 0.05
+        "noise_percentage": noise
     })
 
 df = pd.DataFrame()
 
-for i in range(30):
+for i in range(100):
     # Inference
     obs, info = sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
-        action = np.array((action[0]+10)/20)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
@@ -104,7 +104,7 @@ plt.plot([i for i in range(90)],Tref_list,'k--',lw=2,label=r'$T_{sp}$')
 plt.plot([i for i in range(90)],mean_Tr,'b.-',lw=1,label=r'$T_{sp}$')
 plt.plot([i for i in range(90)],[400 for x in range(90)],'r--',lw=1)
 plt.ylabel('Temperature')
-plt.title('Benchmarks' + f" (RMS T: {rmsT} , RMS Ca: {rmsCa})")
+plt.title(f'Benchmarks Noise: {noise}' + f" (RMS T: {rmsT} , RMS Ca: {rmsCa})")
 
 plt.subplot(2,1,2)
 Cr_list_ = df.set_index('time')['Ca']
