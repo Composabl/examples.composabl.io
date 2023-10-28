@@ -150,7 +150,7 @@ def start():
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
-        #action = np.array((action[0]+10)/20)
+        action = np.array((action[0]+10)/20)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
@@ -170,7 +170,6 @@ def start():
     plt.title('Agent Inference Multi Skill Program Selector' + f" - Noise: {noise}")
 
     plt.subplot(3,1,2)
-    #plt.plot(self.rms_history, 'r.-')
     plt.plot(df.reset_index()['time'],df.reset_index()['T'])
     plt.plot(df.reset_index()['time'],df.reset_index()['Tref'],'r--')
     plt.ylabel('Temp')

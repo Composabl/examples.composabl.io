@@ -80,7 +80,7 @@ def start():
         },
         "runtime": {
             "ray": {
-                "workers": 4
+                "workers": 8
             }
         }
     }
@@ -102,7 +102,7 @@ def start():
         agent.load(checkpoint_path)
 
     # train agent
-    agent.train(train_iters=100)
+    agent.train(train_iters=500)
 
     # save agent
     agent.export(checkpoint_path)
