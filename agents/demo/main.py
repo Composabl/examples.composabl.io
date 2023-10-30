@@ -60,12 +60,12 @@ def start():
             #     #     "url": "https://index.docker.io/v1/",
             #     # }
             # },
-            "docker": {
-                "image": "composabl/sim-demo-discrete:latest"
-            }
-            # "local": {
-            #     "address": "localhost:1337"
+            # "docker": {
+            #     "image": "composabl/sim-demo-discrete:latest"
             # }
+            "local": {
+                "address": "localhost:1337"
+            }
         },
         "env": {
             "name": "composabl",
@@ -73,15 +73,15 @@ def start():
                 "hello": "world"
             }
         },
-        "runtime": {
-            "ray": {
-                # "address": "ray://127.0.0.1:10001",
-                # "workers": 5
-            },
-            # "model": {
-            #     "checkpoint_path": "/mnt/data"
-            # }
-        },
+        # "runtime": {
+        #     "ray": {
+        #         "address": "ray://127.0.0.1:10001",
+        #         "workers": 5
+        #     },
+        #     "model": {
+        #         "checkpoint_path": "/mnt/data"
+        #     }
+        # },
     }
 
     runtime = Runtime(config)
@@ -94,14 +94,14 @@ def start():
     agent.add_skill(decrement_skill_controller)
     agent.add_selector_skill(
         target_skill_controller,
-        [increment_skill, decrement_skill_controller],
+        [increment_skill_controller, decrement_skill_controller],
         fixed_order=True,
         fixed_order_repeat=False,
     )
 
     agent.add_selector_skill(
         target_skill,
-        [increment_skill_controller, decrement_skill],
+        [increment_skill, decrement_skill],
         fixed_order=True,
         fixed_order_repeat=False,
     )
@@ -122,7 +122,7 @@ def start():
 
     agent.load(directory)
 
-    agent.train(train_iters=1)
+    agent.train(train_iters=3)
 
     # Create a callable agent that can be used to execute the agent skill heirarchy
     trained_agent = agent.prepare()

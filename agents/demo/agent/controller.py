@@ -29,7 +29,7 @@ class IncrementController(Controller):
         
     def compute_action(self, obs):
         self.counter += 1
-        return obs["state1"] + 1
+        return {"action1": obs["state1"] + 1}
 
     def transform_obs(self, obs):
         return obs

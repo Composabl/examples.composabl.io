@@ -5,7 +5,6 @@ import gymnasium as gym
 from composabl_core.agent.scenario import Scenario
 from composabl_core.grpc.server.server_composabl import ServerComposabl
 from gymnasium.envs.registration import EnvSpec
-
 from sim import SimEnv
 
 logger = logger_util.get_logger(__name__)
@@ -25,12 +24,15 @@ class ServerImpl(ServerComposabl):
         }
 
     def ObservationSpaceInfo(self) -> gym.Space:
+        print(self.env.observation_space)
         return self.env.observation_space
 
     def ActionSpaceInfo(self) -> gym.Space:
+        print(self.env.action_space)
         return self.env.action_space
 
     def ActionSpaceSample(self) -> Any:
+        print(self.env.action_space.sample())
         return self.env.action_space.sample()
 
     def Reset(self) -> Tuple[Any, Dict[str, Any]]:

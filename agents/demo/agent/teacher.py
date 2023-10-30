@@ -33,7 +33,7 @@ class IncrementTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return ["state1", "delta_counter"]
+        return ["state1", "perceptor1"]
 
 
 class DecrementTeacher(Teacher):

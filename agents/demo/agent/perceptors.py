@@ -19,6 +19,6 @@ class DeltaCounter():
         return ["state1"]
 
 
-delta_counter = Perceptor(["delta_counter", "state2"], DeltaCounter, "the change in the counter from the last two steps")
+delta_counter = Perceptor("perceptor1", DeltaCounter, "the change in the counter from the last two steps")
 
 perceptors = [delta_counter]
