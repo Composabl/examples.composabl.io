@@ -56,17 +56,17 @@ def start():
 
     # Inference
     noise = 0.05
-    cont = MPCController()
-    sim = CSTREnv()
-    sim.scenario = Scenario({
-            "Cref_signal": "complete",
-            "noise_percentage": noise
-        })
+
     df = pd.DataFrame()
 
-    for i in range(3):
+    for j in range(3):
+        sim = CSTREnv()
+        sim.scenario = Scenario({
+                "Cref_signal": "complete",
+                "noise_percentage": noise
+            })
+        cont = MPCController()
         obs, info = sim.reset()
-
         for i in range(90-1):
             action = cont.compute_action(obs)
             obs, reward, done, truncated, info = sim.step(action)
