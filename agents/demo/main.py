@@ -21,7 +21,6 @@ def start():
 
     increment_skill_controller = Skill("increment-controller", IncrementController, trainable=False)
     decrement_skill_controller = Skill("decremement-controller", DecrementController, trainable=False)
-
     increment_skill = Skill("increment", IncrementTeacher, trainable=True)
     for scenario_dict in increment_scenarios:
         scenario = Scenario(scenario_dict)
@@ -48,19 +47,22 @@ def start():
         "license": license_key,
         "target": {
             # One of the below
-            "kubernetes": {
-                "image": "composabl/sim-demo:latest",
-                # "regcred": "composabl-registry",
-                # "namespace": "composabl-sims",
-            },
+            # "kubernetes": {
+            #     "image": "composabl/sim-demo:latest",
+            #     # "regcred": "composabl-registry",
+            #     # "namespace": "composabl-sims",
+            # },
             # "docker": {
-            #     "image": "composabl/sim-cstr:latest",
+            #     "image": "composabl/sim-demo-discrete:latest",
             #     # "registry": {
             #     #     "username": "composabl",
             #     #     "password": "composabl",
             #     #     "url": "https://index.docker.io/v1/",
             #     # }
             # },
+            "docker": {
+                "image": "composabl/sim-demo-discrete:latest"
+            }
             # "local": {
             #     "address": "localhost:1337"
             # }
@@ -74,11 +76,11 @@ def start():
         "runtime": {
             "ray": {
                 # "address": "ray://127.0.0.1:10001",
-                "workers": 5
+                # "workers": 5
             },
-            "model": {
-                "checkpoint_path": "/mnt/data"
-            }
+            # "model": {
+            #     "checkpoint_path": "/mnt/data"
+            # }
         },
     }
 
@@ -86,7 +88,6 @@ def start():
     agent = Agent(runtime, config)
     agent.add_sensors(sensors)
     agent.add_perceptors(perceptors)
-
     agent.add_skill(increment_skill)
     agent.add_skill(decrement_skill)
     agent.add_skill(increment_skill_controller)

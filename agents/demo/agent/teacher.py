@@ -5,7 +5,6 @@ class IncrementTeacher(Teacher):
     def __init__(self):
         self.past_obs = None
         self.counter = 0
-        pass
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         self.counter += 1
@@ -104,7 +103,7 @@ class SelectorTeacher(Teacher):
         return obs
 
     def transform_action(self, transformed_obs, action):
-        print("transform_action ======", transformed_obs)
+        # print("transform_action ======", transformed_obs)
         return action
 
     def filtered_observation_space(self):
