@@ -6,15 +6,22 @@ from teacher import CSTRTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
+
 
 def start():
     # delete old history files
-    dir = './cstr/deep_reinforcement_learning'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
+    try:
+        files = os.listdir(PATH_HISTORY)
+
+        pkl_files = [file for file in files if file.endswith('.pkl')]
+        for file in pkl_files:
+            file_path = os.path.join(dir, file)
+            os.remove(file_path)
+    except:
+        pass
 
     T = Sensor("T", "")
     Tc = Sensor("Tc", "")
@@ -40,18 +47,13 @@ def start():
         "target": {
             "docker": {
                 "image": "composabl/sim-cstr:latest"
-            },
-            #"local": {
-            #"address": "localhost:1337"
-            #}
+            }
         },
         "env": {
             "name": "sim-cstr",
         },
         "runtime": {
-            "ray": {
-                "workers": 1
-            }
+            "workers": 1
         }
     }
 
@@ -61,20 +63,19 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    checkpoint_path = './cstr/deep_reinforcement_learning/saved_agents/'
+    try:
+        files = os.listdir(PATH_CHECKPOINTS)
 
-    files = os.listdir(checkpoint_path)
-    if '.DS_Store' in files:
-        files.remove('.DS_Store')
+        if '.DS_Store' in files:
+            files.remove('.DS_Store')
 
-    if len(files) > 0:
-        #load agent
-        agent.load(checkpoint_path)
+        if len(files) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        os.mkdir(PATH_CHECKPOINTS)
 
     agent.train(train_iters=100)
-
-    #save agent
-    agent.export(checkpoint_path)
+    agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
