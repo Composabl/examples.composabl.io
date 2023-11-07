@@ -74,9 +74,11 @@ def start():
             }
         },
         "runtime": {
-            "ray": {
-                # "address": "ray://127.0.0.1:10001",
-                # "workers": 5
+            "runtime": {
+                "workers": 1,
+                # "ray": {
+                #     "address": "ray://127.0.0.1:10001",
+                # },
             },
             # "model": {
             #     "checkpoint_path": "/mnt/data"
