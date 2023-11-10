@@ -18,7 +18,7 @@ class CSTRTeacher(Teacher):
         self.rms_history = []
         self.last_reward = 0
         self.count = 0
-        self.metrics = 'fast' # standard, fast, none
+        self.metrics = 'none' # standard, fast, none
 
         # Create history folder if it doesn't exist
         if not os.path.exists(PATH_HISTORY):
@@ -71,11 +71,10 @@ class CSTRTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        success = False
         if self.obs_history is None:
             success = False
         else:
-            success = len(self.obs_history) > 100
+            success = False
             if self.metrics == 'standard':
                 try:
                     self.plot_obs()

@@ -3,22 +3,16 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
 from teacher import CSTRTeacher
-
+from sensors import sensors
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
-
-
-T = Sensor("T", "")
-Tc = Sensor("Tc", "")
-Ca = Sensor("Ca", "")
-Cref = Sensor("Cref", "")
-Tref = Sensor("Tref", "")
-
-sensors = [T, Tc, Ca, Cref, Tref]
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 # Cref_signal is a configuration variable for Concentration and Temperature setpoints
 reaction_scenarios = [
@@ -30,7 +24,6 @@ reaction_scenarios = [
 reaction_skill = Skill("reaction", CSTRTeacher, trainable=True)
 for scenario_dict in reaction_scenarios:
     reaction_skill.add_scenario(Scenario(scenario_dict))
-
 
 
 config = {
@@ -56,10 +49,8 @@ agent.add_sensors(sensors)
 
 agent.add_skill(reaction_skill)
 
-checkpoint_path = './cstr/deep_reinforcement_learning/saved_agents/'
-
 #load agent
-agent.load(checkpoint_path)
+agent.load(PATH_CHECKPOINTS)
 
 #save agent
 trained_agent = agent.prepare()
@@ -117,4 +108,4 @@ plt.plot([i for i in range(90)],Cref_list,'k--',lw=2,label=r'$C_{sp}$')
 plt.plot([i for i in range(90)],mean_Cr,'b.-',lw=1,label=r'$C_{sp}$')
 plt.ylabel('Concentration')
 
-plt.savefig('./cstr/deep_reinforcement_learning/benchmark_figure.png')
+plt.savefig(f"{PATH}/img/benchmark_figure.png")

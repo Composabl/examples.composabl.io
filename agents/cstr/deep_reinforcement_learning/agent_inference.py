@@ -1,7 +1,7 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
+from sensors import sensors
 from teacher import CSTRTeacher
 
 from cstr.external_sim.sim import CSTREnv
@@ -10,24 +10,11 @@ import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
-    # delete old history files
-    dir = './cstr/deep_reinforcement_learning'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('inference_data.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
-
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
-
-    sensors = [T, Tc, Ca, Cref, Tref]
-
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     reaction_scenarios = [
         {
@@ -62,10 +49,9 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    checkpoint_path = './cstr/deep_reinforcement_learning/saved_agents/'
-
     #load agent
-    agent.load(checkpoint_path)
+    #agent.load('./cstr/deep_reinforcement_learning/checkpoints')
+    agent.load(PATH_CHECKPOINTS)
 
     #save agent
     trained_agent = agent.prepare()
@@ -89,7 +75,7 @@ def start():
             break
 
     # save history data
-    df.to_pickle("./cstr/deep_reinforcement_learning/inference_data.pkl")
+    df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
 
     # plot
     plt.figure(figsize=(10,5))
@@ -112,7 +98,7 @@ def start():
     plt.ylabel('Concentration')
     plt.xlabel('iteration')
 
-    plt.savefig('./cstr/deep_reinforcement_learning/inference_figure.png')
+    plt.savefig(f"{PATH}/img/inference_figure.png")
 
 
 if __name__ == "__main__":
