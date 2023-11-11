@@ -28,7 +28,6 @@ class IncrementController(Controller):
         self.counter = 0
         
     def compute_action(self, obs):
-        print("controller obs", obs)
         self.counter += 1
         return {"action1": obs["state1"] + 1}
 

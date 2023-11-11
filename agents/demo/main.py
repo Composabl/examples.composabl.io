@@ -18,6 +18,7 @@ def start():
     state1 = Sensor("state1", "the counter")
     time_counter = Sensor("time_counter", "the time counter")
     sensors = [state1, time_counter]
+    sensors = [state1]
 
     increment_skill_controller = Skill("increment-controller", IncrementController, trainable=False)
     decrement_skill_controller = Skill("decremement-controller", DecrementController, trainable=False)
@@ -70,7 +71,7 @@ def start():
         "env": {
             "name": "composabl",
             "init": {
-                "hello": "world"
+                "space_type": "discrete",
             }
         },
         # "runtime": {

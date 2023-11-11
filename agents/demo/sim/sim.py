@@ -64,13 +64,7 @@ class SimEnv(gym.Env):
         self.time_ticks += 1
 
         # Run Simulation
-        print("action", action)
-        if action["action1"] == 0:
-            self.value -= 1
-        elif action["action1"] == 1:
-            self.value += 0
-        elif action["action1"] == 2:
-            self.value += 1
+        self.value += action
 
         #  Update obs with new state values (dummy function)
         obs = self._get_observation()
