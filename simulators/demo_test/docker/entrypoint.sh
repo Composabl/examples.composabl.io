@@ -19,7 +19,7 @@ APP_CMD=${APP_CMD:-"python src/main.py"}
 APP_PATH=${APP_PATH:-"/app"}
 IS_DEBUG=${IS_DEBUG:-false}
 MODE=${MODE:-standalone}  # kubernetes | standalone
-COMPOSABL_VERSION=$(python -c "import importlib.metadata; print(importlib.metadata.version('composabl-core'))" > /dev/null 2>&1)
+COMPOSBAL_VERSION=$(python -c "import importlib.metadata; print(importlib.metadata.version('composabl-core'))" > /dev/null 2>&1)
 HISTORIAN_MONIKER_MQTT=${HISTORIAN_MONIKER_MQTT:-"tcp://mqtt:1883"}
 
 # Function definitions
