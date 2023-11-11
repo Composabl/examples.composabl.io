@@ -10,7 +10,7 @@ class DeltaCounter():
         if self.previous_value is None:
             self.previous_value = obs[self.key]
             return {"delta_counter": 0, "state2": 0}
-        
+        print("obs ===", obs)
         delta = obs["state1"] - self.previous_value
         self.previous_value = obs["state1"]
         return {"delta_counter": delta, "state2": 0}

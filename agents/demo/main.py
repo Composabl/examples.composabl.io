@@ -114,12 +114,12 @@ def start():
     )
 
     # let's train the agent!
-    agent.train(train_iters=1)
+    agent.train(train_iters=5)
 
     # Export the agent to the specified directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
-    # agent.export(directory)
 
+    agent.export(directory)
     agent.load(directory)
 
     agent.train(train_iters=3)
@@ -134,7 +134,7 @@ def start():
         obs, _info = sim.reset()
         for _step_index in range(100):
             action = trained_agent.execute(obs)
-            obs, _reward, done, _truncated, _info = sim.step(action[0])
+            obs, _reward, done, _truncated, _info = sim.step(action)
 
 if __name__ == "__main__":
     start()

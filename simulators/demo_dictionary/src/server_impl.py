@@ -45,6 +45,7 @@ class ServerImpl(ServerComposabl):
         self.env.close()
 
     def SetScenario(self, scenario):
+        print("set scenario called!", scenario)
         self.env.scenario = scenario
 
     def GetScenario(self):
