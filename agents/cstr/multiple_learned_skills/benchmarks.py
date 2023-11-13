@@ -3,22 +3,16 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
-
+from sensors import sensors
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
-
-
-T = Sensor("T", "")
-Tc = Sensor("Tc", "")
-Ca = Sensor("Ca", "")
-Cref = Sensor("Cref", "")
-Tref = Sensor("Tref", "")
-
-sensors = [T, Tc, Ca, Cref, Tref]
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 # Cref_signal is a configuration variable for Concentration and Temperature setpoints
 ss1_scenarios = [
@@ -88,10 +82,8 @@ agent.add_skill(ss2_skill)
 agent.add_skill(transition_skill)
 agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
-checkpoint_path = './cstr/multiple_learned_skills/saved_agents/'
-
 #load agent
-agent.load(checkpoint_path)
+agent.load(PATH_CHECKPOINTS)
 
 #save agent
 trained_agent = agent.prepare()
@@ -151,4 +143,4 @@ plt.plot([i for i in range(90)],Cref_list,'k--',lw=2,label=r'$C_{sp}$')
 plt.plot([i for i in range(90)],mean_Cr,'b.-',lw=1,label=r'$C_{sp}$')
 plt.ylabel('Concentration')
 
-plt.savefig('./cstr/multiple_learned_skills/benchmark_figure.png')
+plt.savefig(f"{PATH}/img/benchmark_figure.png")

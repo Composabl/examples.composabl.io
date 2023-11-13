@@ -50,7 +50,6 @@ def start():
     agent.add_skill(reaction_skill)
 
     #load agent
-    #agent.load('./cstr/deep_reinforcement_learning/checkpoints')
     agent.load(PATH_CHECKPOINTS)
 
     #save agent

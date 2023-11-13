@@ -1,6 +1,6 @@
+import os
 from composabl import Teacher
 import numpy as np
-import os
 import math
 import matplotlib.pyplot as plt
 import pandas as pd

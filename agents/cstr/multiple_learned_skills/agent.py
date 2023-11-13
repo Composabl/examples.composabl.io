@@ -1,29 +1,28 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
+from sensors import sensors
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
     # delete old history files
-    dir = './cstr/multiple_learned_skills'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
+    try:
+        files = os.listdir(PATH_HISTORY)
 
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
+        pkl_files = [file for file in files if file.endswith('.pkl')]
+        for file in pkl_files:
+            file_path = os.path.join(dir, file)
+            os.remove(file_path)
+    except:
+        pass
 
-    sensors = [T, Tc, Ca, Cref, Tref]
-
+    # Scenarios
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     ss1_scenarios = [
         {
@@ -94,18 +93,19 @@ def start():
     agent.add_skill(transition_skill)
     agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
-    checkpoint_path = './cstr/multiple_learned_skills/saved_agents/'
+    try:
+        files = os.listdir(PATH_CHECKPOINTS)
 
-    files = os.listdir(checkpoint_path)
-    if len(files) > 1:
-        # load agent
-        agent.load(checkpoint_path)
+        if '.DS_Store' in files:
+            files.remove('.DS_Store')
 
-    # train agent
-    agent.train(train_iters=100)
+        if len(files) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        os.mkdir(PATH_CHECKPOINTS)
 
-    # save agent
-    agent.export(checkpoint_path)
+    agent.train(train_iters=10)
+    agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":

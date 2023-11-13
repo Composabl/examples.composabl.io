@@ -3,7 +3,7 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
-
+from sensors import sensors
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import numpy as np
@@ -11,24 +11,12 @@ import matplotlib.pyplot as plt
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
+
 
 def start():
-    # delete old history files
-    dir = './cstr/multiple_learned_skills'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('inference_data.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
-
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
-
-    sensors = [T, Tc, Ca, Cref, Tref]
-
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     ss1_scenarios = [
         {
@@ -99,10 +87,8 @@ def start():
     agent.add_skill(transition_skill)
     agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
-    checkpoint_path = './cstr/multiple_learned_skills/saved_agents/'
-
     #load agent
-    agent.load(checkpoint_path)
+    agent.load(PATH_CHECKPOINTS)
 
     #save agent
     trained_agent = agent.prepare()
@@ -127,7 +113,7 @@ def start():
             break
 
     # save history data
-    df.to_pickle("./cstr/multiple_learned_skills/inference_data.pkl")
+    df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
 
     # plot
     plt.figure(figsize=(10,5))
@@ -151,7 +137,7 @@ def start():
     plt.ylabel('Concentration')
     plt.xlabel('iteration')
 
-    plt.savefig('./cstr/multiple_learned_skills/inference_figure.png')
+    plt.savefig(f"{PATH}/img/inference_figure.png")
 
 
 if __name__ == "__main__":
