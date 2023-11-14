@@ -1,1 +1,1 @@
-composabl-core-dev==0.4.6.dev11
+composabl-core-dev==0.5.2.dev2
