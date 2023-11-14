@@ -5,7 +5,6 @@ import gymnasium as gym
 from composabl_core.agent.scenario import Scenario
 from composabl_core.grpc.server.server_composabl import ServerComposabl
 from gymnasium.envs.registration import EnvSpec
-
 from sim import SimEnv
 
 logger = logger_util.get_logger(__name__)
@@ -16,9 +15,12 @@ class ServerImpl(ServerComposabl):
     Define the way how Composabl (ServerComposabl) can interact with the simulation environment (SimEnv)
     """
     def __init__(self):
-        self.env = SimEnv()
+        self.env = None
 
     def Make(self, env_id: str, env_init: dict) -> EnvSpec:
+        print("got here ===", env_init)
+        logger.log("Creating sim with space_type: ", env_init["space_type"])
+        self.env = SimEnv(env_init["space_type"])
         return {
             "id": "my_simulator",
             "max_episode_steps": 1000

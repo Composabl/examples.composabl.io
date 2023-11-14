@@ -18,6 +18,7 @@ def start():
     state1 = Sensor("state1", "the counter")
     time_counter = Sensor("time_counter", "the time counter")
     sensors = [state1, time_counter]
+    sensors = [state1]
 
     increment_skill_controller = Skill("increment-controller", IncrementController, trainable=False)
     decrement_skill_controller = Skill("decremement-controller", DecrementController, trainable=False)
@@ -60,17 +61,17 @@ def start():
             #     #     "url": "https://index.docker.io/v1/",
             #     # }
             # },
-            "docker": {
-                "image": "composabl/sim-demo-discrete:latest"
-            }
-            # "local": {
-            #     "address": "localhost:1337"
+            # "docker": {
+            #     "image": "composabl/sim-demo-discrete:latest"
             # }
+            "local": {
+                "address": "localhost:1337"
+            }
         },
         "env": {
             "name": "composabl",
             "init": {
-                "hello": "world"
+                "space_type": "discrete",
             }
         },
         "runtime": {
@@ -96,14 +97,14 @@ def start():
     agent.add_skill(decrement_skill_controller)
     agent.add_selector_skill(
         target_skill_controller,
-        [increment_skill, decrement_skill_controller],
+        [increment_skill_controller, decrement_skill_controller],
         fixed_order=True,
         fixed_order_repeat=False,
     )
 
     agent.add_selector_skill(
         target_skill,
-        [increment_skill_controller, decrement_skill],
+        [increment_skill, decrement_skill],
         fixed_order=True,
         fixed_order_repeat=False,
     )
@@ -116,15 +117,15 @@ def start():
     )
 
     # let's train the agent!
-    agent.train(train_iters=1)
+    agent.train(train_iters=5)
 
     # Export the agent to the specified directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
-    # agent.export(directory)
 
+    agent.export(directory)
     agent.load(directory)
 
-    agent.train(train_iters=1)
+    agent.train(train_iters=3)
 
     # Create a callable agent that can be used to execute the agent skill heirarchy
     trained_agent = agent.prepare()
@@ -136,7 +137,7 @@ def start():
         obs, _info = sim.reset()
         for _step_index in range(100):
             action = trained_agent.execute(obs)
-            obs, _reward, done, _truncated, _info = sim.step(action[0])
+            obs, _reward, done, _truncated, _info = sim.step(action)
 
 if __name__ == "__main__":
     start()

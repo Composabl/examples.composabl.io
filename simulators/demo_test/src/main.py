@@ -16,7 +16,6 @@ def start():
     args = parser.parse_args()
 
     print(f"Starting with arguments {args}")
-
     try:
         server = Server(ServerImpl, args.host, args.port, args.timeout)
         server.start()
