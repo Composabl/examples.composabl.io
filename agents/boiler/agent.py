@@ -3,7 +3,7 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from teacher import LevelTeacher, PressureTeacher, TemperatureTeacher
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def start():
@@ -71,14 +71,14 @@ def start():
         "training": {}
     }
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Level_skill)
     agent.add_skill(Pressure_skill)
     agent.add_skill(Temperature_skill)
 
-    agent.train(train_iters=3)
+    runtime.train(agent, train_iters=3)
 
 
 if __name__ == "__main__":

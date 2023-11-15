@@ -8,7 +8,7 @@ from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import matplotlib.pyplot as plt
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -44,7 +44,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(reaction_skill)
@@ -53,7 +53,7 @@ def start():
     agent.load(PATH_CHECKPOINTS)
 
     #save agent
-    trained_agent = agent.prepare()
+    trained_agent = runtime.package(agent)
 
     # Inference
     noise = 0.05

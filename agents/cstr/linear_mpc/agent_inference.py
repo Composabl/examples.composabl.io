@@ -7,7 +7,7 @@ from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import matplotlib.pyplot as plt
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def start():
@@ -18,7 +18,7 @@ def start():
     for file in pkl_files:
         file_path = os.path.join(dir, file)
         os.remove(file_path)
-        
+
     T = Sensor("T", "")
     Tc = Sensor("Tc", "")
     Ca = Sensor("Ca", "")
@@ -55,7 +55,7 @@ def start():
         },
     }
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(reaction_skill)
@@ -70,7 +70,7 @@ def start():
         })
     df = pd.DataFrame()
     obs, info= sim.reset()
-    
+
     for i in range(90-1):
         action = cont.compute_action(obs)
         obs, reward, done, truncated, info = sim.step(action)
@@ -79,9 +79,9 @@ def start():
 
         if done:
             break
-    
+
     # save history data
-    df.to_pickle("./cstr/linear_mpc/inference_data.pkl") 
+    df.to_pickle("./cstr/linear_mpc/inference_data.pkl")
 
     # plot
     plt.figure(figsize=(10,5))
@@ -104,7 +104,7 @@ def start():
     plt.ylabel('Concentration')
     plt.xlabel('iteration')
 
-    plt.savefig('./cstr/linear_mpc/inference_figure.png') 
+    plt.savefig('./cstr/linear_mpc/inference_figure.png')
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ composabl sim start sim-NAME
 # Train an agent
 # e.g., poetry run demo
 cd agents/
-export COMPOSABL_KEY="<YOUR_KEY>"
+export COMPOSABL_LICENSE="<YOUR_KEY>"
 python cstr/agent.py
 ```
 

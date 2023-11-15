@@ -4,7 +4,7 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher,
                      StabilizationTeacher)
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def selector(x, y, angle, angle_speed):
@@ -69,7 +69,7 @@ def start():
         "training": {}
     }
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
@@ -78,7 +78,7 @@ def start():
     agent.add_skill(Stabilization_skill)
     # agent.add_selector_skill(selector_skill, [Navigation_skill, Alignment_skill], fixed_order=True, repeat=False)
 
-    agent.train(train_iters=5)
+    runtime.train(agent, train_iters=5)
 
 
 if __name__ == "__main__":

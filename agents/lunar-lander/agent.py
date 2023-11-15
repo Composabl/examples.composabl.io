@@ -4,7 +4,7 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from teacher import (LandTeacher, MoveToCenterTeacher, SelectorTeacher,
                      StabilizeTeacher)
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def start():
@@ -189,14 +189,14 @@ def start():
         "training": {}
     }
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(stabilize_skill)
     agent.add_skill(move_to_center_skill)
     agent.add_skill(land_skill)
     agent.add_selector_skill(selector_skill, [stabilize_skill, move_to_center_skill, land_skill], fixed_order=True, repeat=False)
-    agent.train(train_iters=100)
+    runtime.train(agent, train_iters=100)
 
 
 if __name__ == "__main__":

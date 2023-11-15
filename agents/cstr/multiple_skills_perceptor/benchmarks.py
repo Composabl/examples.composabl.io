@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 from composabl import Controller
 
@@ -112,7 +112,7 @@ config = {
 }
 
 runtime = Runtime(config)
-agent = Agent(runtime, config)
+agent = Agent()
 agent.add_sensors(sensors)
 agent.add_perceptors(perceptors)
 
@@ -127,7 +127,7 @@ checkpoint_path = './cstr/multiple_skills_perceptor/saved_agents/'
 agent.load(checkpoint_path)
 
 #save agent
-trained_agent = agent.prepare()
+trained_agent = runtime.package(agent)
 
 noise = 0.05
 sim = CSTREnv()

@@ -5,7 +5,7 @@ from perceptors import perceptors
 
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 from composabl import Controller
 
@@ -123,7 +123,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
     agent.add_perceptors(perceptors)
 
@@ -140,7 +140,7 @@ def start():
         agent.load(checkpoint_path)
 
     # train agent
-    agent.train(train_iters=10)
+    runtime.train(agent, train_iters=10)
 
     # save agent
     agent.export(checkpoint_path)

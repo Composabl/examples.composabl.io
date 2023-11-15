@@ -9,7 +9,7 @@ from agent.teacher import DecrementTeacher, IncrementTeacher, SelectorTeacher
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sim.sim import SimEnv
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def start():
@@ -87,7 +87,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
     agent.add_perceptors(perceptors)
     agent.add_skill(increment_skill)
@@ -116,7 +116,7 @@ def start():
     )
 
     # let's train the agent!
-    agent.train(train_iters=1)
+    runtime.train(agent, train_iters=1)
 
     # Export the agent to the specified directory then re-load it and resume training
     directory = os.path.join(os.getcwd(), "model")
@@ -124,10 +124,10 @@ def start():
 
     agent.load(directory)
 
-    agent.train(train_iters=1)
+    runtime.train(agent, train_iters=1)
 
-    # Create a callable agent that can be used to execute the agent skill heirarchy
-    trained_agent = agent.prepare()
+    # Create a callable agent that can be used to execute the agent skill hierarchy
+    trained_agent = runtime.package(agent)
 
     # Run the trained_agent on the sim
     sim = SimEnv()
