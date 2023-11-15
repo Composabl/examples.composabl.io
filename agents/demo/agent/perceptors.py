@@ -10,7 +10,6 @@ class DeltaCounter():
         if self.previous_value is None:
             self.previous_value = obs[self.key]
             return {"delta_counter": 0, "state2": 0}
-        
         delta = obs["state1"] - self.previous_value
         self.previous_value = obs["state1"]
         return {"delta_counter": delta, "state2": 0}
@@ -19,6 +18,6 @@ class DeltaCounter():
         return ["state1"]
 
 
-delta_counter = Perceptor(["delta_counter", "state2"], DeltaCounter, "the change in the counter from the last two steps")
+delta_counter = Perceptor("perceptor1", DeltaCounter, "the change in the counter from the last two steps")
 
 perceptors = [delta_counter]
