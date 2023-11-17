@@ -1,21 +1,16 @@
 import os
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl import Agent, Runtime, Scenario, Skill
 from teacher import NavigationTeacher
+from sensors import sensors
 
 license_key = os.environ["COMPOSABL_KEY"]
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
-    y1 = Sensor("y1", "air speed")
-    y2 = Sensor("y2", "climb rate")
-    u1 = Sensor("u1", "horizontal velocity")
-    u2 = Sensor("u2", "vertical velocity")
-    u3 = Sensor("u3", "rotation")
-    u4 = Sensor("u4", "angle")
-
-    sensors = [y1, y2, u1, u2, u3, u4]
-
     Navigation_scenarios = [
         {
             "y1": 0,
@@ -38,7 +33,10 @@ def start():
         "target": {
             "docker": {
                 "image": "composabl/sim-airplane"
-            }
+            },
+            #"local": {
+            #   "address": "localhost:1337"
+            #}
         },
         "env": {
             "name": "airplane",
@@ -51,7 +49,20 @@ def start():
 
     agent.add_skill(Navigation_skill)
 
+    try:
+        files = os.listdir(PATH_CHECKPOINTS)
+
+        if '.DS_Store' in files:
+            files.remove('.DS_Store')
+
+        if len(files) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        os.mkdir(PATH_CHECKPOINTS)
+
     agent.train(train_iters=10)
+
+    agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
