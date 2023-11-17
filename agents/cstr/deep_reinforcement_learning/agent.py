@@ -30,7 +30,7 @@ def start():
         }
     ]
 
-    reaction_skill = Skill("reaction", CSTRTeacher, trainable=True)
+    reaction_skill = Skill("reaction", CSTRTeacher)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
@@ -39,23 +39,26 @@ def start():
         "target": {
             "docker": {
                 "image": "composabl/sim-cstr:latest"
-            }
+            },
+            #"local": {
+            #   "address": "localhost:1337"
+            #}
         },
         "env": {
             "name": "sim-cstr",
         },
         "runtime": {
-            "workers": 8
+            "workers": 1
         }
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(reaction_skill)
 
-    try:
+    '''try:
         files = os.listdir(PATH_CHECKPOINTS)
 
         if '.DS_Store' in files:
@@ -64,9 +67,10 @@ def start():
         if len(files) > 0:
             agent.load(PATH_CHECKPOINTS)
     except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+        os.mkdir(PATH_CHECKPOINTS)'''
 
-    agent.train(train_iters=20)
+    runtime.train(agent, train_iters=2)
+
     agent.export(PATH_CHECKPOINTS)
 
 
