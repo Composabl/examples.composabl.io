@@ -45,7 +45,7 @@ def start():
             "name": "sim-cstr",
         },
         "runtime": {
-            "workers": 8
+            "workers": 1
         }
     }
 
