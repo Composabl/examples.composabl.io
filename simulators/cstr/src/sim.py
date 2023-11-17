@@ -30,7 +30,13 @@ class CSTREnv(gym.Env):
         self.scenario: Scenario = None
 
         self.observation_space = gym.spaces.Box(low=np.array([200, 200, 0, 0, 200]), high=np.array([500, 500, 12, 12, 500]))
-
+        # Dict space test self.T, self.Tc, self.Ca, self.Cref, self.Tref
+        self.observation_space = gym.spaces.Dict({'T': gym.spaces.Box(low=np.array([200.0]), high=np.array([500.0])),
+            'Tc': gym.spaces.Box(low=np.array([200.0]), high=np.array([500.0])),
+            'Ca': gym.spaces.Box(low=np.array([0.0]), high=np.array([12.0])),
+            'Cref': gym.spaces.Box(low=np.array([0.0]), high=np.array([12.0])),
+            'Tref': gym.spaces.Box(low=np.array([200.0]), high=np.array([500.0])),
+        })
         self.action_space = gym.spaces.Box(low=np.array([-10.0]), high=np.array([10.0]))
 
 
@@ -72,7 +78,14 @@ class CSTREnv(gym.Env):
         self.y_list = []
         self.error_list = []
         self.obs = np.array([self.T, self.Tc, self.Ca, self.Cref, self.Tref])
-
+        # Dict space test
+        self.obs = {
+            'T': self.T,
+            'Tc': self.Tc,
+            'Ca': self.Ca,
+            'Cref': self.Cref,
+            'Tref': self.Tref
+        }
         info = {}
         return self.obs, info
 
@@ -158,7 +171,14 @@ class CSTREnv(gym.Env):
         info = {}
 
         self.obs = np.array([self.T, self.Tc, self.Ca, self.Cref, self.Tref])
-
+        # Dict space test
+        self.obs = {
+            'T': self.T,
+            'Tc': self.Tc,
+            'Ca': self.Ca,
+            'Cref': self.Cref,
+            'Tref': self.Tref
+        }
         return self.obs, reward, done, False, info
 
     def render(self, mode='human', close=False):

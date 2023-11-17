@@ -58,7 +58,7 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    '''try:
+    try:
         files = os.listdir(PATH_CHECKPOINTS)
 
         if '.DS_Store' in files:
@@ -67,7 +67,7 @@ def start():
         if len(files) > 0:
             agent.load(PATH_CHECKPOINTS)
     except Exception:
-        os.mkdir(PATH_CHECKPOINTS)'''
+        os.mkdir(PATH_CHECKPOINTS)
 
     runtime.train(agent, train_iters=2)
 

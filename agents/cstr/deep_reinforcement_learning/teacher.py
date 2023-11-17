@@ -18,7 +18,7 @@ class CSTRTeacher(Teacher):
         self.rms_history = []
         self.last_reward = 0
         self.count = 0
-        self.metrics = 'none' # standard, fast, none
+        self.metrics = 'fast' # standard, fast, none
 
         # Create history folder if it doesn't exist
         if not os.path.exists(PATH_HISTORY):
@@ -85,7 +85,12 @@ class CSTRTeacher(Teacher):
         return success
 
     def compute_termination(self, transformed_obs, action):
-        return False
+        # Early termination
+        error = abs(transformed_obs['Cref'] - transformed_obs['Ca'])
+        if error >= 1.5:
+            return True
+        else:
+            return False
 
     def plot_metrics(self):
         plt.figure(1, figsize=(7, 5))
