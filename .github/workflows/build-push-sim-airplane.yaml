@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🏷️ Get Version (v0.5.0 should give 0.5.0) (refs/tags/v)
-        run: echo "TAG_VERSION=${GITHUB_REF#refs/tags/v*/}" | sed 's/refs\/tags\/v//' >> $GITHUB_ENV
+        run: echo "TAG_VERSION=$(echo $GITHUB_REF_NAME | sed 's/v//')" >> $GITHUB_ENV
 
       - name: 🐣 Set up QEMU emulator
         uses: docker/setup-qemu-action@v2
