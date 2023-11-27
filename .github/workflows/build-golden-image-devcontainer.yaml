@@ -14,17 +14,9 @@
 name: 🪙 Golden Image - DevContainer
 
 on:
-  workflow_dispatch:
-  # Run weekly on Mondays
-  # schedule:
-  #   - cron: "0 0 * * 1"
   push:
-    branches:
-      - main
     tags:
       - v*
-    paths:
-      - golden-images/packer/devcontainer.pkr.hcl
 
 env:
   PACKER_PATH: ./golden-images/packer/devcontainer.pkr.hcl

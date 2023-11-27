@@ -14,17 +14,9 @@
 name: 🪙 Golden Image - WSL
 
 on:
-  workflow_dispatch:
-  # Run weekly on Mondays
-  schedule:
-    - cron: "0 0 * * 1"
   push:
-    branches:
-      - main
     tags:
       - v*
-    paths:
-      - golden-images/packer/wsl.pkr.hcl
 
 env:
   PACKER_PATH: ./golden-images/packer/wsl.pkr.hcl
