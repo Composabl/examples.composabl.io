@@ -14,10 +14,7 @@
 name: "🐳 Build and Deploy - Lunar Lander"
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
     tags:
       - v*
     paths:
@@ -33,6 +30,9 @@ jobs:
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v3
+
+      - name: 🏷️ Get Version (v0.5.0 should give 0.5.0)
+        run: echo "TAG_VERSION=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
 
       - name: 🐣 Set up QEMU emulator
         uses: docker/setup-qemu-action@v2

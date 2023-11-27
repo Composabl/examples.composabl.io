@@ -19,9 +19,6 @@ on:
       - v*
     paths:
       - simulators/airplane/**
-  pull_request:
-    branches:
-      - main
 
 env:
   IMAGE_NAME: "sim-airplane"
