@@ -27,15 +27,16 @@ class CSTREnv(gym.Env):
         '''
         self.Cref_signal = "complete"
         self.noise_percentage = 0
+        self.scenario: Scenario = None
 
         self.observation_space = gym.spaces.Box(low=np.array([200, 200, 0, 0, 200]), high=np.array([500, 500, 12, 12, 500]))
+
         self.action_space = gym.spaces.Box(low=np.array([-10.0]), high=np.array([10.0]))
 
 
     def reset(self):
         # Define scenario in the simulation
         if isinstance(self.scenario, Scenario):
-            #print("SCENARIO")
             sample = self.scenario.sample()
 
             for key in list(sample.keys()):
@@ -63,8 +64,6 @@ class CSTREnv(gym.Env):
         if self.Cref_signal == "ss1":
             self.Cref = 2
             self.Tref = 373.1311
-            self.Ca = 2
-            self.T = 373.1311
         else:
             self.Cref = 8.5698
             self.Tref = 311.2612
@@ -73,6 +72,7 @@ class CSTREnv(gym.Env):
         self.y_list = []
         self.error_list = []
         self.obs = np.array([self.T, self.Tc, self.Ca, self.Cref, self.Tref])
+
         info = {}
         return self.obs, info
 
@@ -158,6 +158,7 @@ class CSTREnv(gym.Env):
         info = {}
 
         self.obs = np.array([self.T, self.Tc, self.Ca, self.Cref, self.Tref])
+
         return self.obs, reward, done, False, info
 
     def render(self, mode='human', close=False):
