@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 from composabl import Controller
 
@@ -123,7 +123,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
     agent.add_perceptors(perceptors)
 
@@ -138,7 +138,7 @@ def start():
     agent.load(checkpoint_path)
 
     #save agent
-    trained_agent = agent.prepare()
+    trained_agent = runtime.package(agent)
 
     # Inference
     noise = 0.05

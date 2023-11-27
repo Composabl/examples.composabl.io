@@ -12,9 +12,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 os.environ["COMPOSABL_EULA_AGREED"] = "1"
-license_key = os.environ["COMPOSABL_KEY"]
-    
-    
+license_key = os.environ["COMPOSABL_LICENSE"]
+
+
 def start():
     T = Sensor("T", "")
     Tc = Sensor("Tc", "")
@@ -53,7 +53,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(control_skill)
@@ -64,7 +64,7 @@ def start():
     agent.load(checkpoint_path)
 
     #save agent
-    trained_agent = agent.prepare()
+    trained_agent = runtime.package(agent)
 
     # Inference
     noise = 0.0
@@ -83,9 +83,9 @@ def start():
 
         if done:
             break
-    
+
     # save history data
-    df.to_pickle("./cstr/skill_group_drl_mpc/inference_data.pkl")  
+    df.to_pickle("./cstr/skill_group_drl_mpc/inference_data.pkl")
 
     # plot
     plt.figure(figsize=(10,5))

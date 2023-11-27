@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 os.environ["COMPOSABL_EULA_AGREED"] = "1"
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def start():
@@ -49,7 +49,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(control_skill)
@@ -61,7 +61,7 @@ def start():
         #load agent
         agent.load(checkpoint_path)
 
-    agent.train(train_iters=1)
+    runtime.train(agent, train_iters=1)
 
     #save agent
     agent.export(checkpoint_path)

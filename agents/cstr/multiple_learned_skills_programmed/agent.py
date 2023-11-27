@@ -5,7 +5,7 @@ from sensors import sensors
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 from composabl import Controller
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -113,7 +113,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(ss1_skill)
@@ -133,7 +133,7 @@ def start():
         os.mkdir(PATH_CHECKPOINTS)
 
     # train agent
-    agent.train(train_iters=200)
+    runtime.train(agent, train_iters=200)
 
     # save agent
     agent.export(PATH_CHECKPOINTS)

@@ -3,7 +3,7 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from teacher import BalanceTeacher
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 
 def start():
@@ -70,12 +70,12 @@ def start():
         "training": {}
     }
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
 
-    agent.train(train_iters=10)
+    runtime.train(agent, train_iters=10)
 
 
 if __name__ == "__main__":

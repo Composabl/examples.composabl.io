@@ -4,7 +4,7 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
 from teacher import CSTRTeacher
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -12,16 +12,16 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 
 def start():
-    # delete old history files
-    try:
-        files = os.listdir(PATH_HISTORY)
+    # # delete old history files
+    # try:
+    #     files = os.listdir(PATH_HISTORY)
 
-        pkl_files = [file for file in files if file.endswith('.pkl')]
-        for file in pkl_files:
-            file_path = os.path.join(dir, file)
-            os.remove(file_path)
-    except:
-        pass
+    #     pkl_files = [file for file in files if file.endswith('.pkl')]
+    #     for file in pkl_files:
+    #         file_path = os.path.join(dir, file)
+    #         os.remove(file_path)
+    # except:
+    #     pass
 
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     reaction_scenarios = [
@@ -30,7 +30,7 @@ def start():
         }
     ]
 
-    reaction_skill = Skill("reaction", CSTRTeacher, trainable=True)
+    reaction_skill = Skill("reaction", CSTRTeacher)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
@@ -55,18 +55,18 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    try:
-        files = os.listdir(PATH_CHECKPOINTS)
+    # try:
+    #     files = os.listdir(PATH_CHECKPOINTS)
 
-        if '.DS_Store' in files:
-            files.remove('.DS_Store')
+    #     if '.DS_Store' in files:
+    #         files.remove('.DS_Store')
 
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+    #     if len(files) > 0:
+    #         agent.load(PATH_CHECKPOINTS)
+    # except Exception:
+    #     os.mkdir(PATH_CHECKPOINTS)
 
-    agent.train(train_iters=20)
+    agent.train()
     agent.export(PATH_CHECKPOINTS)
 
 

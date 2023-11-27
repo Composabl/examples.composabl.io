@@ -4,7 +4,7 @@ from composabl import Agent, Runtime, Scenario, Skill
 from teacher import NavigationTeacher
 from sensors import sensors
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -22,7 +22,7 @@ def start():
         }
     ]
 
-    Navigation_skill = Skill("Navigation", NavigationTeacher, trainable=True)
+    Navigation_skill = Skill("Navigation", NavigationTeacher)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
@@ -44,23 +44,12 @@ def start():
         "training": {}
     }
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
 
-    try:
-        files = os.listdir(PATH_CHECKPOINTS)
-
-        if '.DS_Store' in files:
-            files.remove('.DS_Store')
-
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
-
-    agent.train(train_iters=10)
+    runtime.train(agent, train_iters=10)
 
     agent.export(PATH_CHECKPOINTS)
 

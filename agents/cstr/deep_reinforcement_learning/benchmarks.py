@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
@@ -44,7 +44,7 @@ config = {
 }
 
 runtime = Runtime(config)
-agent = Agent(runtime, config)
+agent = Agent()
 agent.add_sensors(sensors)
 
 agent.add_skill(reaction_skill)
@@ -53,7 +53,7 @@ agent.add_skill(reaction_skill)
 agent.load(PATH_CHECKPOINTS)
 
 #save agent
-trained_agent = agent.prepare()
+trained_agent = runtime.package(agent)
 
 noise = 0.05
 sim = CSTREnv()
