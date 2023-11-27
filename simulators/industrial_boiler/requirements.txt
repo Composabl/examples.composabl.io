@@ -1,4 +1,4 @@
-composabl-core==0.4.1
+composabl-core==0.5.0
 scipy
 casadi==3.5.5
 control==0.9.4

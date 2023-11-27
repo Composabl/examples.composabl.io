@@ -27,7 +27,7 @@ def start():
         }
     ]
 
-    Navigation_skill = Skill("Navigation", NavigationTeacher, trainable=True)
+    Navigation_skill = Skill("Navigation", NavigationTeacher)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)

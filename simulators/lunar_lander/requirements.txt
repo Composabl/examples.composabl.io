@@ -1,2 +1,2 @@
-composabl-core==0.4.1
+composabl-core==0.5.0
 gymnasium[box2d]==0.28.1
