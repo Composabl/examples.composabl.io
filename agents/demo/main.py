@@ -59,7 +59,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
     agent.add_perceptors(perceptors)
     agent.add_skill(increment_skill)
@@ -88,7 +88,7 @@ def start():
     )
 
     # let's train the agent!
-    agent.train()
+    runtime.train(agent, train_iters=1)
 
 if __name__ == "__main__":
     start()
