@@ -50,7 +50,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(reaction_skill)
@@ -66,7 +66,7 @@ def start():
     # except Exception:
     #     os.mkdir(PATH_CHECKPOINTS)
 
-    agent.train()
+    runtime.train(agent, train_iters=1)
     agent.export(PATH_CHECKPOINTS)
 
 

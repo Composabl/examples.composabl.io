@@ -73,7 +73,7 @@ def start():
     agent = Agent()
     agent.add_sensors(sensors)
 
-    agent.add_skill(Navigation_skill)
+    agent.add_skill(balance_skill)
 
     runtime.train(agent, train_iters=10)
 
