@@ -28,7 +28,7 @@ control_scenarios = [
     }
 ]
 
-control_skill = Skill("control", CSTRTeacher, trainable=True)
+control_skill = Skill("control", CSTRTeacher)
 for scenario_dict in control_scenarios:
     control_skill.add_scenario(Scenario(scenario_dict))
 

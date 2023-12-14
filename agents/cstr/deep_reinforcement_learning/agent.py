@@ -37,8 +37,11 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            "docker": {
-                "image": "composabl/sim-cstr:latest"
+            #"docker": {
+            #    "image": "composabl/sim-cstr:latest"
+            #},
+            "local": {
+               "address": "localhost:1337"
             }
         },
         "env": {

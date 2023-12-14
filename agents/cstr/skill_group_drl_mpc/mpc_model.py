@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 π = math.pi
 
-def non_lin_mpc(noise, CrSP, Ca0, T0, Tc0):
+def mpc(noise, CrSP, Ca0, T0, Tc0):
 
     #constants
     F = 1 #Volumetric flow rate (m3/h)

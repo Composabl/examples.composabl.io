@@ -22,7 +22,7 @@ def start():
         }
     ]
 
-    reaction_skill = Skill("reaction", CSTRTeacher, trainable=True)
+    reaction_skill = Skill("reaction", CSTRTeacher)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
