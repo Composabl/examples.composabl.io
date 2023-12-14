@@ -18,7 +18,7 @@ class CSTRTeacher(Teacher):
         self.rms_history = []
         self.last_reward = 0
         self.count = 0
-        self.metrics = 'fast' # standard, fast, none
+        self.metrics = 'none' # standard, fast, none
 
         # Create history folder if it doesn't exist
         if not os.path.exists(PATH_HISTORY):
@@ -26,7 +26,7 @@ class CSTRTeacher(Teacher):
 
         # create metrics db
         try:
-            self.df = pd.read_pickle(f"{PATH_HISTORY}/db.pkl")
+            #self.df = pd.read_pickle(f"{PATH_HISTORY}/db.pkl")
 
             if self.metrics == 'fast':
                 self.plot_metrics()
@@ -55,15 +55,16 @@ class CSTRTeacher(Teacher):
         rms = math.sqrt(np.mean(self.error_history))
         self.rms_history.append(rms)
         # minimize rms error
-        reward = 1 / rms
+        reward = 1 / (math.sqrt(error)+0.00000000001)
+        #reward = 1 / rms
         self.reward_history.append(reward)
 
         self.count += 1
 
         # history metrics
-        df_temp = pd.DataFrame(columns=['time', 'Ca', 'Cref', 'reward', 'rms'], data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
+        #df_temp = pd.DataFrame(columns=['time', 'Ca', 'Cref', 'reward', 'rms'], data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+        #self.df = pd.concat([self.df, df_temp])
+        #self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
 
         return reward
 
@@ -85,6 +86,7 @@ class CSTRTeacher(Teacher):
         return success
 
     def compute_termination(self, transformed_obs, action):
+        return False
         # Early termination
         error = abs(transformed_obs['Cref'] - transformed_obs['Ca'])
         if error >= 1.5:

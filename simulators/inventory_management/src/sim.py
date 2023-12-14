@@ -56,6 +56,7 @@ class Env(gym.Env):
         self.inventory_level = []
         self.balance_history = []
         self.num_ordered_list = []
+        self.scenario = None
 
     def handle_order(self, env, order_target, cost_price=50, delay_days_until_delivery=2):
         global inventory, balance, num_ordered
@@ -154,10 +155,8 @@ class Env(gym.Env):
                     "customer_demand_max": float(self.customer_demand_max),
                     "selling_price": float(self.selling_price)
                     }
-        #print("RESET", self.obs)
+        print("RESET", self.obs)
         self.obs = np.array(list(self.obs.values()))
-
-
         info = {}
         return self.obs, info
 
@@ -165,6 +164,7 @@ class Env(gym.Env):
         self.scenario = scenario
 
     def step(self, action):
+        print("Step: ", num_ordered_total, self.balance_history)
         simpyenv = sp.Environment()
 
         simpyenv.process(self.warehouse_run(
@@ -183,7 +183,7 @@ class Env(gym.Env):
         simpyenv.run(until=self.run_time)
 
         num_ordered_total = sum(self.num_ordered_list)
-        #print("Step: ", num_ordered_total, self.balance_history)
+        print("Step: ", num_ordered_total, self.balance_history)
 
         #TODO: new features
         # order max, order mean, balance total, balance mean, balance min,

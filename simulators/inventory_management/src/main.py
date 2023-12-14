@@ -1,14 +1,9 @@
 import argparse
-import asyncio
 import os
 
 import grpc
-
-import composabl_core.utils.logger as logger_util
 from composabl_core.grpc.server.server import Server
 from server_impl import ServerImpl
-
-logger = logger_util.get_logger(__name__)
 
 
 def start():
@@ -20,23 +15,21 @@ def start():
     )
     args = parser.parse_args()
 
-    event_loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(event_loop)
-
-    logger.log(f"Starting with arguments {args}")
+    print(f"Starting with arguments {args}")
 
     try:
         server = Server(ServerImpl, args.host, args.port, args.timeout)
-        event_loop.run_until_complete(server.start())
+        server.start()
     except KeyboardInterrupt:
-        logger.log("KeyboardInterrupt, Gracefully stopping the server")
-        event_loop.run_until_complete(server.stop())
+        print("KeyboardInterrupt, Gracefully stopping the server")
+        server.stop()
     except grpc.RpcError as e:
-        logger.log(f"gRPC error: {e}, Gracefully stopping the server")
-        event_loop.run_until_complete(server.stop())
+        print(f"gRPC error: {e}, Gracefully stopping the server")
+        server.stop()
     except Exception as e:
-        logger.log(f"Unknown error: {e}, Gracefully stopping the server")
-        event_loop.run_until_complete(server.stop())
+        print(f"Unknown error: {e}, Gracefully stopping the server")
+        server.stop()
+
 
 if __name__ == "__main__":
     start()

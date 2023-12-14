@@ -38,7 +38,7 @@ class BalanceTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        return len(self.obs_history) > 100
+        return False
 
     def compute_termination(self, transformed_obs, action):
         return False

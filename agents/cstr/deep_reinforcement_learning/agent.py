@@ -5,6 +5,7 @@ from sensors import sensors
 from teacher import CSTRTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
+os.environ["COMPOSABL_LICENSE"] = os.environ["COMPOSABL_KEY"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -37,19 +38,28 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            "docker": {
-                "image": "composabl/sim-cstr:latest"
-            },
+            #"docker": {
+            #    "image": "composabl/sim-cstr:latest"
+            #},
             #"local": {
             #   "address": "localhost:1337"
-            #}
+            #},
+            "kubernetes":{
+                "is_dev": "true",
+                "image": "composabl/sim-cstr:latest",
+                "namespace": "composabl-train",
+                "namespace_sims": "composabl-sims",
+                "output_dir": "data",
+                #"project_id": "test-project",
+                #"org_id": "test-org"
+            }
         },
         "env": {
             "name": "sim-cstr",
         },
-        "runtime": {
-            "workers": 1
-        }
+        #"runtime": {
+        #    "workers": 8
+        #}
     }
 
     runtime = Runtime(config)
@@ -58,7 +68,7 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    try:
+    '''try:
         files = os.listdir(PATH_CHECKPOINTS)
 
         if '.DS_Store' in files:
@@ -67,12 +77,14 @@ def start():
         if len(files) > 0:
             agent.load(PATH_CHECKPOINTS)
     except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+        os.mkdir(PATH_CHECKPOINTS)'''
 
-    runtime.train(agent, train_iters=2)
-
-    agent.export(PATH_CHECKPOINTS)
+    runtime.train(agent, train_iters=10)
+    #agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
     start()
+
+
+# PPO, 100 iter, 8 workers -  0.6.0.dev2 14:59 - 15:08 : 9 mins

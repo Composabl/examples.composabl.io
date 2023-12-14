@@ -1,8 +1,9 @@
 import math
-import numpy as np 
+import numpy as np
 
 from composabl_core.agent import Teacher
-from non_linear_mpc_model import non_lin_mpc
+#from non_linear_mpc_model import non_lin_mpc
+from linear_mpc_model import non_lin_mpc
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,10 +13,11 @@ class CSTRTeacher(Teacher):
         self.obs_history = None
         self.reward_history = []
         self.error_history = []
+        self.rms_history = []
         self.last_reward = 0
         self.count = 0
         self.metrics = 'none' #standard, fast, none
-        
+
         # create metrics db
         try:
             self.df = pd.read_pickle('./cstr/skill_group_drl_mpc/history.pkl')
@@ -23,7 +25,7 @@ class CSTRTeacher(Teacher):
                 self.plot_metrics()
         except:
             self.df = pd.DataFrame()
-        
+
 
     def transform_obs(self, obs, action):
         return obs
@@ -33,26 +35,27 @@ class CSTRTeacher(Teacher):
             if 'observation' in list(transformed_obs.keys()):
                 transformed_obs = transformed_obs['observation'][0]
                 #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-                MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2], 
+                MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2],
                                                         transformed_obs[0], transformed_obs[1] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
             else:
-                #Import MPC
-                MPC_Tc = non_lin_mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
-                                                        transformed_obs['T'], transformed_obs['Tc'] + action[0])
-                dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
-        
+                #Import MPC (noise, CrSP, Ca0, T0, Tc0)
+                MPC_Tc = non_lin_mpc(0, transformed_obs['Cref'][0], transformed_obs['Ca'][0],
+                                                        transformed_obs['T'][0], transformed_obs['Tc'][0] + action[0])
+                dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc'][0]
+                #print(MPC_Tc[0][0],transformed_obs['Tc'][0], dTc_MPC)
+
         else:
             #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-            MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2], 
+            MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2],
                                                     transformed_obs[0], transformed_obs[1] + action[0])
             dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
 
-            
+
         #limit MPC actions between -10 and 10 degrees Celsius
         dTc_MPC = np.clip(dTc_MPC,-10,10)
         action = dTc_MPC
-        
+
         return action
 
     def filtered_observation_space(self):
@@ -65,18 +68,24 @@ class CSTRTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
 
-        reward = math.e ** (-abs(transformed_obs['Cref'] - transformed_obs['Ca']))
+        #reward = math.e ** (-abs(transformed_obs['Cref'] - transformed_obs['Ca']))
 
         error = (transformed_obs['Cref'] - transformed_obs['Ca'])**2
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
+        self.rms_history.append(rms)
+        reward = 1/rms
         self.last_reward = reward
-        self.count += 1
+
+        if self.count > 90:
+            self.count = 0
+        else:
+            self.count += 1
 
         # history metrics
         df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./cstr/skill_group_drl_mpc/history.pkl")  
+        self.df.to_pickle("./cstr/skill_group_drl_mpc/history.pkl")
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
@@ -93,11 +102,11 @@ class CSTRTeacher(Teacher):
                 except Exception as e:
                     print('Error: ', e)
 
-            return len(self.obs_history) > 100
+            return False
 
     def compute_termination(self, transformed_obs, action):
         return False
-    
+
     def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
         plt.clf()
@@ -107,7 +116,7 @@ class CSTRTeacher(Teacher):
         plt.ylabel('Reward')
         plt.legend(['reward'],loc='best')
         plt.title('Metrics')
-        
+
         plt.subplot(3,1,2)
         plt.plot(self.rms_history, 'r.-')
         plt.scatter(self.df.reset_index()['time'],self.df.reset_index()['rms'],s=0.5, alpha=0.2)
@@ -120,7 +129,7 @@ class CSTRTeacher(Teacher):
         plt.ylabel('Ca')
         plt.legend(['Ca'],loc='best')
         plt.xlabel('iteration')
-        
+
         plt.draw()
         plt.pause(0.001)
 
@@ -132,7 +141,7 @@ class CSTRTeacher(Teacher):
         plt.ylabel('Cooling Tc (K)')
         plt.legend(['Jacket Temperature'],loc='best')
         plt.title('CSTR Live Control')
-        
+
 
         plt.subplot(3,1,2)
         plt.plot([ x["Ca"] for x in self.obs_history],'b.-',lw=3)
@@ -146,6 +155,6 @@ class CSTRTeacher(Teacher):
         plt.ylabel('T (K)')
         plt.xlabel('Time (min)')
         plt.legend(['Temperature Setpoint','Reactor Temperature'],loc='best')
-        
+
         plt.draw()
         plt.pause(0.001)
