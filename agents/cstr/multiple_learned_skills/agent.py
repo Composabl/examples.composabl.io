@@ -98,9 +98,11 @@ def start():
 
         if '.DS_Store' in files:
             files.remove('.DS_Store')
+            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
         if len(files) > 0:
             agent.load(PATH_CHECKPOINTS)
+
     except Exception:
         os.mkdir(PATH_CHECKPOINTS)
 

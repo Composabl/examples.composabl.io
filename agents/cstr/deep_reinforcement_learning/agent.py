@@ -37,18 +37,18 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            #"docker": {
-            #    "image": "composabl/sim-cstr:latest"
-            #},
-            "local": {
-               "address": "localhost:1337"
-            }
+            "docker": {
+                "image": "composabl/sim-cstr:latest"
+            },
+            #"local": {
+            #   "address": "localhost:1337"
+            #}
         },
         "env": {
             "name": "sim-cstr",
         },
         "runtime": {
-            "workers": 1
+            "workers": 8
         }
     }
 
@@ -58,18 +58,22 @@ def start():
 
     agent.add_skill(reaction_skill)
 
-    # try:
-    #     files = os.listdir(PATH_CHECKPOINTS)
+    files = os.listdir(PATH_CHECKPOINTS)
 
-    #     if '.DS_Store' in files:
-    #         files.remove('.DS_Store')
+    try:
+        files = os.listdir(PATH_CHECKPOINTS)
 
-    #     if len(files) > 0:
-    #         agent.load(PATH_CHECKPOINTS)
-    # except Exception:
-    #     os.mkdir(PATH_CHECKPOINTS)
+        if '.DS_Store' in files:
+            files.remove('.DS_Store')
+            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    runtime.train(agent, train_iters=1)
+        if len(files) > 0:
+            agent.load(PATH_CHECKPOINTS)
+
+    except Exception:
+        os.mkdir(PATH_CHECKPOINTS)
+
+    runtime.train(agent, train_iters=100)
     agent.export(PATH_CHECKPOINTS)
 
 
