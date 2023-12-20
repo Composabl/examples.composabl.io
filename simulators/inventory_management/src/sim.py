@@ -31,6 +31,18 @@ class Env(gym.Env):
 
         self.observation_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
 
+        '''self.observation_space = gym.spaces.Dict({
+            "inventory": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e10])),
+            "balance": gym.spaces.Box(low=np.array([-200]), high=np.array([1e10])),
+            "num_ordered": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
+            "holding_cost": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
+            "cost_price": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e10])),
+            "delay_days_until_delivery": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
+            "customer_demand_min": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
+            "customer_demand_max": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
+            "selling_price": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e4]))
+            })'''
+
         action_space = {"order_cutoff": {"low": 0, "high": 100},
                         "order_target": {"low": 0, "high": 100},
                         }
@@ -38,8 +50,11 @@ class Env(gym.Env):
         low_act_list = [x['low'] for x in action_space.values()]
         high_act_list = [x['high'] for x in action_space.values()]
 
-        self.action_space = gym.spaces.Box(low=np.array(low_act_list), high=np.array(high_act_list))
-
+        #self.action_space = gym.spaces.Box(low=np.array(low_act_list), high=np.array(high_act_list))
+        self.action_space = gym.spaces.Dict({
+            "order_cutoff":gym.spaces.Box(low=np.array([0.0]), high=np.array([100.0])),
+            "order_target":gym.spaces.Box(low=np.array([0.0]), high=np.array([100.0]))
+        })
         self.scenario: Scenario = None
 
         self.order_cutoff = 10
@@ -154,9 +169,9 @@ class Env(gym.Env):
                     "customer_demand_max": float(self.customer_demand_max),
                     "selling_price": float(self.selling_price)
                     }
-        #print("RESET", self.obs)
-        self.obs = np.array(list(self.obs.values()))
 
+        #self.obs = np.array(list(self.obs.values()))
+        self.obs = list(self.obs.values())
 
         info = {}
         return self.obs, info
@@ -165,12 +180,13 @@ class Env(gym.Env):
         self.scenario = scenario
 
     def step(self, action):
+        action = action[0]
         simpyenv = sp.Environment()
 
         simpyenv.process(self.warehouse_run(
             env=simpyenv,
-            order_cutoff=action[0],
-            order_target=action[1],
+            order_cutoff=action['order_cutoff'][0],
+            order_target=action['order_target'][0],
             holding_cost=self.holding_cost,
             selling_price=self.selling_price,
             cost_price=self.cost_price,
@@ -213,7 +229,8 @@ class Env(gym.Env):
                     "selling_price": self.selling_price
                     }
 
-        self.obs = np.array(list(self.obs.values()))
+        #self.obs = np.array(list(self.obs.values()))
+        self.obs = list(self.obs.values())
         info = {}
         return self.obs, reward, done, False, info
 

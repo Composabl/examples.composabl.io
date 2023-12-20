@@ -22,7 +22,7 @@ RUN apt-get update \
 ######################################################
 # Install Python Dependencies
 ######################################################
-ARG COMPOSABL_VERSION
+ARG COMPOSABL_VERSION='0.5.2'
 
 COPY requirements.txt ./
 RUN sed -i "s/composabl.*/composabl==${COMPOSABL_VERSION}/g" requirements.txt \
