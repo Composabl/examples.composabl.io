@@ -31,18 +31,6 @@ class Env(gym.Env):
 
         self.observation_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
 
-        '''self.observation_space = gym.spaces.Dict({
-            "inventory": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e10])),
-            "balance": gym.spaces.Box(low=np.array([-200]), high=np.array([1e10])),
-            "num_ordered": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
-            "holding_cost": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
-            "cost_price": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e10])),
-            "delay_days_until_delivery": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
-            "customer_demand_min": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
-            "customer_demand_max": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e3])),
-            "selling_price": gym.spaces.Box(low=np.array([0.0]), high=np.array([1e4]))
-            })'''
-
         action_space = {"order_cutoff": {"low": 0, "high": 100},
                         "order_target": {"low": 0, "high": 100},
                         }
@@ -50,7 +38,6 @@ class Env(gym.Env):
         low_act_list = [x['low'] for x in action_space.values()]
         high_act_list = [x['high'] for x in action_space.values()]
 
-        #self.action_space = gym.spaces.Box(low=np.array(low_act_list), high=np.array(high_act_list))
         self.action_space = gym.spaces.Dict({
             "order_cutoff":gym.spaces.Box(low=np.array([0.0]), high=np.array([100.0])),
             "order_target":gym.spaces.Box(low=np.array([0.0]), high=np.array([100.0]))
@@ -141,17 +128,6 @@ class Env(gym.Env):
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        else:
-            self.order_cutoff = 10
-            self.order_target = 30
-            self.holding_cost = 2
-            self.selling_price = 100
-            self.cost_price = 50
-            self.delay_days_until_delivery = 2
-            self.customer_demand_min = 1
-            self.customer_demand_max = 4
-            self.run_time = 30
-
 
         # time counter
         self.cnt = 0
@@ -170,8 +146,7 @@ class Env(gym.Env):
                     "selling_price": float(self.selling_price)
                     }
 
-        #self.obs = np.array(list(self.obs.values()))
-        self.obs = list(self.obs.values())
+        self.obs = np.array(list(self.obs.values()))
 
         info = {}
         return self.obs, info
@@ -199,12 +174,6 @@ class Env(gym.Env):
         simpyenv.run(until=self.run_time)
 
         num_ordered_total = sum(self.num_ordered_list)
-        #print("Step: ", num_ordered_total, self.balance_history)
-
-        #TODO: new features
-        # order max, order mean, balance total, balance mean, balance min,
-        # inventory max, inventory min, inventory mean, inventory std
-        # times ordered
 
         # Increase time counter
         self.cnt += 1
@@ -229,8 +198,7 @@ class Env(gym.Env):
                     "selling_price": self.selling_price
                     }
 
-        #self.obs = np.array(list(self.obs.values()))
-        self.obs = list(self.obs.values())
+        self.obs = np.array(list(self.obs.values()))
         info = {}
         return self.obs, reward, done, False, info
 

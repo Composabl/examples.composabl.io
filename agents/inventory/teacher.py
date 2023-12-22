@@ -13,11 +13,6 @@ class BalanceTeacher(Teacher):
         return obs
 
     def transform_action(self, transformed_obs, action):
-        '''action = np.array([{'0':1, '1':2}])
-        action = {0:1, 1:2}
-        print('SAASASASA:' , action[1])
-        #print('ACTION L: ', action.shape)
-        print('ACTION: ',action)'''
         return action
 
     def filtered_observation_space(self):
@@ -47,9 +42,8 @@ class BalanceTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        #print(transformed_obs)
-        #if self.obs_history != None:
-        #    self.plot_obs()
+        if self.obs_history != None:
+            self.plot_obs()
 
         return False
 
@@ -59,7 +53,6 @@ class BalanceTeacher(Teacher):
     def plot_obs(self):
         plt.clf()
         plt.subplot(3,1,1)
-        #plt.plot([i for i in range(self.cnt)], self.inventory_level)
         plt.plot([x['inventory'] for x in self.obs_history])
         plt.xlabel("Simulation time (days)")
         plt.ylabel("Inventory level")

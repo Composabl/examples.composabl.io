@@ -11,7 +11,7 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
-    Q1_scenarios = [
+    initial_scenarios = [
         {
             "holding_cost": 2,
             "cost_price": 20,
@@ -25,7 +25,7 @@ def start():
 
     Balance_skill = Skill("Balance", BalanceTeacher)
 
-    for scenario_dict in Q1_scenarios:
+    for scenario_dict in initial_scenarios:
         scenario = Scenario(scenario_dict)
         Balance_skill.add_scenario(scenario)
 
