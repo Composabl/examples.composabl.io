@@ -1,7 +1,18 @@
 # Inventory Management Discrete Event Simulation
 
-Inventory Management Sim is a Python simulator made from discrete functions using simpy library that manages an inventory system.<br>
+Inventory Management Sim is a Python simulator made from discrete functions using simpy library that manages an inventory system.
+Simulated Flow:
+* Every step is one day in the factory and we simulate a customer inter_arrival period and a customer demand  when we have customers arriving in the simulated day.
+* Factory sell "demand" products to "customer"
+* System updates the balance and inventory level
+* Decision: Agent will send actions to decide the order cutoff and how many parts will ordered at each day
+* Apply delay in order, calculate cost of order, and update inventory level
+
+<br>
+
+
 Specification:
+* Sell products for selling_price : we can only sell products in stock and followed by demand
 * Customer inter-arrival period = d~exponential(5)
 * Each customer demands D~uniform("customer_demand_min", "customer_demand_max") products
 * Order Policy ("order_cutoff", "order_target"): if inventory is x < "order_cutoff", order y = "order_target" - x
@@ -37,6 +48,10 @@ Episode = "run_time" steps
 ### Config Values
 * run_time: time in days that the simulation will run
 
+### Graph
+* Inventory level
+* Balance History ($)
+* Order History
 
 ## Building
 
