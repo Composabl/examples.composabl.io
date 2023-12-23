@@ -67,5 +67,11 @@ docker pull composabl/sim-inventory-management
 docker run --rm -it -p 1337:1337 composabl/sim-inventory-management
 ```
 
+## Rquirements to run Train and Inference
+Install this packages in your python env
+* composabl-dev==0.5.0.dev23
+* matplotlib
+* simpy==4.0.2
+
 ## References
 

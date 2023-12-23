@@ -8,6 +8,7 @@ class BalanceTeacher(Teacher):
         self.reward_history = []
         self.last_reward = 0
         self.cnt = 0
+        self.plot = False
 
     def transform_obs(self, obs, action):
         return obs
@@ -43,7 +44,8 @@ class BalanceTeacher(Teacher):
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history != None:
-            self.plot_obs()
+            if self.plot:
+                self.plot_obs()
 
         return False
 
