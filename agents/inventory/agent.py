@@ -61,7 +61,7 @@ def start():
         agent.load(PATH_CHECKPOINTS)
 
 
-    agent.train(train_iters=3)
+    agent.train(train_iters=15)
 
     agent.export(PATH_CHECKPOINTS)
 
