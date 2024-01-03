@@ -31,8 +31,8 @@ class Env(gym.Env):
 
         self.observation_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
 
-        action_space = {"order_cutoff": {"low": 0, "high": 100},
-                        "order_target": {"low": 0, "high": 100},
+        action_space = {"order_cutoff": {"low": 0, "high": 4000},
+                        #"order_target": {"low": 0, "high": 100},
                         }
 
         low_act_list = [x['low'] for x in action_space.values()]
@@ -42,15 +42,15 @@ class Env(gym.Env):
 
         self.scenario: Scenario = None
 
-        self.order_cutoff = 10
-        self.order_target = 30
+        self.order_cutoff = 10 # safety stock
+        self.order_target = 4745 # target quantity
         self.holding_cost = 2
         self.selling_price = 100
         self.cost_price = 50
-        self.delay_days_until_delivery = 2
-        self.customer_demand_min = 1
-        self.customer_demand_max = 4
-        self.run_time = 30
+        self.delay_days_until_delivery = 40 # lead time 40 days
+        self.customer_demand_min = 124
+        self.customer_demand_max = 174
+        self.run_time = 90 # days
 
         self.obs_time = []
         self.inventory_level = []
@@ -126,7 +126,7 @@ class Env(gym.Env):
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        else:
+        '''else:
             self.order_cutoff = 10
             self.order_target = 30
             self.holding_cost = 2
@@ -135,7 +135,7 @@ class Env(gym.Env):
             self.delay_days_until_delivery = 2
             self.customer_demand_min = 1
             self.customer_demand_max = 4
-            self.run_time = 30
+            self.run_time = 30'''
 
 
         # time counter
@@ -170,7 +170,8 @@ class Env(gym.Env):
         simpyenv.process(self.warehouse_run(
             env=simpyenv,
             order_cutoff=action[0],
-            order_target=action[1],
+            #order_target=action[1],
+            order_target=self.order_target,
             holding_cost=self.holding_cost,
             selling_price=self.selling_price,
             cost_price=self.cost_price,
