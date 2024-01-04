@@ -99,7 +99,7 @@ class Env(gym.Env):
             if demand < inventory:
                 balance += selling_price * demand
                 inventory -= demand
-                print(f'{env.now} Sold {demand}')
+                #print(f'{env.now} Sold {demand}')
             else:
                 balance += selling_price * inventory
                 # discount the cost of opportunity
@@ -128,16 +128,6 @@ class Env(gym.Env):
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        '''else:
-            self.order_cutoff = 10
-            self.order_target = 30
-            self.holding_cost = 2
-            self.selling_price = 100
-            self.cost_price = 50
-            self.delay_days_until_delivery = 2
-            self.customer_demand_min = 1
-            self.customer_demand_max = 4
-            self.run_time = 30'''
 
 
         # time counter

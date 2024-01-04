@@ -109,22 +109,22 @@ def start():
     # plot
     plt.figure(figsize=(10,5))
     plt.subplot(4,1,1)
-    plt.plot(df.reset_index()['time'],df.reset_index()['inventory'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['inventory'])
     plt.ylabel("Inventory level")
     plt.title(f"Final Balance {round(df['balance'].to_list()[-1],1)} $" )
 
     plt.subplot(4,1,2)
-    plt.plot(df.reset_index()['time'],df.reset_index()['balance'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['balance'])
     plt.ylabel("Balance History ($)")
 
 
     plt.subplot(4,1,3)
-    plt.plot(df.reset_index()['time'],df.reset_index()['order_cutoff'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['order_cutoff'])
     plt.ylabel('order_cutoff')
 
 
     '''plt.subplot(4,1,4)
-    plt.plot(df.reset_index()['time'],df.reset_index()['order_target'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['order_target'])
     plt.ylabel('order_target')'''
     plt.xlabel("Simulation time (days)")
 
@@ -155,25 +155,36 @@ def start():
         #if done:
         #    break
 
+    # save history data
+    df['Storage Cost per Item'] = scenario_dict['holding_cost']
+    df['Daily Demand Min'] = scenario_dict['customer_demand_min']
+    df['Daily Demand Max'] = scenario_dict['customer_demand_max']
+    df['Safety Stock'] = df['order_cutoff']
+    df['Revenue'] = df['balance']
+    df['Days'] = [scenario_dict["run_time"]*(i+1) for i in range(len(df))]
+
+    df.to_pickle(f"{PATH_HISTORY}/inference_data_baseline.pkl")
+    df.to_csv(f"{PATH_HISTORY}/inference_data_baseline.csv")
+
     # plot
     plt.figure(figsize=(10,5))
     plt.subplot(4,1,1)
-    plt.plot(df.reset_index()['time'],df.reset_index()['inventory'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['inventory'])
     plt.ylabel("Inventory level")
     plt.title(f"Final Balance {round(df['balance'].to_list()[-1],1)} $" )
 
     plt.subplot(4,1,2)
-    plt.plot(df.reset_index()['time'],df.reset_index()['balance'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['balance'])
     plt.ylabel("Balance History ($)")
 
 
     plt.subplot(4,1,3)
-    plt.plot(df.reset_index()['time'],df.reset_index()['order_cutoff'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['order_cutoff'])
     plt.ylabel('order_cutoff')
 
 
     '''plt.subplot(4,1,4)
-    plt.plot(df.reset_index()['time'],df.reset_index()['order_target'])
+    plt.plot([scenario_dict["run_time"]*(i+1) for i in range(len(df))],df.reset_index()['order_target'])
     plt.ylabel('order_target')'''
     plt.xlabel("Simulation time (days)")
 
