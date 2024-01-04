@@ -50,7 +50,7 @@ class Env(gym.Env):
         self.delay_days_until_delivery = 40 # lead time 40 days
         self.customer_demand_min = 124
         self.customer_demand_max = 174
-        self.run_time = 90 # days
+        self.run_time = 180 # days
 
         self.obs_time = []
         self.inventory_level = []
@@ -69,7 +69,7 @@ class Env(gym.Env):
         #print(f'{env.now} received order, {inventory} in inventory')
 
     def generate_interarrival(self):
-        return np.random.exponential(1 / 5)
+        return int(np.random.exponential(1))
 
     def generate_demand(self, customer_demand_min=1, customer_demand_max=4):
         return np.random.randint(customer_demand_min, customer_demand_max)
@@ -102,6 +102,8 @@ class Env(gym.Env):
                 #print(f'{env.now} Sold {demand}')
             else:
                 balance += selling_price * inventory
+                # subtract the opportunity cost
+                balance -= (selling_price - cost_price) * (demand-inventory)
                 inventory = 0
                 #print(f'{env.now} Sold {inventory} (out of stock)')
 
@@ -126,16 +128,6 @@ class Env(gym.Env):
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        '''else:
-            self.order_cutoff = 10
-            self.order_target = 30
-            self.holding_cost = 2
-            self.selling_price = 100
-            self.cost_price = 50
-            self.delay_days_until_delivery = 2
-            self.customer_demand_min = 1
-            self.customer_demand_max = 4
-            self.run_time = 30'''
 
 
         # time counter
@@ -186,11 +178,6 @@ class Env(gym.Env):
         num_ordered_total = sum(self.num_ordered_list)
         #print("Step: ", num_ordered_total, self.balance_history)
 
-        #TODO: new features
-        # order max, order mean, balance total, balance mean, balance min,
-        # inventory max, inventory min, inventory mean, inventory std
-        # times ordered
-
         # Increase time counter
         self.cnt += 1
 
@@ -200,7 +187,7 @@ class Env(gym.Env):
         done = False
 
         # Constraints to break the simulation
-        if self.cnt == self.run_time:
+        if self.cnt == 10: # 10 times the running time
             done = True
 
         self.obs = {"inventory": self.inventory_level[-1],

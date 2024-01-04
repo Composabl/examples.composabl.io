@@ -14,12 +14,12 @@ def start():
     Q1_scenarios = [
         {
             "holding_cost": 2,
-            "cost_price": 20,
-            "delay_days_until_delivery": 5,
-            "customer_demand_min": 1,
-            "customer_demand_max": 3,
-            "selling_price": 25,
-            "run_time": 30
+            "cost_price": 50,
+            "delay_days_until_delivery": 40, # lead time days
+            "customer_demand_min": 124,
+            "customer_demand_max": 174,
+            "selling_price": 100,
+            "run_time": 180
         }
     ]
 
@@ -43,6 +43,9 @@ def start():
         "env": {
             "name": "inventory-management",
         },
+        #"runtime": {
+        #    "workers": 8
+        #},
         "training": {}
     }
 
@@ -61,7 +64,7 @@ def start():
         agent.load(PATH_CHECKPOINTS)
 
 
-    agent.train(train_iters=15)
+    agent.train(train_iters=3)
 
     agent.export(PATH_CHECKPOINTS)
 

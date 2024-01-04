@@ -1,6 +1,11 @@
+import os
+import pandas as pd
 from composabl import Teacher
 import numpy as np
 import matplotlib.pyplot as plt
+
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
 
 class BalanceTeacher(Teacher):
     def __init__(self):
@@ -9,6 +14,15 @@ class BalanceTeacher(Teacher):
         self.last_reward = 0
         self.cnt = 0
         self.plot = False
+
+        # create metrics db
+        try:
+            self.df = pd.read_pickle(f"{PATH_HISTORY}/db.pkl")
+
+            #if self.metrics == 'fast':
+            #    self.plot_metrics()
+        except Exception:
+            self.df = pd.DataFrame()
 
     def transform_obs(self, obs, action):
         return obs
@@ -36,7 +50,13 @@ class BalanceTeacher(Teacher):
 
         self.cnt += 1
 
-        reward = transformed_obs["balance"]
+        reward = transformed_obs["balance"]/1e7
+
+        # history metrics
+        df_temp = pd.DataFrame(columns=['inventory','balance','num_ordered','order_cutoff','reward','time'],
+        data=[[transformed_obs['inventory'],transformed_obs['balance'],transformed_obs['num_ordered'],action[0],reward,self.cnt]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
         return reward
 
     def compute_action_mask(self, transformed_obs, action):

@@ -20,11 +20,11 @@ def start():
         {
             "holding_cost": 2,
             "cost_price": 20,
-            "delay_days_until_delivery": 5,
+            "delay_days_until_delivery": 40,
             "customer_demand_min": 1,
             "customer_demand_max": 3,
             "selling_price": 25,
-            "run_time": 60
+            "run_time": 180
         }
     ]
 
@@ -69,33 +69,42 @@ def start():
     trained_agent = agent.prepare()
 
     # Inference
-    sim = Env()
-    sim.scenario = Scenario({
+    scenario_dict = {
             "holding_cost": 2,
-            "cost_price": 20,
-            "delay_days_until_delivery": 5,
-            "customer_demand_min": 1,
-            "customer_demand_max": 3,
-            "selling_price": 25,
-            "run_time": 30
-        })
+            "cost_price": 50,
+            "selling_price": 100,
+            'customer_demand_min':124,
+            'customer_demand_max':174,
+            "run_time": 180
+        }
+    sim = Env()
+    sim.scenario = Scenario(scenario_dict)
     df = pd.DataFrame()
     obs, info= sim.reset()
-    for i in range(30):
+    for i in range(10): # 5 years
         action = trained_agent.execute(obs)
         action = action[0]
-        action = [action*1 for i in action]
-        obs, reward, done, truncated, info = sim.step(action[0])
+        action = [action*4000 for i in action]
+        #print(action[0])
+        obs, reward, done, truncated, info = sim.step(action)
 
-        df_temp = pd.DataFrame(columns=['inventory','balance','num_ordered','order_cutoff','order_target','time'],
-        data=[[obs[0],obs[1],obs[2],action[0][0], action[0][1],i]])
+        df_temp = pd.DataFrame(columns=['inventory','balance','num_ordered','order_cutoff','time'],
+        data=[[obs[0],obs[1],obs[2],action[0],i]])
         df = pd.concat([df, df_temp])
 
-        if done:
-            break
+        #if done:
+        #    break
 
     # save history data
+    df['Storage Cost per Item'] = scenario_dict['holding_cost']
+    df['Daily Demand Min'] = scenario_dict['customer_demand_min']
+    df['Daily Demand Max'] = scenario_dict['customer_demand_max']
+    df['Safety Stock'] = df['order_cutoff']
+    df['Revenue'] = df['balance']
+    df['Days'] = [scenario_dict["run_time"]*(i+1) for i in range(len(df))]
+
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
+    df.to_csv(f"{PATH_HISTORY}/inference_data.csv")
 
     # plot
     plt.figure(figsize=(10,5))
@@ -114,9 +123,9 @@ def start():
     plt.ylabel('order_cutoff')
 
 
-    plt.subplot(4,1,4)
+    '''plt.subplot(4,1,4)
     plt.plot(df.reset_index()['time'],df.reset_index()['order_target'])
-    plt.ylabel('order_target')
+    plt.ylabel('order_target')'''
     plt.xlabel("Simulation time (days)")
 
 
@@ -124,6 +133,55 @@ def start():
 
 
     plt.savefig(f"{PATH}/inference_figure.png")
+
+    # Inference Benchmark
+    sim = Env()
+    sim.scenario = Scenario({
+            "holding_cost": 2,
+            "cost_price": 20,
+            "selling_price": 100,
+            "run_time": 180
+        })
+    df = pd.DataFrame()
+    obs, info= sim.reset()
+    for i in range(10):
+        action = [271]
+        obs, reward, done, truncated, info = sim.step(action)
+
+        df_temp = pd.DataFrame(columns=['inventory','balance','num_ordered','order_cutoff','time'],
+        data=[[obs[0],obs[1],obs[2],action[0],i]])
+        df = pd.concat([df, df_temp])
+
+        #if done:
+        #    break
+
+    # plot
+    plt.figure(figsize=(10,5))
+    plt.subplot(4,1,1)
+    plt.plot(df.reset_index()['time'],df.reset_index()['inventory'])
+    plt.ylabel("Inventory level")
+    plt.title(f"Final Balance {round(df['balance'].to_list()[-1],1)} $" )
+
+    plt.subplot(4,1,2)
+    plt.plot(df.reset_index()['time'],df.reset_index()['balance'])
+    plt.ylabel("Balance History ($)")
+
+
+    plt.subplot(4,1,3)
+    plt.plot(df.reset_index()['time'],df.reset_index()['order_cutoff'])
+    plt.ylabel('order_cutoff')
+
+
+    '''plt.subplot(4,1,4)
+    plt.plot(df.reset_index()['time'],df.reset_index()['order_target'])
+    plt.ylabel('order_target')'''
+    plt.xlabel("Simulation time (days)")
+
+
+    print(f"Baseline: Final Balance {df['balance'].to_list()[-1]} Total Balance {df['balance'].sum()}" )
+
+
+    plt.savefig(f"{PATH}/inference_baseline_figure.png")
 
 if __name__ == "__main__":
     start()
