@@ -72,6 +72,14 @@ class ServerImpl(ServerComposabl):
         obs = self.env.reset()
         return obs, {}
 
+    def UStep(self, action) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
+        obs, reward, is_terminated, is_truncated, info = self.env.step(action)
+        return obs, reward, is_terminated, is_truncated, info
+
+    # def USStep(self, action) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
+    #     obs, reward, is_terminated, is_truncated, info = self.env.step(action)
+    #     return obs, reward, is_terminated, is_truncated, info
+
     def Step(self, action) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
         obs, reward, is_terminated, is_truncated, info = self.env.step(action)
         return obs, reward, is_terminated, is_truncated, info
