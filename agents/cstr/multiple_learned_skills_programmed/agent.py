@@ -76,19 +76,19 @@ def start():
         }
     ]
 
-    ss1_skill = Skill("ss1", SS1Teacher, trainable=True)
+    ss1_skill = Skill("ss1", SS1Teacher)
     for scenario_dict in ss1_scenarios:
         ss1_skill.add_scenario(Scenario(scenario_dict))
 
-    ss2_skill = Skill("ss2", SS2Teacher, trainable=True)
+    ss2_skill = Skill("ss2", SS2Teacher)
     for scenario_dict in ss2_scenarios:
         ss2_skill.add_scenario(Scenario(scenario_dict))
 
-    transition_skill = Skill("transition", TransitionTeacher, trainable=True)
+    transition_skill = Skill("transition", TransitionTeacher)
     for scenario_dict in transition_scenarios:
         transition_skill.add_scenario(Scenario(scenario_dict))
 
-    selector_skill = Skill("selector", ProgrammedSelector, trainable=False)
+    selector_skill = Skill("selector", ProgrammedSelector)
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
@@ -126,9 +126,11 @@ def start():
 
         if '.DS_Store' in files:
             files.remove('.DS_Store')
+            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
         if len(files) > 0:
             agent.load(PATH_CHECKPOINTS)
+
     except Exception:
         os.mkdir(PATH_CHECKPOINTS)
 

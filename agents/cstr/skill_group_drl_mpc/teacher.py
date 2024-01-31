@@ -2,7 +2,7 @@ import math
 import numpy as np 
 
 from composabl_core.agent import Teacher
-from non_linear_mpc_model import non_lin_mpc
+from mpc_model import mpc
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -33,18 +33,18 @@ class CSTRTeacher(Teacher):
             if 'observation' in list(transformed_obs.keys()):
                 transformed_obs = transformed_obs['observation'][0]
                 #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-                MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2], 
+                MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2], 
                                                         transformed_obs[0], transformed_obs[1] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
             else:
                 #Import MPC
-                MPC_Tc = non_lin_mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
+                MPC_Tc = mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
                                                         transformed_obs['T'], transformed_obs['Tc'] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
         
         else:
             #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-            MPC_Tc = non_lin_mpc(0, transformed_obs[3], transformed_obs[2], 
+            MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2], 
                                                     transformed_obs[0], transformed_obs[1] + action[0])
             dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
 

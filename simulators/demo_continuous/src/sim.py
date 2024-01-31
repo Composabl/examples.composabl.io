@@ -16,9 +16,14 @@ class SimEnv(gym.Env):
             "time_counter": {"low": 0, "high": 1e12},
         })
 
-        self.action_space = self._get_space({
-            "action1": {"low": -1e3, "high": 1e3},
-        })
+        action_space = {"order_cutoff": {"low": 0, "high": 100},
+                        "order_target": {"low": 0, "high": 100},
+                        }
+
+        low_act_list = [x['low'] for x in action_space.values()]
+        high_act_list = [x['high'] for x in action_space.values()]
+
+        self.action_space = gym.spaces.Box(low=np.array(low_act_list), high=np.array(high_act_list), dtype=np.float64)
 
         # Define the scenario
         self.scenario: Scenario = None

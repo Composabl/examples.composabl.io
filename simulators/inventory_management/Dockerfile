@@ -1,16 +1,8 @@
 ######################################################
-# Composabl Sim Dockerfile - Version 2.0.0
-#
-# CHANGELOG
-# Version 2.0.0:
-#   - Update to Python 3.11
-#   - Dynamic composabl-version from Dockerfile args
-# Version 1.0.0:
-#   - Initial build file
+# Composabl Sim Dockerfile - Version 1.1.0
 ######################################################
 # Build stage
-# FROM python:3.8-slim
-FROM python:3.9-slim
+FROM python:3.8-slim
 
 # Set working directory
 WORKDIR /app
@@ -22,8 +14,6 @@ RUN apt-get update \
 ######################################################
 # Install Python Dependencies
 ######################################################
-ARG COMPOSABL_VERSION
-
 COPY requirements.txt ./
 RUN sed -i "s/composabl-core.*/composabl-core==${COMPOSABL_VERSION}/g" requirements.txt \
     && pip install --no-cache-dir --upgrade pip \

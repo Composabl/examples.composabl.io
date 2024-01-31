@@ -55,6 +55,7 @@ class AirplaneEnv(gym.Env):
         self.u2 = 0
         self.u3 = 0
         self.u4 = 0
+        self.scenario = None
 
     def reset(self):
         self.done = False

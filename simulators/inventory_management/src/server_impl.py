@@ -59,5 +59,3 @@ class ServerImpl(ServerComposabl):
 
     def GetRender(self):
         return self.env.render_frame()
-
-

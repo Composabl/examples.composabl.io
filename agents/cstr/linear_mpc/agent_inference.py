@@ -35,7 +35,7 @@ def start():
         }
     ]
 
-    reaction_skill = Skill("reaction", MPCController, trainable=False)
+    reaction_skill = Skill("reaction", MPCController)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 

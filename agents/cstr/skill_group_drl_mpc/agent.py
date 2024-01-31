@@ -28,7 +28,7 @@ def start():
         }
     ]
 
-    control_skill = Skill("control", CSTRTeacher, trainable=True)
+    control_skill = Skill("control", CSTRTeacher)
     for scenario_dict in control_scenarios:
         control_skill.add_scenario(Scenario(scenario_dict))
 
@@ -56,10 +56,18 @@ def start():
 
     checkpoint_path = './cstr/skill_group_drl_mpc/saved_agents/'
 
-    files = os.listdir(checkpoint_path)
-    if len(files) > 0:
-        #load agent
-        agent.load(checkpoint_path)
+    try:
+        files = os.listdir(PATH_CHECKPOINTS)
+
+        if '.DS_Store' in files:
+            files.remove('.DS_Store')
+            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
+
+        if len(files) > 0:
+            agent.load(PATH_CHECKPOINTS)
+
+    except Exception:
+        os.mkdir(PATH_CHECKPOINTS)
 
     runtime.train(agent, train_iters=1)
 
