@@ -4,7 +4,8 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
 from teacher import CSTRTeacher
 
-from cstr.external_sim.sim import CSTREnv
+#from cstr.external_sim.sim import CSTREnv
+from composabl_core.grpc.client.client import make
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -15,17 +16,6 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
-    # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-    reaction_scenarios = [
-        {
-            "Cref_signal": "complete"
-        }
-    ]
-
-    reaction_skill = Skill("reaction", CSTRTeacher)
-    for scenario_dict in reaction_scenarios:
-        reaction_skill.add_scenario(Scenario(scenario_dict))
-
     config = {
         "license": license_key,
         "target": {
@@ -43,26 +33,51 @@ def start():
         }
     }
 
+    # Remove unused files from path (mac only)
+    files = os.listdir(PATH_CHECKPOINTS)
+
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
+
+    # Start Runtime
     runtime = Runtime(config)
-    agent = Agent()
-    agent.add_sensors(sensors)
+    directory = PATH_CHECKPOINTS
 
-    agent.add_skill(reaction_skill)
+    # Load the pre trained agent
+    agent = Agent.load(directory)
 
-    #load agent
-    agent.load(PATH_CHECKPOINTS)
-
-    #save agent
+    # Prepare the loaded agent for inference
     trained_agent = runtime.package(agent)
 
     # Inference
+    print("Creating Environment")
+    sim = make(
+        "run-benchmark",
+        "sim-benchmark",
+        "",
+        "localhost:1337",
+        {
+            "render_mode": "rgb_array",
+            #"observation_space": _create_observation_space(),
+            #"action_space": _create_action_space()
+        },
+    )
+
+    print("Initializing Environment")
+    sim.init()
+    print("Initialized")
+
+    #a = sim.action_space_sample()
+
     noise = 0.05
-    sim = CSTREnv()
+    #sim = CSTREnv()
     sim.scenario = Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
         })
     df = pd.DataFrame()
+    print("Resetting Environment")
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
@@ -72,6 +87,9 @@ def start():
 
         if done:
             break
+    
+    print("Closing")
+    sim.close()
 
     # save history data
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")

@@ -45,7 +45,7 @@ class CSTRTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
