@@ -38,7 +38,7 @@ def start():
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl/sim-cstr:latest"
+                "image": "composabl/sim-cstr-local:latest"
             },
             #"local": {
             #   "address": "localhost:1337"
@@ -51,6 +51,29 @@ def start():
             "workers": 8
         }
     }
+    
+
+    '''config = {
+        "license": license_key,
+        "target": {
+            "kubernetes": {
+                "is_dev": True,
+                "image": "composabl/sim-cstr:latest",
+                "output_dir": "/data"
+            },
+            "config": {
+                "watchdog_timeout": 180
+            }
+        },
+        "env": {
+            "name": "sim-cstr",
+        },
+        "runtime": {
+            "model": {
+                "checkpoint_path": "/checkpoints",
+            }
+        },
+    }'''
 
     runtime = Runtime(config)
     agent = Agent()
@@ -59,17 +82,14 @@ def start():
     agent.add_skill(reaction_skill)
 
     files = os.listdir(PATH_CHECKPOINTS)
-
+ 
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
+ 
     try:
-        files = os.listdir(PATH_CHECKPOINTS)
-
-        if '.DS_Store' in files:
-            files.remove('.DS_Store')
-            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
-
         if len(files) > 0:
             agent.load(PATH_CHECKPOINTS)
-
     except Exception:
         os.mkdir(PATH_CHECKPOINTS)
 

@@ -56,6 +56,7 @@ class CSTRTeacher(Teacher):
         self.rms_history.append(rms)
         # minimize rms error
         reward = 1 / rms
+        reward = float(1/(math.sqrt((transformed_obs['Ca'] - transformed_obs['Cref'])**2)))
         self.reward_history.append(reward)
 
         self.count += 1
