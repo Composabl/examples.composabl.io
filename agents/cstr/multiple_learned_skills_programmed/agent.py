@@ -1,15 +1,23 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
-from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
+from teacher import SS1Teacher, SS2Teacher, TransitionTeacher
 from composabl import Controller
+
+from utils.cleanup import clean_folder
+from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
+
+DELETE_OLD_HISTORY_FILES: bool = True
 
 class ProgrammedSelector(Controller):
     def __init__(self):
@@ -40,16 +48,11 @@ class ProgrammedSelector(Controller):
 
 
 def start():
-    # delete old history files
-    try:
-        files = os.listdir(PATH_HISTORY)
+    if DELETE_OLD_HISTORY_FILES:
+        clean_folder(PATH_HISTORY)
+    else:
+        print("|-- Skipping deletion of old history files...")
 
-        pkl_files = [file for file in files if file.endswith('.pkl')]
-        for file in pkl_files:
-            file_path = os.path.join(dir, file)
-            os.remove(file_path)
-    except:
-        pass
 
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     ss1_scenarios = [
@@ -92,25 +95,16 @@ def start():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    config = {
-        "license": license_key,
-        "target": {
-            "docker": {
-                "image": "composabl/sim-cstr:latest"
-            },
-            #"local": {
-            #    "address": "localhost:1337"
-            #}
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-        "runtime": {
-            "ray": {
-                "workers": 1
-            }
-        }
-    }
+    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
+
+    config = generate_config(
+        license_key=license_key,
+        target="docker",
+        image=DOCKER_IMAGE,
+        env_name="sim-cstr",
+        workers=1,
+        num_gpus=0,
+    )
 
     runtime = Runtime(config)
     agent = Agent()
@@ -121,23 +115,18 @@ def start():
     agent.add_skill(transition_skill)
     agent.add_selector_skill(selector_skill, [ss2_skill, transition_skill, ss1_skill], fixed_order=False, fixed_order_repeat=False)
 
+    # Load a pre-trained agent
+    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
     try:
-        files = os.listdir(PATH_CHECKPOINTS)
-
-        if '.DS_Store' in files:
-            files.remove('.DS_Store')
-            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
-
-        if len(files) > 0:
+        if len(os.listdir(PATH_CHECKPOINTS)) > 0:
             agent.load(PATH_CHECKPOINTS)
-
     except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+        print("|-- No checkpoints found. Training from scratch...")
 
-    # train agent
-    runtime.train(agent, train_iters=200)
+    # Start training the agent
+    runtime.train(agent, train_iters=10)
 
-    # save agent
+    # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
 
 
