@@ -1,13 +1,16 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl_core.grpc.client.client import make
 
-from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
-from sensors import sensors
-from cstr.external_sim.sim import CSTREnv
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+
+from utils.cleanup import clean_folder
+from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
 
@@ -15,102 +18,67 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
+DELETE_OLD_HISTORY_FILES: bool = True
 
 def start():
-    # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-    ss1_scenarios = [
-        {
-            "Cref_signal": "ss1"
-        }
-    ]
+    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
 
-    ss2_scenarios = [
-        {
-            "Cref_signal": "ss2"
-        }
-    ]
+    config = generate_config(
+        license_key=license_key,
+        target="docker",
+        image=DOCKER_IMAGE,
+        env_name="sim-cstr",
+        workers=1,
+        num_gpus=0,
+    )
 
-    transition_scenarios = [
-        {
-            "Cref_signal": "transition"
-        }
-    ]
+    # Remove unused files from path (mac only)
+    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
 
-    selector_scenarios = [
-        {
-            "Cref_signal": "complete"
-        }
-    ]
-
-    ss1_skill = Skill("ss1", SS1Teacher)
-    for scenario_dict in ss1_scenarios:
-        ss1_skill.add_scenario(Scenario(scenario_dict))
-
-    ss2_skill = Skill("ss2", SS2Teacher)
-    for scenario_dict in ss2_scenarios:
-        ss2_skill.add_scenario(Scenario(scenario_dict))
-
-    transition_skill = Skill("transition", TransitionTeacher)
-    for scenario_dict in transition_scenarios:
-        transition_skill.add_scenario(Scenario(scenario_dict))
-
-    selector_skill = Skill("selector", CSTRTeacher)
-    for scenario_dict in selector_scenarios:
-        selector_skill.add_scenario(Scenario(scenario_dict))
-
-    config = {
-        "license": license_key,
-        "target": {
-            "docker": {
-                "image": "composabl/sim-cstr:latest"
-            },
-            #"local": {
-            #    "address": "localhost:1337"
-            #}
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-        "runtime": {
-            "ray": {
-                "workers": 1
-            }
-        }
-    }
-
+    # Start Runtime
     runtime = Runtime(config)
-    agent = Agent()
-    agent.add_sensors(sensors)
 
-    agent.add_skill(ss1_skill)
-    agent.add_skill(ss2_skill)
-    agent.add_skill(transition_skill)
-    agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
+    # Load the pre trained agent
+    agent = Agent.load(PATH_CHECKPOINTS)
 
-    #load agent
-    agent.load(PATH_CHECKPOINTS)
-
-    #save agent
+    # Prepare the loaded agent for inference
     trained_agent = runtime.package(agent)
 
     # Inference
+    print("Creating Environment")
+    sim = make(
+        "run-benchmark",
+        "sim-benchmark",
+        "",
+        "localhost:1337",
+        {
+            "render_mode": "rgb_array"
+        },
+    )
+
+    print("Initializing Environment")
+    sim.init()
+    print("Initialized")
+
     noise = 0.05
-    sim = CSTREnv()
-    sim.scenario = Scenario({
+    sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
-        })
+        }))
     df = pd.DataFrame()
+    print("Resetting Environment")
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
-        action = np.array((action[0]+10)/20)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
 
         if done:
             break
+
+    print("Closing")
+    sim.close()
 
     # save history data
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
@@ -124,7 +92,6 @@ def start():
     plt.title('Agent Inference Multiple Learned Skills' + f" - Noise: {noise}")
 
     plt.subplot(3,1,2)
-    #plt.plot(self.rms_history, 'r.-')
     plt.plot(df.reset_index()['time'],df.reset_index()['T'])
     plt.plot(df.reset_index()['time'],df.reset_index()['Tref'],'r--')
     plt.ylabel('Temp')

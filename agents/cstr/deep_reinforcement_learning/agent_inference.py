@@ -4,7 +4,6 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
 
 from composabl_core.grpc.client.client import make
 import pandas as pd
@@ -33,14 +32,12 @@ def start():
         num_gpus=0,
     )
 
-
     # Start Runtime
     runtime = Runtime(config)
-    directory = PATH_CHECKPOINTS
 
     # Load the pre trained agent
     clean_folder(PATH_CHECKPOINTS, ".DS_Store")
-    agent = Agent.load(directory)
+    agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
     trained_agent = runtime.package(agent)

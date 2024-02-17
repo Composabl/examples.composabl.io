@@ -5,7 +5,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from composabl_core.grpc.client.client import make
-from sensors import sensors
 
 import pandas as pd
 import numpy as np
