@@ -50,13 +50,16 @@ class CSTRTeacher(Teacher):
             self.obs_history.append(transformed_obs)
 
 
-        error = (transformed_obs['Cref'] - transformed_obs['Ca'])**2
+        error = (float(transformed_obs['Cref']) - float(transformed_obs['Ca']))**2
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
         self.rms_history.append(rms)
         # minimize rms error
-        reward = 1 / rms
-        reward = float(1/(math.sqrt((transformed_obs['Ca'] - transformed_obs['Cref'])**2)))
+
+        if error == 0:
+            reward = float(1/(math.sqrt(error + 0.00000000001)))
+        else:
+            reward = float(1/(math.sqrt(error)))
         self.reward_history.append(reward)
 
         self.count += 1

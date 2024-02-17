@@ -1,13 +1,17 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
-from teacher import CSTRTeacher
 
-#from cstr.external_sim.sim import CSTREnv
 from composabl_core.grpc.client.client import make
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from utils.cleanup import clean_folder
+from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
 
@@ -15,36 +19,27 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
+DELETE_OLD_HISTORY_FILES: bool = True
+
 def start():
-    config = {
-        "license": license_key,
-        "target": {
-            "docker": {
-                "image": "composabl/sim-cstr:latest"
-            }
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-        "runtime": {
-            "ray": {
-                "workers": 1
-            }
-        }
-    }
+    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
 
-    # Remove unused files from path (mac only)
-    files = os.listdir(PATH_CHECKPOINTS)
+    config = generate_config(
+        license_key=license_key,
+        target="docker",
+        image=DOCKER_IMAGE,
+        env_name="sim-cstr",
+        workers=1,
+        num_gpus=0,
+    )
 
-    if '.DS_Store' in files:
-        files.remove('.DS_Store')
-        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
     # Start Runtime
     runtime = Runtime(config)
     directory = PATH_CHECKPOINTS
 
     # Load the pre trained agent
+    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
     agent = Agent.load(directory)
 
     # Prepare the loaded agent for inference
@@ -59,8 +54,6 @@ def start():
         "localhost:1337",
         {
             "render_mode": "rgb_array",
-            #"observation_space": _create_observation_space(),
-            #"action_space": _create_action_space()
         },
     )
 
@@ -68,14 +61,11 @@ def start():
     sim.init()
     print("Initialized")
 
-    #a = sim.action_space_sample()
-
     noise = 0.05
-    #sim = CSTREnv()
-    sim.scenario = Scenario({
+    sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
-        })
+        }))
     df = pd.DataFrame()
     print("Resetting Environment")
     obs, info= sim.reset()
@@ -87,7 +77,7 @@ def start():
 
         if done:
             break
-    
+
     print("Closing")
     sim.close()
 

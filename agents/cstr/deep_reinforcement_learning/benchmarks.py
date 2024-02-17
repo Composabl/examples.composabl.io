@@ -1,72 +1,73 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
-from teacher import CSTRTeacher
+from composabl_core.grpc.client.client import make
 from sensors import sensors
-from cstr.external_sim.sim import CSTREnv
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
+from utils.cleanup import clean_folder
+from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
-# Cref_signal is a configuration variable for Concentration and Temperature setpoints
-reaction_scenarios = [
-    {
-        "Cref_signal": "complete"
-    }
-]
+DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
 
-reaction_skill = Skill("reaction", CSTRTeacher)
-for scenario_dict in reaction_scenarios:
-    reaction_skill.add_scenario(Scenario(scenario_dict))
+config = generate_config(
+    license_key=license_key,
+    target="docker",
+    image=DOCKER_IMAGE,
+    env_name="sim-cstr",
+    workers=1,
+    num_gpus=0,
+)
 
+# Remove unused files from path (mac only)
+clean_folder(PATH_CHECKPOINTS, ".DS_Store")
 
-config = {
-    "license": license_key,
-    "target": {
-        "docker": {
-            "image": "composabl/sim-cstr:latest"
-        }
-    },
-    "env": {
-        "name": "sim-cstr",
-    },
-    "runtime": {
-        "ray": {
-            "workers": 1
-        }
-    }
-}
-
+# Start Runtime
 runtime = Runtime(config)
-agent = Agent()
-agent.add_sensors(sensors)
+directory = PATH_CHECKPOINTS
 
-agent.add_skill(reaction_skill)
+# Load the pre trained agent
+agent = Agent.load(directory)
 
-#load agent
-agent.load(PATH_CHECKPOINTS)
-
-#save agent
+# Prepare the loaded agent for inference
 trained_agent = runtime.package(agent)
 
+# Inference
+print("Creating Environment")
+sim = make(
+    "run-benchmark",
+    "sim-benchmark",
+    "",
+    "localhost:1337",
+    {
+        "render_mode": "rgb_array"
+    },
+)
+
+print("Initializing Environment")
+sim.init()
+print("Initialized")
+
 noise = 0.05
-sim = CSTREnv()
-sim.scenario = Scenario({
+sim.set_scenario(Scenario({
         "Cref_signal": "complete",
         "noise_percentage": noise
-    })
-
+    }))
 df = pd.DataFrame()
 
 for i in range(100):
-    # Inference
-    obs, info = sim.reset()
+    obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
         obs, reward, done, truncated, info = sim.step(action)
@@ -75,6 +76,10 @@ for i in range(100):
 
         if done:
             break
+
+print("Closing")
+sim.close()
+
 
 # calculate error
 df['error_temp'] = (df['T'] - df['Tref'])**2
