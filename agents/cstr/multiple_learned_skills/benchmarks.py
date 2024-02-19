@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils.cleanup import clean_folder
+from utils.cleanup import cleanup_folder
 from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
@@ -31,7 +31,7 @@ config = generate_config(
 )
 
 # Remove unused files from path (mac only)
-clean_folder(PATH_CHECKPOINTS, ".DS_Store")
+cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
 
 # Start Runtime
 runtime = Runtime(config)

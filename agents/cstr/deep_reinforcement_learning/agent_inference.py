@@ -9,7 +9,7 @@ from composabl_core.grpc.client.client import make
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from utils.cleanup import clean_folder
+from utils.cleanup import cleanup_folder
 from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
@@ -36,7 +36,7 @@ def start():
     runtime = Runtime(config)
 
     # Load the pre trained agent
-    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
+    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
     agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
@@ -58,7 +58,7 @@ def start():
     sim.init()
     print("Initialized")
 
-    noise = 0.05
+    noise = 0.0
     sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise

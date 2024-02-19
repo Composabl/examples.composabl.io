@@ -7,7 +7,7 @@ from composabl import Agent, Runtime, Scenario, Skill
 from sensors import sensors
 from teacher import CSTRTeacher
 
-from utils.cleanup import clean_folder
+from utils.cleanup import cleanup_folder
 from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
@@ -22,7 +22,7 @@ def start():
     """Starting the agent."""
 
     if DELETE_OLD_HISTORY_FILES:
-        clean_folder(PATH_HISTORY)
+        cleanup_folder(PATH_HISTORY)
     else:
         print("|-- Skipping deletion of old history files...")
 
@@ -52,7 +52,7 @@ def start():
     agent.add_skill(reaction_skill)
 
     # Load a pre-trained agent
-    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
+    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
     try:
         if len(os.listdir(PATH_CHECKPOINTS)) > 0:
             agent.load(PATH_CHECKPOINTS)

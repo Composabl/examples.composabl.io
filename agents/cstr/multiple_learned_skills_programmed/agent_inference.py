@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils.cleanup import clean_folder
+from utils.cleanup import cleanup_folder
 from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
@@ -22,7 +22,7 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 DELETE_OLD_HISTORY_FILES: bool = True
 
 def start():
-    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
+    DOCKER_IMAGE: str = "composabl/sim-cstr-local:latest"
 
     config = generate_config(
         license_key=license_key,
@@ -34,7 +34,7 @@ def start():
     )
 
     # Remove unused files from path (mac only)
-    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
+    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
 
     # Start Runtime
     runtime = Runtime(config)
@@ -61,7 +61,7 @@ def start():
     sim.init()
     print("Initialized")
 
-    noise = 0.05
+    noise = 0.0
     sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise

@@ -1,84 +1,85 @@
+"""
+Agent for the industrial boiler environment.
+"""
+
 import os
+import sys
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl import Agent, Runtime, Scenario, Skill
 from teacher import LevelTeacher, PressureTeacher, TemperatureTeacher
+from sensors import SENSORS
 
-license_key = os.environ["COMPOSABL_LICENSE"]
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
+from utils.config import generate_config
+from utils.cleanup import cleanup_folder
+
+# Constants for setting up execution environment
+LICENSE_KEY = os.environ["COMPOSABL_LICENSE"]
+PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY: str = f"{PATH}/history"
+PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
+DELETE_OLD_HISTORY_FILES: bool = True
 
 
 def start():
-    y1 = Sensor("y1", "drum level")
-    y2 = Sensor("y2", "drum pressure")
-    y3 = Sensor("y3", "drum temperature")
-    y1ref = Sensor("y1ref", "")
-    y2ref = Sensor("y2ref", "")
-    y3ref = Sensor("y3ref", "")
-    u1 = Sensor("u1", "feed water flow rate")
-    u2 = Sensor("u2", "fuel flow rate")
-    u3 = Sensor("u3", "spray flow rate")
+    """Starting the agent."""
 
-    sensors = [y1, y2, y3, y1ref, y2ref, y3ref, u1, u2, u3]
+    if DELETE_OLD_HISTORY_FILES:
+        print("|-- Deleting old history files...")
+        cleanup_folder(PATH_HISTORY)
+    else:
+        print("|-- Skipping deletion of old history files...")
 
-    y1_scenarios = [
-        {
-            "signal": "y1",
-            "eff_nox_red": 0.7
-        }
-    ]
-
-    Level_skill = Skill("Level", LevelTeacher, trainable=True)
-
+    # Setting up scenarios for each skill
+    y1_scenarios = [{"signal": "y1", "eff_nox_red": 0.7}]
+    level_skill = Skill("Level", LevelTeacher)
     for scenario_dict in y1_scenarios:
         scenario = Scenario(scenario_dict)
-        Level_skill.add_scenario(scenario)
+        level_skill.add_scenario(scenario)
 
-    y2_scenarios = [
-        {
-            "signal": "y2",
-            "eff_nox_red": 0.7
-        }
-    ]
-
-    Pressure_skill = Skill("Pressure", PressureTeacher, trainable=True)
-
+    y2_scenarios = [{"signal": "y2", "eff_nox_red": 0.7}]
+    pressure_skill = Skill("Pressure", PressureTeacher)
     for scenario_dict in y2_scenarios:
         scenario = Scenario(scenario_dict)
-        Pressure_skill.add_scenario(scenario)
+        pressure_skill.add_scenario(scenario)
 
-    y3_scenarios = [
-        {
-            "signal": "y3",
-            "eff_nox_red": 0.7
-        }
-    ]
-
-    Temperature_skill = Skill("Temperature", TemperatureTeacher, trainable=True)
-
+    y3_scenarios = [{"signal": "y3", "eff_nox_red": 0.7}]
+    temperature_skill = Skill("Temperature", TemperatureTeacher)
     for scenario_dict in y3_scenarios:
         scenario = Scenario(scenario_dict)
-        Temperature_skill.add_scenario(scenario)
+        temperature_skill.add_scenario(scenario)
 
-    config = {
-        "license": license_key,
-        "target": {
-            "docker": {
-                "image": "composabl/sim-industrial-boiler"
-            }
-        },
-        "env": {
-            "name": "industrial-boiler",
-        },
-        "training": {}
-    }
+    # Setting up the runtime and agent configuration
+    config = generate_config(
+        license_key=LICENSE_KEY,
+        target="docker",
+        image="composabl/sim-industrial-boiler",
+        env_name="industrial-boiler",
+        workers=1,
+        num_gpus=0,
+        training={},
+    )
+
     runtime = Runtime(config)
+
     agent = Agent()
-    agent.add_sensors(sensors)
+    agent.add_sensors(SENSORS)
+    agent.add_skill(level_skill)
+    agent.add_skill(pressure_skill)
+    agent.add_skill(temperature_skill)
 
-    agent.add_skill(Level_skill)
-    agent.add_skill(Pressure_skill)
-    agent.add_skill(Temperature_skill)
+    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
 
-    runtime.train(agent, train_iters=3)
+    try:
+        if len(os.listdir(PATH_CHECKPOINTS)) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        print("|-- No checkpoints found. Training from scratch...")
+
+    runtime.train(agent, train_iters=5)
+
+    agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":

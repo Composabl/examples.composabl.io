@@ -7,7 +7,7 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
-from utils.cleanup import clean_folder
+from utils.cleanup import cleanup_folder
 from utils.config import generate_config
 
 license_key = os.environ["COMPOSABL_LICENSE"]
@@ -22,7 +22,7 @@ def start():
     """Starting the agent."""
 
     if DELETE_OLD_HISTORY_FILES:
-        clean_folder(PATH_HISTORY)
+        cleanup_folder(PATH_HISTORY)
     else:
         print("|-- Skipping deletion of old history files...")
 
@@ -69,14 +69,14 @@ def start():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
+    DOCKER_IMAGE: str = "composabl/sim-cstr-local:latest"
 
     config = generate_config(
         license_key=license_key,
         target="docker",
         image=DOCKER_IMAGE,
         env_name="sim-cstr",
-        workers=1,
+        workers=8,
         num_gpus=0,
     )
 
@@ -90,7 +90,7 @@ def start():
     agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
     # Load a pre-trained agent
-    clean_folder(PATH_CHECKPOINTS, ".DS_Store")
+    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
     try:
         if len(os.listdir(PATH_CHECKPOINTS)) > 0:
             agent.load(PATH_CHECKPOINTS)
@@ -98,7 +98,7 @@ def start():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=100)
+    runtime.train(agent, train_iters=1200)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
