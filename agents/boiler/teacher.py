@@ -1,5 +1,6 @@
 import numpy as np
 from composabl import Teacher
+from sensors import sensors
 
 
 class LevelTeacher(Teacher):
@@ -15,12 +16,12 @@ class LevelTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return ['y1', 'y2', 'y3', 'y1ref', 'y2ref', 'y3ref', 'u1', 'u2', 'u3']
+        return [s.name for s in sensors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(list(transformed_obs.values()))
 
@@ -37,7 +38,7 @@ class LevelTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        return len(self.obs_history) > 100
+        return False
 
     def compute_termination(self, transformed_obs, action):
         return False
@@ -56,12 +57,12 @@ class PressureTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return ['y1', 'y2', 'y3', 'y1ref', 'y2ref', 'y3ref', 'u1', 'u2', 'u3']
+        return [s.name for s in sensors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(list(transformed_obs.values()))
 
@@ -97,12 +98,12 @@ class TemperatureTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return ['y1', 'y2', 'y3', 'y1ref', 'y2ref', 'y3ref', 'u1', 'u2', 'u3']
+        return [s.name for s in sensors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [list(transformed_obs.values())]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(list(transformed_obs.values()))
 

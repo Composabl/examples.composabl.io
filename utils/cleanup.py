@@ -4,7 +4,7 @@ Utils for cleaning up folder structures while running agents.
 
 import os
 
-def clean_folder(path: str, extension: str = '.pkl') -> None:
+def cleanup_folder(path: str, extension: str = '.pkl') -> None:
     """
     Delete old history files.
 

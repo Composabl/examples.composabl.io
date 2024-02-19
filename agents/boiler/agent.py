@@ -1,15 +1,11 @@
-"""
-Agent for the industrial boiler environment.
-"""
-
 import os
 import sys
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
 from composabl import Agent, Runtime, Scenario, Skill
 from teacher import LevelTeacher, PressureTeacher, TemperatureTeacher
-from sensors import SENSORS
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+from sensors import sensors
 
 from utils.config import generate_config
 from utils.cleanup import cleanup_folder
@@ -53,10 +49,10 @@ def start():
     # Setting up the runtime and agent configuration
     config = generate_config(
         license_key=LICENSE_KEY,
-        target="docker",
-        image="composabl/sim-industrial-boiler",
+        target="local",
+        image="composabl/sim-boiler-local",
         env_name="industrial-boiler",
-        workers=1,
+        workers=4,
         num_gpus=0,
         training={},
     )
@@ -64,10 +60,11 @@ def start():
     runtime = Runtime(config)
 
     agent = Agent()
-    agent.add_sensors(SENSORS)
+    agent.add_sensors(sensors)
     agent.add_skill(level_skill)
-    agent.add_skill(pressure_skill)
-    agent.add_skill(temperature_skill)
+    #agent.add_skill(pressure_skill)
+    #agent.add_skill(temperature_skill)
+
 
     cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
 
