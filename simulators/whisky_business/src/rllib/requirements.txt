@@ -1,0 +1,8 @@
+ray==2.3.0
+ray[air]
+ray[tune]
+ray[rllib]
+gymnasium
+tensorflow 
+torch
+simpy==4.0.1
