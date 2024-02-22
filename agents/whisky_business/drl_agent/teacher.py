@@ -50,8 +50,9 @@ class BaseTeacher(Teacher):
         reward = (float(transformed_obs['completed_cookies'])*(float(transformed_obs['cookies_price'])) \
                   + float(transformed_obs['completed_cupcakes'])*(float(transformed_obs['cupcake_price'])) \
                   + float(transformed_obs['completed_cake'])*(float(transformed_obs['cake_price'])))
+        
+        reward = sim_reward
     
-
         self.reward_history.append(reward)
         self.action_history.append(action)
 
