@@ -1,4 +1,4 @@
-composabl-core==0.6.1
+composabl-core-dev==0.7.1.dev12
 scipy
 simpy==4.0.1
 statsmodels==0.14.0

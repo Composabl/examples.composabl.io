@@ -95,6 +95,9 @@ class Env(gym.Env):
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
 
+        print('SCENARIO: ', sample)
+        print('DEMAND ', self.cookies_demand, self.cupcake_demand, self.cake_demand)
+
         self.business_env.cookies_price = self.cookies_price
         self.business_env.cupcake_price = self.cupcake_price
         self.business_env.cake_price = self.cake_price
@@ -114,7 +117,7 @@ class Env(gym.Env):
 
         obs, info = self.business_env.reset()
         self.obs = self.process_state(obs)
-        print('OBS: ', self.obs)
+        #print('OBS: ', self.obs)
 
         return self.obs, info
 
@@ -191,21 +194,21 @@ class Env(gym.Env):
             cookies_profit = (completed_cookies * (self.cookies_price - self.cookies_cost)) - cost_of_opportunity
         else:
             waste  = (self.cookies_demand_real - completed_cookies) * self.cookies_cost
-            cookies_profit = (completed_cookies * (self.cookies_price - self.cookies_cost))
+            cookies_profit = (completed_cookies * (self.cookies_price - self.cookies_cost)) - waste
 
         if completed_cupcakes <= self.cupcakes_demand_real:
             cost_of_opportunity = (self.cupcakes_demand_real - completed_cupcakes) * (self.cupcake_price - self.cupcake_cost)
             cupcakes_profit = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) - cost_of_opportunity
         else:
             waste  = (self.cupcakes_demand_real - completed_cupcakes) * self.cupcake_cost
-            cupcakes_profit = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost))
+            cupcakes_profit = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) - waste
 
         if completed_cakes <= self.cakes_demand_real:
             cost_of_opportunity = (self.cakes_demand_real - completed_cakes) * (self.cake_price - self.cake_cost)
             cakes_profit = (completed_cakes * (self.cake_price - self.cake_cost)) - cost_of_opportunity
         else:
             waste  = (self.cakes_demand_real - completed_cakes) * self.cake_cost
-            cakes_profit = (completed_cakes * (self.cake_price - self.cake_cost))
+            cakes_profit = (completed_cakes * (self.cake_price - self.cake_cost)) - waste
         
         self.profit = cookies_profit + cupcakes_profit + cakes_profit
         reward = self.profit
