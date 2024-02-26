@@ -95,8 +95,8 @@ class Env(gym.Env):
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
 
-        print('SCENARIO: ', sample)
-        print('DEMAND ', self.cookies_demand, self.cupcake_demand, self.cake_demand)
+        #print('SCENARIO: ', sample)
+        #print('DEMAND ', self.cookies_demand, self.cupcake_demand, self.cake_demand)
 
         self.business_env.cookies_price = self.cookies_price
         self.business_env.cupcake_price = self.cupcake_price
