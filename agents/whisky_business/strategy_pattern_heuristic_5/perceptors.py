@@ -17,8 +17,6 @@ class DemandPredict():
         return [s.name for s in sensors]
 
 
-co_predict = Perceptor("cookies_demand_predict", DemandPredict, "")
-cp_predict = Perceptor("cupcake_demand_predict", DemandPredict, "")
-ck_predict = Perceptor("cake_demand_predict", DemandPredict, "")
+demand_predict = Perceptor("demand_predict", DemandPredict, "")
 
-perceptors = [co_predict, cp_predict, ck_predict]
+perceptors = [demand_predict]

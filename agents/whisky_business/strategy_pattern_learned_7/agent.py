@@ -2,9 +2,8 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
-from teacher import BaseTeacher
+from teacher import BaseTeacher, CookiesTeacher, CupcakesTeacher, CakesTeacher, WaitTeacher
 from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController, WaitController
-from perceptors import perceptors
 
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -41,10 +40,14 @@ def start():
         }
     ]
 
-    cookies_skill = Skill("cookies", MakeCookieController)
-    cupcakes_skill = Skill("cupcakes", MakeCupcakeController)
-    cakes_skill = Skill("cakes", MakeCakeController)
-    wait_skill = Skill("wait", WaitController)
+    #cookies_skill = Skill("cookies", MakeCookieController)
+    #cupcakes_skill = Skill("cupcakes", MakeCupcakeController)
+    #cakes_skill = Skill("cakes", MakeCakeController)
+    #wait_skill = Skill("wait", WaitController)
+    cookies_skill = Skill("cookies", CookiesTeacher)
+    cupcakes_skill = Skill("cupcakes", CupcakesTeacher)
+    cakes_skill = Skill("cakes", CakesTeacher)
+    wait_skill = Skill("wait", WaitTeacher)
 
     selector_skill = Skill("selector", BaseTeacher)
     for scenario_dict in bake_scenarios:
@@ -74,7 +77,6 @@ def start():
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
-    #agent.add_perceptors(perceptors)
 
     agent.add_skill(cookies_skill)
     agent.add_skill(cupcakes_skill)
@@ -94,7 +96,7 @@ def start():
     except Exception:
         os.mkdir(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=30)
+    runtime.train(agent, train_iters=10)
     
     agent.export(PATH_CHECKPOINTS)
 

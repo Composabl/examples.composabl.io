@@ -51,7 +51,8 @@ class BaseTeacher(Teacher):
                   + float(transformed_obs['completed_cupcakes'])*(float(transformed_obs['cupcake_price'])) \
                   + float(transformed_obs['completed_cake'])*(float(transformed_obs['cake_price'])))
     
-
+        reward = sim_reward
+        
         self.reward_history.append(reward)
         self.action_history.append(action)
 
@@ -80,8 +81,7 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        action_mask = [float(x) for x in list(transformed_obs.values())[:25]]
-        return action_mask
+        return None
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
@@ -174,7 +174,6 @@ class BaseTeacher(Teacher):
 
         plt.draw()
         plt.pause(0.001)
-
 
 
 
