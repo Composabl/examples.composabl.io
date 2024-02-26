@@ -80,7 +80,8 @@ def start():
             "name": "sim-whisky",
         },
         "runtime": {
-            "workers": 1
+            "workers": 1,
+            "num_gpus": 0
         }
     }
 
@@ -96,11 +97,10 @@ def start():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    try:
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+
+    if len(files) > 0:
+        agent.load(PATH_CHECKPOINTS)
+
 
     runtime.train(agent, train_iters=10)
     
