@@ -81,7 +81,8 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        return None
+        action_mask = [float(x) for x in list(transformed_obs.values())[:25]]
+        return action_mask
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
