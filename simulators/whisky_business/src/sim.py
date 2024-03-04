@@ -124,6 +124,9 @@ class Env(gym.Env):
     def set_scenario(self, scenario):
         self.scenario = scenario
 
+    def get_real_demand(self):
+        return [self.cookies_demand_real, self.cupcakes_demand_real, self.cakes_demand_real]
+
     def step(self, action):
         #action = action[0]
         #map actions

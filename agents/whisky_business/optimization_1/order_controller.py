@@ -23,7 +23,7 @@ class OrderController(Controller):
 
         # Variables
         q = self.m.SV(value=0, lb=0, integer=True) #state variable
-        wt = self.m.SV(value=0, lb=0, ub=480, integer=True)
+        self.wt = self.m.SV(value=0, lb=0, ub=480, integer=True)
         r = self.m.SV(value=0, lb=0, ub=5000, integer=True)
 
         ## CONSTRAINTS
@@ -46,8 +46,8 @@ class OrderController(Controller):
 
         # Equations
         self.m.Equations([q.dt() == 12*self.u1 + 6*self.u2 + 1*self.u3,
-                    wt.dt() == self.m.max2(self.m.max2(28*self.u1,57*self.u2),80*self.u3),
-                    wt <= 480,
+                    self.wt.dt() == self.m.max2(self.m.max2(28*self.u1,57*self.u2),80*self.u3),
+                    self.wt <= 480,
                     r.dt() == 12*5*self.u1 + 6*7*self.u2 + 1*10*self.u3,
                     self.u1 + self.u2 + self.u3 <= 2
                     ])

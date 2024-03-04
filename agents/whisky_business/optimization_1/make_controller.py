@@ -18,6 +18,8 @@ class MakeCookieController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        sensors_name = [s.name for s in sensors]
+        obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
@@ -99,6 +101,8 @@ class MakeCupcakeController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        sensors_name = [s.name for s in sensors]
+        obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
@@ -180,6 +184,8 @@ class MakeCakeController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        sensors_name = [s.name for s in sensors]
+        obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
@@ -261,6 +267,8 @@ class WaitController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        sensors_name = [s.name for s in sensors]
+        obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))

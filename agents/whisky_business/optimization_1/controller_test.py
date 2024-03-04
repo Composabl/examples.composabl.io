@@ -1,5 +1,5 @@
 #from order_controller import OrderController
-
+from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController
 from gekko import GEKKO
 
 
@@ -64,7 +64,7 @@ class OrderController():
         self.make_cookie = True
     
     def compute_action(self, obs):
-        action = [-1] # wait
+        action = 0 # wait
         self.count += 1
         
 
@@ -75,6 +75,9 @@ class OrderController():
 
         wt = [int(x) for x in self.wt.value]
 
+        if self.action_count >= len(wt):
+            return action
+        
         wt_plan = wt[self.action_count]
 
         if self.count < wt_plan:
@@ -82,8 +85,8 @@ class OrderController():
             if self.make_cake:
                 if x3[self.action_count] == 1:
                     print('Produce Cake')
-                    #action = MakeCakeController.compute_action(obs)
-                    action = [2]
+                    action = MakeCakeController().compute_action(obs)
+                    #action = [2]
                     self.make_cake = False
                     self.make_cupcake = True
                     self.make_cookie = True
@@ -92,8 +95,8 @@ class OrderController():
             if self.make_cupcake:
                 if x2[self.action_count] == 1:
                     print('Produce Cupcake')
-                    #action = MakeCupcakeController.compute_action(obs)
-                    action = [1]
+                    action = MakeCupcakeController().compute_action(obs)
+                    #action = [1]
                     self.make_cake = True
                     self.make_cupcake = False
                     self.make_cookie = True
@@ -102,8 +105,8 @@ class OrderController():
             if self.make_cookie:
                 if x1[self.action_count] == 1:
                     print('Produce Cookie')
-                    #action = MakeCookieController.compute_action(obs)
-                    action = [0]
+                    action = MakeCookieController().compute_action(obs)
+                    #action = [0]
                     self.make_cake = True
                     self.make_cupcake = True
                     self.make_cookie = False
@@ -121,7 +124,7 @@ class OrderController():
         else:
             return False
     
-cont = OrderController()
+#cont = OrderController()
 
-for i in range(480):
-    print(cont.compute_action(obs=[1,1,1]))
+#for i in range(480):
+#    print(cont.compute_action(obs=[1,1,1]))

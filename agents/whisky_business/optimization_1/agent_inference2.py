@@ -4,12 +4,8 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
 
 from composabl_core.grpc.client.client import make
-import numpy as np
-import math
-from gymnasium import spaces
+from make_controller import MakeController
 import matplotlib.pyplot as plt
-import pickle
-from controller_test import OrderController
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -63,31 +59,17 @@ def start():
         "",
         "localhost:1337",
         {
-            "render_mode": "rgb_array",
-            #"observation_space": _create_observation_space(),
-            #"action_space": _create_action_space()
+            "render_mode": "rgb_array"
         },
     )
 
     print("Initializing Environment")
     sim.init()
-    co_dm = 100
-    cp_dm = 18
-    ck_dm = 5
-    metrics = {
-        'Co_demand': co_dm,
-        'Cp_demand': cp_dm,
-        'Ck_demand':ck_dm
-    }
-    
-    sim.set_scenario(Scenario({ 
-            "cookies_demand": co_dm,
-            "cupcake_demand": cp_dm,
-            "cake_demand": ck_dm,
-        }))
     print("Resetting Environment")
     obs, info = sim.reset()
     print("Initialized")
+
+    trained_agent = MakeController()
     # Get a sim action sample if needed (debug)
     #a = sim.action_space_sample()
     obs_history = []
@@ -95,30 +77,38 @@ def start():
     reward_history = []
     sensors_name = [s.name for s in sensors]
     obs_base = {}
-    cont = OrderController()
+
+    actions = {
+        'u1': [1,1,1,1,1,1,1,1,1],
+        'u2': [1,1,1,1,1,1,1,1,0],
+        'u3': [0,0,0,0,0,0,0,0,0]
+    } # u1,u2,u3
     
     for s in sensors_name:
         obs_base[s] = None
-    
+        
+    cnt = 0
     for i in range(480):
-        # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
-        #action = trained_agent.execute(obs)
-        action = cont.compute_action(obs)
-        print(action)
-        #action_history.append(list(action.values()))
-        #action = [action]
-        #action = sim.action_space_sample()[0]
-
+        #convert obs to dict
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
-        #ccok = obs[sensor_names.index('completed_cookies')] if obs[sensor_names.index('completed_cookies')] > 0 else 0
-        #ccup = obs[sensor_names.index('completed_cupcakes')] if obs[sensor_names.index('completed_cupcakes')] > 0 else 0
-        #ccak = obs[sensor_names.index('completed_cake')] if obs[sensor_names.index('completed_cake')] > 0 else 0
-        ccok = obs['completed_cookies']
-        ccup = obs['completed_cupcakes']
-        ccak = obs['completed_cake']
 
-        observation_dict = {
+        obs_copy = obs.copy()
+        obs_copy['order_skill'] = 1
+
+        action = trained_agent.compute_action(obs_copy)
+        #action = [action]
+        # get simultaneous production
+        obs, sim_reward, done, terminated, info =  sim.step(action)
+        reward_history.append(sim_reward)
+
+        if done:
+            break
+
+    print("Closing")
+    sim.close()
+
+    observation_dict = {
             0:'sim_time',
             1:'baker_1_time_remaining',
             2:'baker_2_time_remaining',
@@ -145,25 +135,8 @@ def start():
             #21:'completed_cake',
         }
 
-        obs, sim_reward, done, terminated, info =  sim.step(action)
-        reward_history.append(sim_reward)
-        
-        #if done:
-        #    break
-
-    metrics['completed_cookies'] = ccok
-    metrics['completed_cupcakes'] = ccup
-    metrics['completed_cake'] = ccak
-
-    with open('metrics.pkl', 'wb') as f:
-        pickle.dump(metrics, f)
-
-    print("Done", ccok, ccup, ccak)
-    print("Closing")
-    sim.close()
-
     plt.figure(2,figsize=(7,5))
-    plt.subplot(4,1,1)
+    plt.subplot(5,1,1)
     plt.plot([ x["completed_cookies"] for x in obs_history],'k.-',lw=2)
     plt.plot([ x["completed_cupcakes"] for x in obs_history],'b.-',lw=2)
     plt.plot([ x["completed_cake"] for x in obs_history],'r.-',lw=2)
@@ -171,7 +144,7 @@ def start():
     plt.legend(['cookies','cupcakes','cake'],loc='best')
     plt.title('Live Control')
 
-    plt.subplot(4,1,2)
+    plt.subplot(5,1,2)
     '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]), 
                                                 float(obs_history[-1]["completed_cupcakes"]), 
                                                 float(obs_history[-1]["completed_cake"]) 
@@ -185,30 +158,32 @@ def start():
     plt.ylabel('Completed')
     plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
-    plt.subplot(4,1,3)
+    plt.subplot(5,1,3)
     '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]) * float(obs_history[-1]["cookies_price"]), 
                                                 float(obs_history[-1]["completed_cupcakes"])  * float(obs_history[-1]["cupcake_price"]), 
                                                 float(obs_history[-1]["completed_cake"])  * float(obs_history[-1]["cake_price"]) 
                                                 ])'''
-    '''plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
+    plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[8]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[11]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[12]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[13]] for x in obs_history],'b.-',lw=2)
     plt.plot([ x[observation_dict[14]] for x in obs_history],'b.-',lw=2)
     plt.plot([ x[observation_dict[17]] for x in obs_history],'g.-',lw=2)
-    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)'''
+    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)
+
+    plt.subplot(5,1,4)
     plt.plot(action_history)
     plt.ylabel('Income')
-    plt.legend(['cookie','cupcake','cake'],loc='best')
+    plt.legend(['chip_coco_eclair_wait','mix_bake_decorate','product_equip'],loc='best')
 
-    plt.subplot(4,1,4)
+    plt.subplot(5,1,5)
     plt.plot(reward_history,'k--',lw=2,label=r'$T_{sp}$')
     plt.ylabel('Reward')
     plt.xlabel('Time (min)')
     plt.legend(['Reward'],loc='best')
 
-    plt.savefig(f"{PATH}/img/inference_figure.png")
+    plt.show()
     
 
 if __name__ == "__main__":
