@@ -3,6 +3,7 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
 from teacher import BaseTeacher
+import datetime
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -11,6 +12,7 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
+    start_time = datetime.datetime.now()
     # delete old history files
     try:
         files = os.listdir(PATH_HISTORY)
@@ -102,9 +104,11 @@ def start():
         agent.load(PATH_CHECKPOINTS)
 
 
-    runtime.train(agent, train_iters=10)
+    runtime.train(agent, train_iters=1)
     
     agent.export(PATH_CHECKPOINTS)
+    end_time = datetime.datetime.now()
+    print(f"Training time: {end_time - start_time}")
 
 
 if __name__ == "__main__":

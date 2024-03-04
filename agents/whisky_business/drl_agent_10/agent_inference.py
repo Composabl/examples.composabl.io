@@ -8,6 +8,7 @@ import numpy as np
 import math
 from gymnasium import spaces
 import matplotlib.pyplot as plt
+import pickle
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -69,6 +70,20 @@ def start():
 
     print("Initializing Environment")
     sim.init()
+    co_dm = 100
+    cp_dm = 18
+    ck_dm = 5
+    metrics = {
+        'Co_demand': co_dm,
+        'Cp_demand': cp_dm,
+        'Ck_demand':ck_dm
+    }
+    
+    sim.set_scenario(Scenario({ 
+            "cookies_demand": co_dm,
+            "cupcake_demand": cp_dm,
+            "cake_demand": ck_dm,
+        }))
     print("Resetting Environment")
     obs, info = sim.reset()
     print("Initialized")
@@ -89,7 +104,6 @@ def start():
         #action_history.append(list(action.values()))
         #action = [action]
         #action = sim.action_space_sample()[0]
-        print(action)
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
@@ -126,18 +140,21 @@ def start():
             #20:'completed_cupcakes',
             #21:'completed_cake',
         }
-        print(obs[observation_dict[5]],obs[observation_dict[6]])
-        print(obs[observation_dict[7]],obs[observation_dict[8]])
 
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
         
-        #print(ccok, ccup, ccak)
-        
-
         #if done:
         #    break
 
+    metrics['completed_cookies'] = ccok
+    metrics['completed_cupcakes'] = ccup
+    metrics['completed_cake'] = ccak
+
+    with open('metrics.pkl', 'wb') as f:
+        pickle.dump(metrics, f)
+
+    print("Done", ccok, ccup, ccak)
     print("Closing")
     sim.close()
 

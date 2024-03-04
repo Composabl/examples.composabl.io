@@ -38,7 +38,7 @@ class BaseTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return [s.name for s in sensors]
+        return [s.name for s in sensors] + ["cookies_demand_predict"]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:

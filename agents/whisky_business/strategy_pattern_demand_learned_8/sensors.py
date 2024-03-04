@@ -81,3 +81,7 @@ for d in sensors_dict_list:
     for key in list(d.keys()):
         globals()[d[key]] = Sensor(d[key], "")
         sensors.append(globals()[d[key]])
+
+#sensors += [Sensor('cookies_demand_predict', ''),Sensor('cookies_demand_predict1', ''),
+#            Sensor('cookies_demand_predict2', ''), Sensor('cookies_demand_predict3', ''),
+#            Sensor('cookies_demand_predict4', ''),Sensor('cookies_demand_predict5', '')]

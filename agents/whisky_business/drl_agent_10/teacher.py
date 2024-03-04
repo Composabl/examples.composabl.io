@@ -83,6 +83,8 @@ class BaseTeacher(Teacher):
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             success = False
+        if (float(transformed_obs["completed_cookies"]) >= 0.95*float(transformed_obs["cookies_demand"])) and (float(transformed_obs["completed_cupcakes"]) >= 0.95*float(transformed_obs["cupcake_demand"])) and (float(transformed_obs["completed_cake"]) >= 0.95*float(transformed_obs["cake_demand"])):
+            success = True
         else:
             success = False
             if self.metrics == 'standard':

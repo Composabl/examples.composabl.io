@@ -5,6 +5,7 @@ from sensors import sensors
 from teacher import BaseTeacher
 from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController, WaitController
 from perceptors import perceptors
+import datetime
 
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -15,6 +16,7 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 
 def start():
+    start_time = datetime.datetime.now()
     # delete old history files
     try:
         files = os.listdir(PATH_HISTORY)
@@ -54,9 +56,12 @@ def start():
 
     selector_demand_scenarios = [
         {   # Std Demand
-            "cookies_demand": [20,60,100],
-            "cupcake_demand": [6,18],
-            "cake_demand": [1,2,5],
+            #"cookies_demand": [20,60,100], # not working
+            #"cupcake_demand": [6,18],
+            #"cake_demand": [1,2,5],
+            "cookies_demand": 60,
+            "cupcake_demand": 18,
+            "cake_demand": 5,
         },
     ]
     
@@ -98,6 +103,7 @@ def start():
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
+    agent.add_perceptors(perceptors)
 
     agent.add_skill(high_demand_skill)
     agent.add_skill(low_demand_skill)
@@ -110,12 +116,14 @@ def start():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    if len(files) > 0:
-        agent.load(PATH_CHECKPOINTS)
+    #if len(files) > 0:
+    #|    agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=30)
+    runtime.train(agent, train_iters=3)
     
     agent.export(PATH_CHECKPOINTS)
+    end_time = datetime.datetime.now()
+    print('Time to train: ', end_time - start_time)
 
 
 if __name__ == "__main__":

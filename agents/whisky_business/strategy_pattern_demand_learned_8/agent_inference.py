@@ -69,6 +69,11 @@ def start():
 
     print("Initializing Environment")
     sim.init()
+    sim.set_scenario(Scenario({   # High Demand
+            "cookies_demand": 100,
+            "cupcake_demand": 18,
+            "cake_demand": 5,
+        }))
     print("Resetting Environment")
     obs, info = sim.reset()
     print("Initialized")
@@ -89,10 +94,15 @@ def start():
         #action_history.append(list(action.values()))
         #action = [action]
         #action = sim.action_space_sample()[0]
-        print(action)
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
+        #ccok = obs[sensor_names.index('completed_cookies')] if obs[sensor_names.index('completed_cookies')] > 0 else 0
+        #ccup = obs[sensor_names.index('completed_cupcakes')] if obs[sensor_names.index('completed_cupcakes')] > 0 else 0
+        #ccak = obs[sensor_names.index('completed_cake')] if obs[sensor_names.index('completed_cake')] > 0 else 0
+        ccok = obs['completed_cookies']
+        ccup = obs['completed_cupcakes']
+        ccak = obs['completed_cake']
 
         observation_dict = {
             0:'sim_time',
@@ -124,12 +134,10 @@ def start():
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
         
-        #print(ccok, ccup, ccak)
-        
-
         #if done:
         #    break
 
+    print("Done", ccok, ccup, ccak)
     print("Closing")
     sim.close()
 
@@ -179,7 +187,7 @@ def start():
     plt.xlabel('Time (min)')
     plt.legend(['Reward'],loc='best')
 
-    plt.show()
+    plt.savefig(f"{PATH}/img/inference_figure.png")
     
 
 if __name__ == "__main__":
