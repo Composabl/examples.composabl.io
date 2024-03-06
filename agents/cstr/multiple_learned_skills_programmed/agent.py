@@ -24,12 +24,12 @@ class ProgrammedSelector(Controller):
         self.counter = 0
 
     def compute_action(self, obs):
-        if obs['Cref'] >= 8.56 and obs['Cref'] <= 8.58:
+        if self.counter >= 0 and self.counter <= 22:
             action = [0]
-        elif obs['Cref'] == 2.0:
-            action = [1]
-        else:
+        elif self.counter >= 76 :
             action = [2]
+        else:
+            action = [1]
 
         return action
 

@@ -18,11 +18,11 @@ class ProgrammedSelector(Controller):
         self.counter = 0
 
     def compute_action(self, obs):
-        if obs['cake_demand'] < obs['completed_cake']:
+        if obs["cake_demand_predict"] < obs['completed_cake']:
             action = [2]
-        elif obs['cupcake_demand'] < obs['completed_cupcakes']:
+        elif obs["cupcake_demand_predict"] < obs['completed_cupcakes']:
             action = [1]
-        elif obs['cookies_demand'] < obs['completed_cookies']:
+        elif obs["cookies_demand_predict"] < obs['completed_cookies']:
             action = [0]    
         else:
             action = [3]
@@ -57,15 +57,40 @@ def start():
 
     # dt=1 minute, we are running for 8hours=480 mins
     bake_scenarios = [
-        {
-            "cookies_price": 2,
-            "cupcake_price": 5,
-            "cake_price": 20,
-
-            "cookies_demand": 30,
+        {   # High Demand
+            "cookies_demand": 100,
+            "cupcake_demand": 18,
+            "cake_demand": 5,
+        },
+        {   # Std Demand
+            "cookies_demand": 60,
+            "cupcake_demand": 18,
+            "cake_demand": 2,
+        },
+        {   # Low Demand
+            "cookies_demand": 20,
+            "cupcake_demand": 6,
+            "cake_demand": 1,
+        },
+        {   # Xmas Demand
+            "cookies_demand": 260,
             "cupcake_demand": 10,
-            "cake_demand": 5
-
+            "cake_demand": 1,
+        },
+        {   # Cupcake Wars
+            "cookies_demand": 0,
+            "cupcake_demand": 96,
+            "cake_demand": 0,
+        },
+        {   # Cookie Wars
+            "cookies_demand": 396,
+            "cupcake_demand": 0,
+            "cake_demand": 0,
+        },
+        {   # November Birthday
+            "cookies_demand": 0,
+            "cupcake_demand": 0,
+            "cake_demand": 11,
         }
     ]
 
@@ -89,7 +114,7 @@ def start():
         "license": license_key,
         "target": {
             #"docker": {
-            #    "image": "composabl/sim-cstr:latest"
+            #    "image": "composabl/sim-whisky-local:latest"
             #},
             "local": {
                "address": "localhost:1337"
@@ -99,7 +124,8 @@ def start():
             "name": "sim-whisky",
         },
         "runtime": {
-            "workers": 1
+            "workers": 1,
+            "num_gpus":0
         }
     }
 
@@ -126,7 +152,7 @@ def start():
     except Exception:
         os.mkdir(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=10)
+    runtime.train(agent, train_iters=1)
     
     agent.export(PATH_CHECKPOINTS)
 

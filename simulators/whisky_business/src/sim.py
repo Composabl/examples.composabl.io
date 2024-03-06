@@ -34,7 +34,9 @@ class Env(gym.Env):
             "action_mask":  { "low": 0, "high": 1},
             "observations":  {"low": 0, "high": 500},
             "dessert_cases":  {"low": 0, "high": 700},
-            "dessert_prices":  {"low": 0, "high": 50}
+            "dessert_prices":  {"low": 0, "high": 100},
+            "dessert_demand":  {"low": 0, "high": 1000},
+            "dessert_cost":  {"low": 0, "high": 100}
         }
 
         low_list = []
@@ -52,8 +54,8 @@ class Env(gym.Env):
                 llist = llist * len_default_state
                 hlist = hlist * len_default_state
             else:
-                llist = llist * 9
-                hlist = hlist * 9
+                llist = llist * 3
+                hlist = hlist * 3
 
             low_list += llist
             high_list += hlist
@@ -71,6 +73,8 @@ class Env(gym.Env):
         self.observation_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
         self.cnt = 0
         self.scenario: Scenario = None
+
+        #print('OBS SPACE: ', self.observation_space)
 
     def process_state(self, state):
         new_state = []

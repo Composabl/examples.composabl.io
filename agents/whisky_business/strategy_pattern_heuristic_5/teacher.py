@@ -39,8 +39,7 @@ class BaseTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        #return [s.name for s in sensors] + [p.name for p in perceptors]
-        return [s.name for s in sensors]
+        return [s.name for s in sensors] + [p.name for p in perceptors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
@@ -49,9 +48,7 @@ class BaseTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
         
-        reward = (float(transformed_obs['completed_cookies'])*(float(transformed_obs['cookies_price'])) \
-                  + float(transformed_obs['completed_cupcakes'])*(float(transformed_obs['cupcake_price'])) \
-                  + float(transformed_obs['completed_cake'])*(float(transformed_obs['cake_price'])))
+        reward = sim_reward
     
 
         self.reward_history.append(reward)

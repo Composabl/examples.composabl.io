@@ -37,16 +37,16 @@ class BaseTeacher(Teacher):
 
     def transform_action(self, transformed_obs, action):
         #wait
-        if action >= 0 or action <= 6:
+        if action == 0:
             return WaitController().compute_action(transformed_obs)
         #cookies
-        elif action >= 7 or action <= 12:
+        elif action == 1:
             return MakeCookieController().compute_action(transformed_obs)
         #cupcakes
-        elif action >= 13 or action <= 18:
+        elif action == 2:
             return MakeCupcakeController().compute_action(transformed_obs)
         #cake
-        elif action >= 19 or action <= 24:
+        elif action == 3:
             return MakeCakeController().compute_action(transformed_obs)
 
     def filtered_observation_space(self):
@@ -89,7 +89,7 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        return None
+        return [1,1,1,1] + ([0] * 21)
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:

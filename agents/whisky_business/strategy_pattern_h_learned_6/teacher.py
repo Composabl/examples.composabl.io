@@ -5,6 +5,7 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 from sensors import sensors
+from perceptors import perceptors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -38,7 +39,7 @@ class BaseTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return [s.name for s in sensors]
+        return [s.name for s in sensors] + [p.name for p in perceptors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
@@ -47,12 +48,9 @@ class BaseTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
         
-        reward = (float(transformed_obs['completed_cookies'])*(float(transformed_obs['cookies_price'])) \
-                  + float(transformed_obs['completed_cupcakes'])*(float(transformed_obs['cupcake_price'])) \
-                  + float(transformed_obs['completed_cake'])*(float(transformed_obs['cake_price'])))
-    
         reward = sim_reward
-        
+    
+
         self.reward_history.append(reward)
         self.action_history.append(action)
 
@@ -81,7 +79,8 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        return None
+        action_mask = [float(x) for x in list(transformed_obs.values())[:25]]
+        return action_mask
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
@@ -178,3 +177,85 @@ class BaseTeacher(Teacher):
 
 
 
+class CookiesTeacher(BaseTeacher):
+    def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        reward = float(transformed_obs['completed_cookies'])
+        self.reward_history.append(reward)
+
+        self.count += 1
+
+        # history metrics
+        if self.metrics != 'none':
+            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'], 
+                                data=[[self.count,float(transformed_obs["completed_cookies"]), float(transformed_obs["completed_cupcakes"]),
+                                        float(transformed_obs["completed_cake"]),
+                                        reward]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
+
+        return reward
+    
+
+class CupcakesTeacher(BaseTeacher): 
+    def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        reward = float(transformed_obs['completed_cupcakes'])
+        self.reward_history.append(reward)
+
+        self.count += 1
+
+        # history metrics
+        if self.metrics != 'none':
+            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'], 
+                                data=[[self.count,float(transformed_obs["completed_cookies"]), float(transformed_obs["completed_cupcakes"]),
+                                        float(transformed_obs["completed_cake"]),
+                                        reward]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
+
+        return reward
+    
+    
+class CakesTeacher(BaseTeacher):
+    def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        reward = float(transformed_obs['completed_cake'])
+        self.reward_history.append(reward)
+
+        self.count += 1
+
+        # history metrics
+        if self.metrics != 'none':
+            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'], 
+                                data=[[self.count,float(transformed_obs["completed_cookies"]), float(transformed_obs["completed_cupcakes"]),
+                                        float(transformed_obs["completed_cake"]),
+                                        reward]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
+
+        return reward
+    
+class WaitTeacher(BaseTeacher):
+    def transform_action(self, transformed_obs, action):
+        return 0
+    
+
+class SelectorTeacher(BaseTeacher):
+    def compute_action_mask(self, transformed_obs, action):
+        return None

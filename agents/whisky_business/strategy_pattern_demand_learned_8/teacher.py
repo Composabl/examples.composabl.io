@@ -5,6 +5,7 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 from sensors import sensors
+from perceptors import perceptors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -38,7 +39,7 @@ class BaseTeacher(Teacher):
         return action
 
     def filtered_observation_space(self):
-        return [s.name for s in sensors] + ["cookies_demand_predict"]
+        return [s.name for s in sensors] + [p.name for p in perceptors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
@@ -81,7 +82,8 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        return None
+        action_mask = [float(x) for x in list(transformed_obs.values())[:25]]
+        return action_mask
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
@@ -174,6 +176,11 @@ class BaseTeacher(Teacher):
 
         plt.draw()
         plt.pause(0.001)
+
+
+class SelectorTeacher(BaseTeacher):
+    def compute_action_mask(self, transformed_obs, action):
+        return None
 
 
 

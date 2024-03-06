@@ -8,7 +8,7 @@ import numpy as np
 import math
 from gymnasium import spaces
 import matplotlib.pyplot as plt
-import pickle
+import pickle 
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -104,12 +104,10 @@ def start():
         #action_history.append(list(action.values()))
         #action = [action]
         #action = sim.action_space_sample()[0]
+        #print('ACTION: ', action)
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
-        #ccok = obs[sensor_names.index('completed_cookies')] if obs[sensor_names.index('completed_cookies')] > 0 else 0
-        #ccup = obs[sensor_names.index('completed_cupcakes')] if obs[sensor_names.index('completed_cupcakes')] > 0 else 0
-        #ccak = obs[sensor_names.index('completed_cake')] if obs[sensor_names.index('completed_cake')] > 0 else 0
         ccok = obs['completed_cookies']
         ccup = obs['completed_cupcakes']
         ccak = obs['completed_cake']
@@ -143,9 +141,11 @@ def start():
 
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
+    
         
-        #if done:
-        #    break
+
+        if done:
+            break
 
     metrics['completed_cookies'] = ccok
     metrics['completed_cupcakes'] = ccup
@@ -154,7 +154,7 @@ def start():
     with open('metrics.pkl', 'wb') as f:
         pickle.dump(metrics, f)
 
-    print("Done", ccok, ccup, ccak)
+    print(metrics)
     print("Closing")
     sim.close()
 
@@ -178,25 +178,21 @@ def start():
     plt.plot([ x[observation_dict[10]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[15]] for x in obs_history],'g.-',lw=2)
     plt.plot([ x[observation_dict[16]] for x in obs_history],'g.-',lw=2)
-    plt.ylabel('Completed')
-    plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
+    plt.ylabel('Making')
+    #plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
     plt.subplot(4,1,3)
-    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]) * float(obs_history[-1]["cookies_price"]), 
-                                                float(obs_history[-1]["completed_cupcakes"])  * float(obs_history[-1]["cupcake_price"]), 
-                                                float(obs_history[-1]["completed_cake"])  * float(obs_history[-1]["cake_price"]) 
-                                                ])'''
-    '''plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
+    plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[8]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[11]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[12]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[13]] for x in obs_history],'b.-',lw=2)
     plt.plot([ x[observation_dict[14]] for x in obs_history],'b.-',lw=2)
     plt.plot([ x[observation_dict[17]] for x in obs_history],'g.-',lw=2)
-    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)'''
+    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)
     plt.plot(action_history)
-    plt.ylabel('Income')
-    plt.legend(['cookie','cupcake','cake'],loc='best')
+    plt.ylabel('Making')
+    #plt.legend(['cookie','cupcake','cake'],loc='best')
 
     plt.subplot(4,1,4)
     plt.plot(reward_history,'k--',lw=2,label=r'$T_{sp}$')
