@@ -2,7 +2,7 @@ import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
-from teacher import BaseTeacher, CookiesTeacher, CupcakesTeacher, CakesTeacher, WaitTeacher
+from teacher import BaseTeacher, CookiesTeacher, CupcakesTeacher, CakesTeacher, WaitTeacher, SelectorTeacher
 from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController, WaitController
 
 
@@ -74,7 +74,7 @@ def start():
     cakes_skill = Skill("cakes", CakesTeacher)
     wait_skill = Skill("wait", WaitTeacher)
 
-    selector_skill = Skill("selector", BaseTeacher)
+    selector_skill = Skill("selector", SelectorTeacher)
     for scenario_dict in bake_scenarios:
         cookies_skill.add_scenario(Scenario(scenario_dict))
         cupcakes_skill.add_scenario(Scenario(scenario_dict))

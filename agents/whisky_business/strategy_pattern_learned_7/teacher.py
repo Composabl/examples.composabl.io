@@ -255,3 +255,7 @@ class CakesTeacher(BaseTeacher):
 class WaitTeacher(BaseTeacher):
     def transform_action(self, transformed_obs, action):
         return 0
+    
+class SelectorTeacher(BaseTeacher):
+    def compute_action_mask(self, transformed_obs, action):
+        return None

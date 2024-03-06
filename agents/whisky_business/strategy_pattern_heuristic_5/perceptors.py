@@ -7,9 +7,9 @@ class DemandPredict():
 
     def compute(self, obs):  
         #Heuristic
-        co = int(round(1.3 * obs["cookies_demand"],0))
-        cp = int(round(1.1 * obs["cupcake_demand"]),0)
-        ck = int(round(1.05 * obs["cake_demand"]),0)
+        co = int(1.3 * obs["cookies_demand"])
+        cp = int(1.1 * obs["cupcake_demand"])
+        ck = int(1.05 * obs["cake_demand"])
         
         return {"cookies_demand_predict": co, "cupcake_demand_predict": cp, "cake_demand_predict": ck}
     

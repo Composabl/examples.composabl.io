@@ -195,6 +195,7 @@ class MakeCakeController(Controller):
 
         ## CAKES
         # MIX
+        print('OBS: ', obs)
         if obs['baker_1_time_remaining'] == 0: #chip
             action = 3
         elif obs['baker_2_time_remaining'] == 0: #coco

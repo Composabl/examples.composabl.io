@@ -4,6 +4,7 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
 from teacher import BaseTeacher
 from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController, WaitController
+from teacher import CookiesTeacher, CupcakesTeacher, CakesTeacher, WaitTeacher, SelectorTeacher
 from perceptors import perceptors
 
 
@@ -29,24 +30,53 @@ def start():
 
     # dt=1 minute, we are running for 8hours=480 mins
     bake_scenarios = [
-        {
-            "cookies_price": 2,
-            "cupcake_price": 5,
-            "cake_price": 20,
-
-            "cookies_demand": 30,
+        {   # High Demand
+            "cookies_demand": 100,
+            "cupcake_demand": 18,
+            "cake_demand": 5,
+        },
+        {   # Std Demand
+            "cookies_demand": 60,
+            "cupcake_demand": 18,
+            "cake_demand": 2,
+        },
+        {   # Low Demand
+            "cookies_demand": 20,
+            "cupcake_demand": 6,
+            "cake_demand": 1,
+        },
+        {   # Xmas Demand
+            "cookies_demand": 260,
             "cupcake_demand": 10,
-            "cake_demand": 5
-
+            "cake_demand": 1,
+        },
+        {   # Cupcake Wars
+            "cookies_demand": 0,
+            "cupcake_demand": 96,
+            "cake_demand": 0,
+        },
+        {   # Cookie Wars
+            "cookies_demand": 396,
+            "cupcake_demand": 0,
+            "cake_demand": 0,
+        },
+        {   # November Birthday
+            "cookies_demand": 0,
+            "cupcake_demand": 0,
+            "cake_demand": 11,
         }
     ]
 
-    cookies_skill = Skill("cookies", MakeCookieController)
-    cupcakes_skill = Skill("cupcakes", MakeCupcakeController)
-    cakes_skill = Skill("cakes", MakeCakeController)
-    wait_skill = Skill("wait", WaitController)
+    #cookies_skill = Skill("cookies", MakeCookieController)
+    #cupcakes_skill = Skill("cupcakes", MakeCupcakeController)
+    #cakes_skill = Skill("cakes", MakeCakeController)
+    #wait_skill = Skill("wait", WaitController)
+    cookies_skill = Skill("cookies", CookiesTeacher)
+    cupcakes_skill = Skill("cupcakes", CupcakesTeacher)
+    cakes_skill = Skill("cakes", CakesTeacher)
+    wait_skill = Skill("wait", WaitTeacher)
 
-    selector_skill = Skill("selector", BaseTeacher)
+    selector_skill = Skill("selector", SelectorTeacher)
     for scenario_dict in bake_scenarios:
         cookies_skill.add_scenario(Scenario(scenario_dict))
         cupcakes_skill.add_scenario(Scenario(scenario_dict))
@@ -57,7 +87,7 @@ def start():
         "license": license_key,
         "target": {
             #"docker": {
-            #    "image": "composabl/sim-cstr:latest"
+            #    "image": "composabl/sim-whisky-local:latest"
             #},
             "local": {
                "address": "localhost:1337"
@@ -67,14 +97,15 @@ def start():
             "name": "sim-whisky",
         },
         "runtime": {
-            "workers": 1
+            "workers": 1,
+            "num_cpus": 0
         }
     }
 
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
-    #agent.add_perceptors(perceptors)
+    agent.add_perceptors(perceptors)
 
     agent.add_skill(cookies_skill)
     agent.add_skill(cupcakes_skill)
@@ -88,13 +119,10 @@ def start():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    try:
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+    #if len(files) > 0:
+    #    agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=30)
+    runtime.train(agent, train_iters=1)
     
     agent.export(PATH_CHECKPOINTS)
 
