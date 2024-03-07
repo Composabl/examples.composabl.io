@@ -21,6 +21,7 @@ class Env(gym.Env):
                 "render_mode": "human"
             }
         }
+        self.config = config
         self.business_env = WhiskeyBusinessEnv(config)
 
         self.action_space = self.business_env.action_space
@@ -101,6 +102,7 @@ class Env(gym.Env):
 
         #print('SCENARIO: ', sample)
         #print('DEMAND ', self.cookies_demand, self.cupcake_demand, self.cake_demand)
+        self.business_env = WhiskeyBusinessEnv(self.config)
 
         self.business_env.cookies_price = self.cookies_price
         self.business_env.cupcake_price = self.cupcake_price

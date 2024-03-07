@@ -205,22 +205,26 @@ def start():
     
 
     plt.figure(3,figsize=(10,7))
+    x = np.arange(len(last_revenue_history))
+
     plt.subplot(3,1,1)
     plt.plot(last_reward_history,'k.-',lw=2)
     plt.axhline(y=0, color='k', linestyle='--')
-    plt.ylabel('Completed')
+    plt.ylabel('Profit')
     plt.legend(['cookies','cupcakes','cake'],loc='best')
+    plt.setp(plt.gca(), xticks=x, xticklabels=['Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat', 'Sun'])
     #plt.title('Live Control')
 
     plt.subplot(3,1,2)
     plt.plot(last_revenue_history,'k.-',lw=2)
     #plt.axhline(y=0, color='k', linestyle='--')
-    plt.ylabel('Completed')
+    plt.ylabel('Revenue')
     plt.legend(['cookies','cupcakes','cake'],loc='best')
+    plt.setp(plt.gca(), xticks=x, xticklabels=['Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat', 'Sun'])
     
     plt.subplot(3,1,3)
     #plt.bar(['cookies','cupcakes', 'cakes'], [float(ccok), float(ccup), float(ccak)])
-    x = np.arange(len(last_revenue_history))
+    
     w = 0.35
     #plt.bar( np.arange(len(last_revenue_history)) , [tuple(x) for x in production_history] )
     plt.bar( x - w/3, [x[0] for x in production_history], w/3)
@@ -229,9 +233,11 @@ def start():
     plt.plot([ x[0] for x in demand_history], 'b--')
     plt.plot([ x[1] for x in demand_history], 'r--')
     plt.plot([ x[2] for x in demand_history], 'g--')
+    plt.legend(['cookies','cupcakes','cake'],loc='best')
     plt.ylabel('Demand and Production')
 
-    plt.xlabel('Time (min)')
+    plt.xlabel('Days of the week')
+    plt.setp(plt.gca(), xticks=x, xticklabels=['Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat', 'Sun'])
 
     plt.savefig(f"{PATH}/img/benchmarks.png")
     
