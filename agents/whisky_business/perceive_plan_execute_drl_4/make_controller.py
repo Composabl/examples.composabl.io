@@ -2,7 +2,7 @@ from composabl import Controller
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from gekko import GEKKO
 from sensors import sensors
 
 
@@ -18,6 +18,14 @@ class MakeCookieController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        if type(obs) != dict:
+            old_obs = obs.copy()
+            sensors_name = [s.name for s in sensors]
+            obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
+        else:
+            old_obs = obs
+            for k, v in obs.items():
+                obs[k] = float(v)
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
@@ -99,6 +107,14 @@ class MakeCupcakeController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        if type(obs) != dict:
+            old_obs = obs.copy()
+            sensors_name = [s.name for s in sensors]
+            obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
+        else:
+            old_obs = obs
+            for k, v in obs.items():
+                obs[k] = float(v)
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
@@ -180,6 +196,14 @@ class MakeCakeController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        if type(obs) != dict:
+            old_obs = obs.copy()
+            sensors_name = [s.name for s in sensors]
+            obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
+        else:
+            old_obs = obs
+            for k, v in obs.items():
+                obs[k] = float(v)
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
@@ -189,6 +213,7 @@ class MakeCakeController(Controller):
 
         ## CAKES
         # MIX
+        #print('OBS: ', obs)
         if obs['baker_1_time_remaining'] == 0: #chip
             action = 3
         elif obs['baker_2_time_remaining'] == 0: #coco
@@ -261,6 +286,14 @@ class WaitController(Controller):
         return [s.name for s in sensors]
     
     def compute_action(self, obs):
+        if type(obs) != dict:
+            old_obs = obs.copy()
+            sensors_name = [s.name for s in sensors]
+            obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
+        else:
+            old_obs = obs
+            for k, v in obs.items():
+                obs[k] = float(v)
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))

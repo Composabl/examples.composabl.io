@@ -3,6 +3,7 @@ from composabl_core.grpc.client.client import make
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from controller import MPCController
 from sensors import sensors
+from heuristic_controller import OrderController
 
 import pandas as pd
 import matplotlib.pyplot as plt

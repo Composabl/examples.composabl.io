@@ -92,135 +92,146 @@ def start():
         'ck_dm' : 10}
     ]
 
-    total_reward_history = []
-    last_reward_history = []
-    last_revenue_history = []
-    production_history = []
-    demand_history = []
+    last_reward_history_total = []
 
-    for d in range(7):
-        co_dm = scenarios_list[d]['co_dm']
-        cp_dm = scenarios_list[d]['cp_dm']
-        ck_dm = scenarios_list[d]['ck_dm']
-        metrics = {
-            'Co_demand': co_dm,
-            'Cp_demand': cp_dm,
-            'Ck_demand': ck_dm
-        }
+    for i in range(30):
+        print(f'Run {i}')
+        total_reward_history = []
+        last_reward_history = []
+        last_revenue_history = []
+        production_history = []
+        demand_history = []
 
-        print("Initializing Environment")
-        sim.init()
-        
-        sim.set_scenario(Scenario({ 
-                "cookies_demand": co_dm,
-                "cupcake_demand": cp_dm,
-                "cake_demand": ck_dm,
-            }))
-        print("Resetting Environment")
-        obs, info = sim.reset()
-        demand_history.append([co_dm, cp_dm, ck_dm])
-
-        # Get a sim action sample if needed (debug)
-        #a = sim.action_space_sample()
-        obs_history = []
-        action_history = []
-        reward_history = []
-
-        sensors_name = [s.name for s in sensors]
-        obs_base = {}
-        
-        for s in sensors_name:
-            obs_base[s] = None
-        
-        for i in range(480):
-            # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
-            action = trained_agent.execute(obs)
-            action_history.append(action)
-            #action = [action]
-            #action = sim.action_space_sample()[0]
-
-            observation_dict = {
-                0:'sim_time',
-                1:'baker_1_time_remaining',
-                2:'baker_2_time_remaining',
-                3:'baker_3_time_remaining',
-                4:'baker_4_time_remaining',
-                # EQUIPMENT
-                5:'mixer_1_recipe',
-                6:'mixer_1_time_remaining',
-                7:'mixer_2_recipe',
-                8:'mixer_2_time_remaining',
-                9:'oven_1_recipe',
-                10:'oven_1_time_remaining',
-                11:'oven_2_recipe',
-                12:'oven_2_time_remaining',
-                13:'oven_3_recipe',
-                14:'oven_3_time_remaining',
-                15:'decorating_station_1_recipe',
-                16:'decorating_station_1_time_remaining',
-                17:'decorating_station_2_recipe',
-                18:'decorating_station_2_time_remaining',
-                # DESSERT CASE
-                #19:'completed_cookies',
-                #20:'completed_cupcakes',
-                #21:'completed_cake',
+        for d in range(7):
+            co_dm = scenarios_list[d]['co_dm']
+            cp_dm = scenarios_list[d]['cp_dm']
+            ck_dm = scenarios_list[d]['ck_dm']
+            metrics = {
+                'Co_demand': co_dm,
+                'Cp_demand': cp_dm,
+                'Ck_demand': ck_dm
             }
 
-            obs, sim_reward, done, terminated, info =  sim.step(action)
-            reward_history.append(sim_reward)
+            sim.init()
             
-            old_obs = obs.copy()
-            obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
-            obs_history.append(obs)
-            ccok = obs['completed_cookies']
-            ccup = obs['completed_cupcakes']
-            ccak = obs['completed_cake']
-            revenue = ccok * float(obs['cookies_price']) + ccup * float(obs['cupcake_price']) + ccak * float(obs['cake_price'])
+            sim.set_scenario(Scenario({ 
+                    "cookies_demand": co_dm,
+                    "cupcake_demand": cp_dm,
+                    "cake_demand": ck_dm,
+                }))
+
+            obs, info = sim.reset()
+            demand_history.append([co_dm, cp_dm, ck_dm])
+
+            # Get a sim action sample if needed (debug)
+            #a = sim.action_space_sample()
+            obs_history = []
+            action_history = []
+            reward_history = []
+
+            sensors_name = [s.name for s in sensors]
+            obs_base = {}
             
-            obs = old_obs
+            for s in sensors_name:
+                obs_base[s] = None
             
-            #if done:
-            #    break
+            for i in range(480):
+                # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
+                action = trained_agent.execute(obs)
+                action_history.append(action)
+                #action = [action]
+                #action = sim.action_space_sample()[0]
 
-        metrics['completed_cookies'] = ccok
-        metrics['completed_cupcakes'] = ccup
-        metrics['completed_cake'] = ccak
+                observation_dict = {
+                    0:'sim_time',
+                    1:'baker_1_time_remaining',
+                    2:'baker_2_time_remaining',
+                    3:'baker_3_time_remaining',
+                    4:'baker_4_time_remaining',
+                    # EQUIPMENT
+                    5:'mixer_1_recipe',
+                    6:'mixer_1_time_remaining',
+                    7:'mixer_2_recipe',
+                    8:'mixer_2_time_remaining',
+                    9:'oven_1_recipe',
+                    10:'oven_1_time_remaining',
+                    11:'oven_2_recipe',
+                    12:'oven_2_time_remaining',
+                    13:'oven_3_recipe',
+                    14:'oven_3_time_remaining',
+                    15:'decorating_station_1_recipe',
+                    16:'decorating_station_1_time_remaining',
+                    17:'decorating_station_2_recipe',
+                    18:'decorating_station_2_time_remaining',
+                    # DESSERT CASE
+                    #19:'completed_cookies',
+                    #20:'completed_cupcakes',
+                    #21:'completed_cake',
+                }
 
-        print('Day: ', d, ' metrics:', metrics)
+                obs, sim_reward, done, terminated, info =  sim.step(action)
+                reward_history.append(sim_reward)
+                
+                old_obs = obs.copy()
+                obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
+                obs_history.append(obs)
+                ccok = obs['completed_cookies']
+                ccup = obs['completed_cupcakes']
+                ccak = obs['completed_cake']
+                revenue = min(ccok,co_dm) * float(obs['cookies_price']) + min(ccup, cp_dm) * float(obs['cupcake_price']) + min(ccak, ck_dm) * float(obs['cake_price'])
+                
+                obs = old_obs
+                
+                #if done:
+                #    break
 
-        total_reward_history.append(reward_history)
-        last_reward_history.append(sim_reward)
-        last_revenue_history.append(revenue)
-        production_history.append([ccok, ccup, ccak])
+            metrics['completed_cookies'] = ccok
+            metrics['completed_cupcakes'] = ccup
+            metrics['completed_cake'] = ccak
 
-        print("Closing")
-        sim.close()
+            #print('Day: ', d, ' metrics:', metrics)
 
+            total_reward_history.append(reward_history)
+            last_reward_history.append(sim_reward)
+            last_revenue_history.append(revenue)
+            production_history.append([ccok, ccup, ccak])
 
-    print('REWARD: ', last_reward_history)
+            sim.close()
+
+        last_reward_history_total.append(last_reward_history)
+
+    # Plot the results
+    min_reward = [min(np.array(last_reward_history_total)[:,i]) for i in range(7)]
+    max_reward = [max(np.array(last_reward_history_total)[:,i])for i in range(7)]
+    mean_reward = [np.mean((np.array(last_reward_history_total)[:,i])) for i in range(7)]
+
+    #print('REWARD: ', last_reward_history)
     with open('metrics.pkl', 'wb') as f:
         pickle.dump(metrics, f)
 
-    print("Done", ccok, ccup, ccak)
+    #print("Done", ccok, ccup, ccak)
     
-
     plt.figure(3,figsize=(10,7))
+    x = np.arange(len(last_revenue_history))
     plt.subplot(3,1,1)
-    plt.plot(last_reward_history,'k.-',lw=2)
+    #plt.plot(last_reward_history,'k.-',lw=2)
+    plt.plot(mean_reward,'k.-',lw=2)
+    plt.fill_between([i for i in range(7)] , min_reward , max_reward, alpha = 0.2)
     plt.axhline(y=0, color='k', linestyle='--')
-    plt.ylabel('Completed')
-    plt.legend(['cookies','cupcakes','cake'],loc='best')
-    #plt.title('Live Control')
+    plt.ylabel('Profit')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+    plt.legend(['mean_profit','std_profit'],loc='best')
+    plt.title(f'Total Profit {round(sum(min_reward),2)} < {round(sum(mean_reward),2)} < {round(sum(max_reward),2)}, , Total Revenue {round(sum(last_revenue_history),2)}')
 
     plt.subplot(3,1,2)
     plt.plot(last_revenue_history,'k.-',lw=2)
     #plt.axhline(y=0, color='k', linestyle='--')
-    plt.ylabel('Completed')
-    plt.legend(['cookies','cupcakes','cake'],loc='best')
+    plt.ylabel('Revenue')
+    #plt.legend(['mean_profit','std_profit','cake'],loc='best')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
     
     plt.subplot(3,1,3)
     #plt.bar(['cookies','cupcakes', 'cakes'], [float(ccok), float(ccup), float(ccak)])
-    x = np.arange(len(last_revenue_history))
     w = 0.35
     #plt.bar( np.arange(len(last_revenue_history)) , [tuple(x) for x in production_history] )
     plt.bar( x - w/3, [x[0] for x in production_history], w/3)
@@ -230,8 +241,8 @@ def start():
     plt.plot([ x[1] for x in demand_history], 'r--')
     plt.plot([ x[2] for x in demand_history], 'g--')
     plt.ylabel('Demand and Production')
-
-    plt.xlabel('Time (min)')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+    plt.xlabel('Day of the week')
 
     plt.savefig(f"{PATH}/img/benchmarks.png")
     
