@@ -17,6 +17,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
+# INFERENCE FOR OPTIMIZATION CONTROLLER
 
 def start():
     # Define the right configuration

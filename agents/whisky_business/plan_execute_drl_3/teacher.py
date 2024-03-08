@@ -5,7 +5,7 @@ import math
 import matplotlib.pyplot as plt
 import pandas as pd
 from sensors import sensors
-from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController, WaitController
+from heuristic_controller import OrderController
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -22,6 +22,7 @@ class BaseTeacher(Teacher):
         self.last_reward = 0
         self.count = 0
         self.metrics = 'none' # standard, fast, none
+        self.cont = OrderController()
 
         # Read metrics db
         try:
@@ -33,21 +34,32 @@ class BaseTeacher(Teacher):
             self.df = pd.DataFrame()
 
     def transform_obs(self, obs, action):
+        self.obs = obs
         return obs
 
     def transform_action(self, transformed_obs, action):
-        #wait
-        if action == 0:
-            return WaitController().compute_action(transformed_obs)
-        #cookies
-        elif action == 1:
-            return MakeCookieController().compute_action(transformed_obs)
-        #cupcakes
-        elif action == 2:
-            return MakeCupcakeController().compute_action(transformed_obs)
-        #cake
-        elif action == 3:
-            return MakeCakeController().compute_action(transformed_obs)
+        sensors_name = [s.name for s in sensors]
+        transformed_obs = self.obs
+        #if (type(transformed_obs) == dict) and ('observation' in transformed_obs.keys()):
+        #    transformed_obs = transformed_obs['observation']
+
+        #if type(transformed_obs) != dict:
+        #    transformed_obs = dict(map(lambda i,j : (i,j), sensors_name, transformed_obs))
+
+        #print(transformed_obs)
+        #print(transformed_obs['completed_cookies'])
+        # add noise to transform_action
+        transformed_obs['cookies_demand'] = float(transformed_obs['cookies_demand']) * (1 + action * 0.01)
+        transformed_obs['cupcake_demand'] = float(transformed_obs['cupcake_demand']) * (1 + action * 0.01)
+        transformed_obs['cake_demand'] = float(transformed_obs['cake_demand']) * (1 + action * 0.01)
+        #print('AFTER: ', transformed_obs['cookies_demand'])
+        #print('AFTER: ', transformed_obs['cupcake_demand'])
+        #print('AFTER: ', transformed_obs['cake_demand'])
+
+        # get controller action
+        #action = self.cont.compute_action(list(transformed_obs.values()))
+        action = self.cont.compute_action(transformed_obs)
+        return action
 
     def filtered_observation_space(self):
         return [s.name for s in sensors]
@@ -89,7 +101,8 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        return [1,1,1,1] + ([0] * 21)
+        #return [1] + ([0] * 24)
+        return None
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:

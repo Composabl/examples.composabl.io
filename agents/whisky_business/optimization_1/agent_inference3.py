@@ -8,7 +8,8 @@ import numpy as np
 import math
 from gymnasium import spaces
 import matplotlib.pyplot as plt
-import pickle 
+import pickle
+from heuristic_controller import OrderController
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -16,6 +17,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
+## INFERENCE FOR HEURISTIC CONTROLLER
 
 def start():
     # Define the right configuration
@@ -45,14 +47,14 @@ def start():
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
     # Start Runtime
-    runtime = Runtime(config)
-    directory = PATH_CHECKPOINTS
+    #runtime = Runtime(config)
+    #directory = PATH_CHECKPOINTS
 
     # Load the pre trained agent
-    agent = Agent.load(directory)
+    #agent = Agent.load(directory)
 
     # Prepare the loaded agent for inference
-    trained_agent = runtime.package(agent)
+    #trained_agent = runtime.package(agent)
     
     # Create a new Simulation Environment
     print("Creating Environment")
@@ -94,25 +96,25 @@ def start():
     reward_history = []
     sensors_name = [s.name for s in sensors]
     obs_base = {}
+    cont = OrderController()
     
     for s in sensors_name:
         obs_base[s] = None
-
-    prev_action = None
+    
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
-        #composbl_obs = trained_agent.process_sim_observation(obs, previous_action=prev_action)
-        #print("COMPO: ", composbl_obs)
-        action = trained_agent.execute(obs)
-        #prev_action = action
-        #print(action)
+        #action = trained_agent.execute(obs)
+        action = cont.compute_action(obs)
+        print(action)
         #action_history.append(list(action.values()))
         #action = [action]
         #action = sim.action_space_sample()[0]
-        #print('ACTION: ', action)
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
+        #ccok = obs[sensor_names.index('completed_cookies')] if obs[sensor_names.index('completed_cookies')] > 0 else 0
+        #ccup = obs[sensor_names.index('completed_cupcakes')] if obs[sensor_names.index('completed_cupcakes')] > 0 else 0
+        #ccak = obs[sensor_names.index('completed_cake')] if obs[sensor_names.index('completed_cake')] > 0 else 0
         ccok = obs['completed_cookies']
         ccup = obs['completed_cupcakes']
         ccak = obs['completed_cake']
@@ -146,11 +148,9 @@ def start():
 
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
-    
         
-
-        if done:
-            break
+        #if done:
+        #    break
 
     metrics['completed_cookies'] = ccok
     metrics['completed_cupcakes'] = ccup
@@ -159,7 +159,7 @@ def start():
     with open('metrics.pkl', 'wb') as f:
         pickle.dump(metrics, f)
 
-    print(metrics)
+    print("Done", ccok, ccup, ccak)
     print("Closing")
     sim.close()
 
@@ -183,21 +183,25 @@ def start():
     plt.plot([ x[observation_dict[10]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[15]] for x in obs_history],'g.-',lw=2)
     plt.plot([ x[observation_dict[16]] for x in obs_history],'g.-',lw=2)
-    plt.ylabel('Making')
-    #plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
+    plt.ylabel('Completed')
+    plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
     plt.subplot(4,1,3)
-    plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
+    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]) * float(obs_history[-1]["cookies_price"]), 
+                                                float(obs_history[-1]["completed_cupcakes"])  * float(obs_history[-1]["cupcake_price"]), 
+                                                float(obs_history[-1]["completed_cake"])  * float(obs_history[-1]["cake_price"]) 
+                                                ])'''
+    '''plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[8]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[11]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[12]] for x in obs_history],'r.-',lw=2)
     plt.plot([ x[observation_dict[13]] for x in obs_history],'b.-',lw=2)
     plt.plot([ x[observation_dict[14]] for x in obs_history],'b.-',lw=2)
     plt.plot([ x[observation_dict[17]] for x in obs_history],'g.-',lw=2)
-    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)
+    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)'''
     plt.plot(action_history)
-    plt.ylabel('Making')
-    #plt.legend(['cookie','cupcake','cake'],loc='best')
+    plt.ylabel('Income')
+    plt.legend(['cookie','cupcake','cake'],loc='best')
 
     plt.subplot(4,1,4)
     plt.plot(reward_history,'k--',lw=2,label=r'$T_{sp}$')
@@ -205,7 +209,7 @@ def start():
     plt.xlabel('Time (min)')
     plt.legend(['Reward'],loc='best')
 
-    plt.savefig(f"{PATH}/img/inference_figure.png")
+    plt.savefig(f"{PATH}/img/inference_figure_heuristic.png")
     
 
 if __name__ == "__main__":
