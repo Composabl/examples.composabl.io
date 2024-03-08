@@ -101,7 +101,6 @@ class BaseTeacher(Teacher):
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
-        #return [1] + ([0] * 24)
         return None
 
     def compute_success_criteria(self, transformed_obs, action):

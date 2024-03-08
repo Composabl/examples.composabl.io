@@ -97,10 +97,15 @@ def start():
     
     for s in sensors_name:
         obs_base[s] = None
-    
+
+    prev_action = None
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
+        #composbl_obs = trained_agent.process_sim_observation(obs, previous_action=prev_action)
+        #print("COMPO: ", composbl_obs)
         action = trained_agent.execute(obs)
+        #prev_action = action
+        #print(action)
         #action_history.append(list(action.values()))
         #action = [action]
         #action = sim.action_space_sample()[0]

@@ -3,6 +3,8 @@ import os
 from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
 from teacher import BaseTeacher
+import datetime
+from perceptors import perceptors
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -11,6 +13,7 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def start():
+    start_time = datetime.datetime.now()
     # delete old history files
     try:
         files = os.listdir(PATH_HISTORY)
@@ -80,13 +83,15 @@ def start():
             "name": "sim-whisky",
         },
         "runtime": {
-            "workers": 1
+            "workers": 1,
+            "num_gpus": 0
         }
     }
 
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
+    agent.add_perceptors(perceptors)
 
     agent.add_skill(produce_skill)
     
@@ -96,15 +101,15 @@ def start():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    try:
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+    #if len(files) > 0:
+    #   agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=10)
+
+    runtime.train(agent, train_iters=2)
     
     agent.export(PATH_CHECKPOINTS)
+    end_time = datetime.datetime.now()
+    print('Training time: ', end_time - start_time)
 
 
 if __name__ == "__main__":
