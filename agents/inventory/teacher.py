@@ -14,6 +14,7 @@ class BalanceTeacher(Teacher):
         self.last_reward = 0
         self.cnt = 0
         self.plot = False
+        self.metrics = 'none'
 
         # create metrics db
         try:
@@ -44,19 +45,20 @@ class BalanceTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
         self.cnt += 1
 
-        reward = transformed_obs["balance"]/1e7
+        reward = float(transformed_obs["balance"])/1e7
 
-        # history metrics
-        df_temp = pd.DataFrame(columns=['inventory','balance','num_ordered','order_cutoff','reward','time'],
-        data=[[transformed_obs['inventory'],transformed_obs['balance'],transformed_obs['num_ordered'],action[0],reward,self.cnt]])
-        self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
+        if self.metrics != 'none':
+            # history metrics
+            df_temp = pd.DataFrame(columns=['inventory','balance','num_ordered','order_cutoff','reward','time'],
+            data=[[transformed_obs['inventory'],transformed_obs['balance'],transformed_obs['num_ordered'],action[0],reward,self.cnt]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
         return reward
 
     def compute_action_mask(self, transformed_obs, action):

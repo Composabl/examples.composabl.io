@@ -194,33 +194,50 @@ class Env(gym.Env):
         self.obs = self.process_state(self.obs)
 
         # Calculate Profit
-        completed_cookies = self.obs[45]
-        completed_cupcakes = self.obs[46]
-        completed_cakes = self.obs[47]
+        completed_cookies = self.obs[44]
+        completed_cupcakes = self.obs[45]
+        completed_cakes = self.obs[46]
 
         if completed_cookies <= self.cookies_demand_real:
             cost_of_opportunity = (self.cookies_demand_real - completed_cookies) * (self.cookies_price - self.cookies_cost)
-            cookies_profit = (completed_cookies * (self.cookies_price - self.cookies_cost)) - cost_of_opportunity
+            cookies_revenue = (completed_cookies * (self.cookies_price - self.cookies_cost))
+            cookies_profit = cookies_revenue - cost_of_opportunity
         else:
-            waste  = (self.cookies_demand_real - completed_cookies) * self.cookies_cost
-            cookies_profit = (completed_cookies * (self.cookies_price - self.cookies_cost)) - waste
+            waste  = -(self.cookies_demand_real - completed_cookies) * self.cookies_cost
+            cookies_revenue = (self.cookies_demand_real * (self.cookies_price - self.cookies_cost))
+            cookies_profit = cookies_revenue - waste
 
         if completed_cupcakes <= self.cupcakes_demand_real:
             cost_of_opportunity = (self.cupcakes_demand_real - completed_cupcakes) * (self.cupcake_price - self.cupcake_cost)
-            cupcakes_profit = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) - cost_of_opportunity
+            cupcakes_revenue = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) 
+            cupcakes_profit = cupcakes_revenue - cost_of_opportunity
         else:
-            waste  = (self.cupcakes_demand_real - completed_cupcakes) * self.cupcake_cost
-            cupcakes_profit = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) - waste
+            waste  = -(self.cupcakes_demand_real - completed_cupcakes) * self.cupcake_cost
+            cupcakes_revenue = (self.cupcakes_demand_real * (self.cupcake_price - self.cupcake_cost))
+            cupcakes_profit = cupcakes_revenue - waste
 
         if completed_cakes <= self.cakes_demand_real:
             cost_of_opportunity = (self.cakes_demand_real - completed_cakes) * (self.cake_price - self.cake_cost)
-            cakes_profit = (completed_cakes * (self.cake_price - self.cake_cost)) - cost_of_opportunity
+            cakes_revenue = (completed_cakes * (self.cake_price - self.cake_cost))
+            cakes_profit = cakes_revenue - cost_of_opportunity
         else:
-            waste  = (self.cakes_demand_real - completed_cakes) * self.cake_cost
-            cakes_profit = (completed_cakes * (self.cake_price - self.cake_cost)) - waste
+            waste  = -(self.cakes_demand_real - completed_cakes) * self.cake_cost
+            cakes_revenue = (self.cakes_demand_real * (self.cake_price - self.cake_cost))
+            cakes_profit = cakes_revenue - waste
         
         self.profit = cookies_profit + cupcakes_profit + cakes_profit
         reward = self.profit
+        
+        debug = False
+        if debug:
+            # Debug
+            print("##################")
+            print('DEMAND: ', self.cookies_demand, self.cupcake_demand, self.cake_demand)
+            print('DEMAND Real: ', self.cookies_demand_real, self.cupcakes_demand_real, self.cakes_demand_real)
+            print('COMPLETED: ', completed_cookies, completed_cupcakes, completed_cakes)
+            print('PRICE: ', self.cookies_price, self.cupcake_price, self.cake_price)
+            print('REVENUE: ', cookies_revenue, cupcakes_revenue, cakes_revenue)
+            print('PROFIT: ', cookies_profit, cupcakes_profit, cakes_profit)
 
         return self.obs, reward, terminate, done, info
 

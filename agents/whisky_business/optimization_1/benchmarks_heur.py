@@ -167,8 +167,8 @@ def start():
         
 
     # Plot the results
-    print('REWARD: ', last_reward_history)
-    print('REWARD: ', last_reward_history_total)
+    #print('REWARD: ', last_reward_history)
+    #print('REWARD: ', last_reward_history_total)
     
     min_reward = [min(np.array(last_reward_history_total)[:,i]) for i in range(7)]
     max_reward = [max(np.array(last_reward_history_total)[:,i])for i in range(7)]
@@ -182,24 +182,26 @@ def start():
     
 
     plt.figure(3,figsize=(10,7))
+    x = np.arange(len(last_revenue_history))
     plt.subplot(3,1,1)
     #plt.plot(last_reward_history,'k.-',lw=2)
     plt.plot(mean_reward,'k.-',lw=2)
     plt.fill_between([i for i in range(7)] , min_reward , max_reward, alpha = 0.2)
     plt.axhline(y=0, color='k', linestyle='--')
-    plt.ylabel('Completed')
-    plt.legend(['mean profit','std_profit'],loc='best')
+    plt.ylabel('Profit')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+    plt.legend(['mean_profit','std_profit'],loc='best')
     plt.title(f'Total Profit {round(sum(min_reward),2)} < {round(sum(mean_reward),2)} < {round(sum(max_reward),2)}, , Total Revenue {round(sum(last_revenue_history),2)}')
 
     plt.subplot(3,1,2)
     plt.plot(last_revenue_history,'k.-',lw=2)
     #plt.axhline(y=0, color='k', linestyle='--')
-    plt.ylabel('Completed')
-    plt.legend(['cookies','cupcakes','cake'],loc='best')
+    plt.ylabel('Revenue')
+    #plt.legend(['mean_profit','std_profit','cake'],loc='best')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
     
     plt.subplot(3,1,3)
     #plt.bar(['cookies','cupcakes', 'cakes'], [float(ccok), float(ccup), float(ccak)])
-    x = np.arange(len(last_revenue_history))
     w = 0.35
     #plt.bar( np.arange(len(last_revenue_history)) , [tuple(x) for x in production_history] )
     plt.bar( x - w/3, [x[0] for x in production_history], w/3)
@@ -209,8 +211,8 @@ def start():
     plt.plot([ x[1] for x in demand_history], 'r--')
     plt.plot([ x[2] for x in demand_history], 'g--')
     plt.ylabel('Demand and Production')
-
-    plt.xlabel('Time (min)')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+    plt.xlabel('Day of the week')
 
     plt.savefig(f"{PATH}/img/benchmarks_heur.png")
     

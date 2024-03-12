@@ -23,7 +23,7 @@ def start():
         }
     ]
 
-    Balance_skill = Skill("Balance", BalanceTeacher, trainable=True)
+    Balance_skill = Skill("Balance", BalanceTeacher)
 
     for scenario_dict in Q1_scenarios:
         scenario = Scenario(scenario_dict)
@@ -50,7 +50,7 @@ def start():
     }
 
     runtime = Runtime(config)
-    agent = Agent(runtime, config)
+    agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Balance_skill)
@@ -59,14 +59,14 @@ def start():
     if '.DS_Store' in files:
         files.remove('.DS_Store')
 
-    if len(files) > 0:
-        #load agent
-        agent.load(PATH_CHECKPOINTS)
+    #if len(files) > 0:
+    #    #load agent
+    #    agent.load(PATH_CHECKPOINTS)
 
 
-    agent.train(train_iters=6)
+    runtime.train(agent, train_iters=6)
 
-    agent.export(PATH_CHECKPOINTS)
+    #agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":

@@ -15,7 +15,8 @@ RUN apt-get update \
 # Install Python Dependencies
 ######################################################
 COPY requirements.txt ./
-RUN sed -i "s/composabl-core.*/composabl-core==${COMPOSABL_VERSION}/g" requirements.txt \
+#RUN sed -i "s/composabl-core.*/composabl-core==${COMPOSABL_VERSION}/g" requirements.txt \
+RUN sed requirements.txt \
     && pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
