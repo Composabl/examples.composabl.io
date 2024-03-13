@@ -71,18 +71,18 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            #"docker": {
-            #    "image": "composabl/sim-whisky-local:latest"
-            #},
-            "local": {
-               "address": "localhost:1337"
-            }
+            "docker": {
+                "image": "composabl/sim-whisky-local:latest"
+            },
+            #"local": {
+            #   "address": "localhost:1337"
+            #}
         },
         "env": {
             "name": "sim-whisky",
         },
         "runtime": {
-            "workers": 1,
+            "workers": 8,
             "num_gpus": 0
         }
     }
@@ -103,9 +103,9 @@ def start():
     #   agent.load(PATH_CHECKPOINTS)
 
 
-    runtime.train(agent, train_iters=2)
+    runtime.train(agent, train_iters=100)
     
-    agent.export(PATH_CHECKPOINTS)
+    #agent.export(PATH_CHECKPOINTS)
     end_time = datetime.datetime.now()
     print('Training time: ', end_time - start_time)
 

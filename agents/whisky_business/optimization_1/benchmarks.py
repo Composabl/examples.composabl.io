@@ -172,20 +172,24 @@ def start():
     #print('COMPLETED: ', ccok, ccup, ccak)
     #print('COMPLETED: ', production_history[-1])
     
+    # Plot the results
     min_reward = [min(np.array(last_reward_history_total)[:,i]) for i in range(7)]
     max_reward = [max(np.array(last_reward_history_total)[:,i])for i in range(7)]
     mean_reward = [np.mean((np.array(last_reward_history_total)[:,i])) for i in range(7)]
+    std_reward = [np.std((np.array(last_reward_history_total)[:,i])) for i in range(7)]
 
-    
+    #profit Margin 
+    profit_margin = [ (mean_reward[i]/last_revenue_history[i])*100 for i in range(7)]
+
+    #print('REWARD: ', last_reward_history)
     with open('metrics.pkl', 'wb') as f:
         pickle.dump(metrics, f)
 
     #print("Done", ccok, ccup, ccak)
     
-
-    plt.figure(3,figsize=(10,7))
+    plt.figure(4,figsize=(10,7))
     x = np.arange(len(last_revenue_history))
-    plt.subplot(3,1,1)
+    plt.subplot(4,1,1)
     #plt.plot(last_reward_history,'k.-',lw=2)
     plt.plot(mean_reward,'k.-',lw=2)
     plt.fill_between([i for i in range(7)] , min_reward , max_reward, alpha = 0.2)
@@ -193,16 +197,21 @@ def start():
     plt.ylabel('Profit')
     plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
     plt.legend(['mean_profit','std_profit'],loc='best')
-    plt.title(f'Total Profit {round(sum(min_reward),2)} < {round(sum(mean_reward),2)} < {round(sum(max_reward),2)}, , Total Revenue {round(sum(last_revenue_history),2)}')
 
-    plt.subplot(3,1,2)
+    plt.title(f'Total Profit {round(sum(min_reward),2)} < {round(sum(mean_reward),2)} < {round(sum(max_reward),2)} | Total Revenue {round(sum(last_revenue_history),2)} | Profit Margin {round(np.mean(profit_margin),0)} % | Adapt Index {round(100/np.mean(std_reward),2)}')
+
+    plt.subplot(4,1,2)
     plt.plot(last_revenue_history,'k.-',lw=2)
-    #plt.axhline(y=0, color='k', linestyle='--')
     plt.ylabel('Revenue')
-    #plt.legend(['mean_profit','std_profit','cake'],loc='best')
+    plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+
+    plt.subplot(4,1,3)
+    plt.plot(profit_margin,'r.-',lw=2)
+    plt.axhline(y=0, color='k', linestyle='--')
+    plt.ylabel('Profit Margin')
     plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
     
-    plt.subplot(3,1,3)
+    plt.subplot(4,1,4)
     #plt.bar(['cookies','cupcakes', 'cakes'], [float(ccok), float(ccup), float(ccak)])
     w = 0.35
     #plt.bar( np.arange(len(last_revenue_history)) , [tuple(x) for x in production_history] )
@@ -213,6 +222,7 @@ def start():
     plt.plot([ x[1] for x in demand_history], 'r--')
     plt.plot([ x[2] for x in demand_history], 'g--')
     plt.ylabel('Demand and Production')
+    plt.legend(['cookies','cupcakes', 'cakes'])
     plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
     plt.xlabel('Day of the week')
 
