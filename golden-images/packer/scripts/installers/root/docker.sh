@@ -30,4 +30,11 @@ source $HELPER_SCRIPTS/install.sh
 # usermod -aG docker $SSH_USER
 
 # Install docker with the get.docker.com script
+# https://github.com/docker/docker-install
 curl -fsSL https://get.docker.com | bash
+
+# Allow docker access without sudo
+usermod -aG docker $SSH_USER
+
+# Enable docker.service
+systemctl is-enabled --quiet docker.service || systemctl enable docker.service
