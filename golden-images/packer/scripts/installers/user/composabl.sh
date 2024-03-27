@@ -3,9 +3,6 @@
 ##  File:  composabl.sh
 ##  Desc:  Configure Composabl Specific things (e.g., install libs, examples, ...)
 ################################################################################
-# Install PyTorch CPU already
-pip install torch==2.0.0 torchvision==2.0.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cpu
-
 # Install the composabl package
 pip install --upgrade composabl==$VERSION_COMPOSABL
 
@@ -17,3 +14,6 @@ git clone https://github.com/Composabl/examples.composabl.io.git /home/${SSH_USE
 # pip uninstall torch torchvision torchaudio -y
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 pip list | grep nvidia | awk '{print $1}' | xargs pip uninstall -y
+
+# Install PyTorch CPU
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
