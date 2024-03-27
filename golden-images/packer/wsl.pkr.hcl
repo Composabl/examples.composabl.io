@@ -100,7 +100,6 @@ build {
         ]
         scripts         = [
             "${path.root}/scripts/installers/user/zsh.sh",
-            "${path.root}/scripts/installers/user/pyenv.sh",
             "${path.root}/scripts/installers/user/composabl.sh",
             "${path.root}/scripts/installers/user/bashrc.sh",
         ]

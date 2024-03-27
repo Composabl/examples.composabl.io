@@ -40,14 +40,31 @@ build {
         "source.docker.ubuntu"
     ]
 
+    // Create a folder to store temporary data
+    provisioner "shell" {
+        inline          = ["mkdir ${local.image_folder}", "chmod 777 ${local.image_folder}"]
+    }
+
     // Add base packages
     provisioner "shell" {
         script          = "${path.root}/scripts/base/apt.sh"
     }
 
+    // Configure User and set is as the active user
+    provisioner "shell" {
+        environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}", "SSH_USER=${var.ssh_username}"]
+        script          = "${path.root}/scripts/base/configure-user.sh"
+    }
+
     // Configure limits
     provisioner "shell" {
         script          = "${path.root}/scripts/base/limits.sh"
+    }
+
+    // Configure Environment
+    provisioner "shell" {
+        environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}"]
+        script           = "${path.root}/scripts/base/configure-environment.sh"
     }
 
     // Install helpers and installer scripts

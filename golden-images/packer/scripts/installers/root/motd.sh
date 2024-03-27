@@ -29,7 +29,7 @@ cat << 'EOF' > /etc/update-motd.d/01-custom.sh
 cat /etc/update-motd.d/01-custom.txt
 EOF
 
-sudo chmod +x /etc/update-motd.d/01-custom.sh
+chmod +x /etc/update-motd.d/01-custom.sh
 
 # Ensure the motd is ran on startup through bashrc and zshrc
 echo "run-parts /etc/update-motd.d" >> /home/${SSH_USER}/.bashrc
