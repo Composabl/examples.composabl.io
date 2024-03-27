@@ -20,6 +20,7 @@ variables {
 
     version_nvm = "0.39.5"
     version_python = "3.8.17"
+    version_composabl = "0.6.3"
 
     docker_repository = ""
     docker_username = ""
@@ -102,10 +103,11 @@ build {
             "HELPER_SCRIPTS=${local.helper_script_folder}",
             "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
             "VERSION_PYTHON=${var.version_python}",
+            "VERSION_COMPOSABL=${var.version_composabl}",
         ]
         scripts         = [
             "${path.root}/scripts/installers/user/zsh.sh",
-            "${path.root}/scripts/installers/user/composabl.sh",
+            "${path.root}/scripts/installers/user/composabl.sh ",
             "${path.root}/scripts/installers/user/bashrc.sh",
         ]
     }

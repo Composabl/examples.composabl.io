@@ -53,6 +53,7 @@ jobs:
             -var docker_repository=$docker_repository \
             -var docker_username=$docker_username \
             -var docker_password=$docker_password \
+            -var version_composabl=0.6.3 \
             ${{ env.PACKER_PATH }}
         # https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#environment-variables
         env:
