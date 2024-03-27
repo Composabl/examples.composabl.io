@@ -18,7 +18,6 @@ variables {
     ssh_username = "composabl"
     ssh_password = "composabl"
 
-    version_nvm = "0.39.5"
     version_python = "3.8.17"
     version_composabl = "0.6.3"
 
@@ -107,7 +106,7 @@ build {
         ]
         scripts         = [
             "${path.root}/scripts/installers/user/zsh.sh",
-            "${path.root}/scripts/installers/user/composabl.sh ",
+            "${path.root}/scripts/installers/user/composabl.sh",
             "${path.root}/scripts/installers/user/bashrc.sh",
         ]
     }
