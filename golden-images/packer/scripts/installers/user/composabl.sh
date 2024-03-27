@@ -11,5 +11,6 @@ git clone https://github.com/Composabl/examples.composabl.io.git /home/${SSH_USE
 
 # Remove PyTorch and Reinstall with only CPU Support
 # Note: we do this as the disk space is limited and we don't need GPU support for testing
-pip uninstall torch torchvision torchaudio -y
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+# pip uninstall torch torchvision torchaudio -y
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip list | grep nvidia | awk '{print $1}' | xargs pip uninstall -y
