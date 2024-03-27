@@ -17,6 +17,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 env:
   PACKER_PATH: ./golden-images/packer/devcontainer.pkr.hcl
