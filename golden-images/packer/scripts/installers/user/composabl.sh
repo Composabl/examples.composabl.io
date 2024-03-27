@@ -4,7 +4,7 @@
 ##  Desc:  Configure Composabl Specific things (e.g., install libs, examples, ...)
 ################################################################################
 # Install PyTorch CPU already
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.0.0 torchvision==2.0.0 torchaudio==2.0.0 --index-url https://download.pytorch.org/whl/cpu
 
 # Install the composabl package
 pip install --upgrade composabl==$VERSION_COMPOSABL
