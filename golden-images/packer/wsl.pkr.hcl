@@ -24,7 +24,7 @@ variables {
 }
 
 source "docker" "ubuntu" {
-    image = "ubuntu:22.04"
+    image = "python:3.8-bookworm"
 
     # Also export as tar
     export_path = "composabl.tar"
