@@ -3,9 +3,6 @@
 ##  File:  composabl.sh
 ##  Desc:  Configure Composabl Specific things (e.g., install libs, examples, ...)
 ################################################################################
-# Ensure Python is active
-source ~/.pyenvrc
-
 # Install the composabl package
 pip install --upgrade composabl
 

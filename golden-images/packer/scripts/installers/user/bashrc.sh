@@ -18,7 +18,3 @@ echo "cd /home/${SSH_USER}" >> /home/${SSH_USER}/.bashrc
 # Start Docker
 echo "sudo service docker start" >> /home/${SSH_USER}/.zshrc
 echo "sudo service docker start" >> /home/${SSH_USER}/.bashrc
-
-# Init PyEnv
-echo "source ~/.pyenvrc" >> /home/${SSH_USER}/.zshrc
-echo "source ~/.pyenvrc" >> /home/${SSH_USER}/.bashrc
