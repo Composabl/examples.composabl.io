@@ -1,7 +1,7 @@
 packer {
   required_plugins {
-    docker = {
-      source  = "github.com/hashicorp/docker"
+    googlecompute = {
+      source  = "github.com/hashicorp/googlecompute"
       version = "~> 1"
     }
   }
@@ -16,23 +16,22 @@ locals {
 
 variables {
     ssh_username = "composabl"
-    ssh_password = "composabl"
+    ssh_password = "composabl123!"
 
     version_nvm = "0.39.7"
-    // version_python = "3.11.8"
-    version_python = "3.8.18"
+    version_python = "3.11.8"
 }
 
-source "docker" "ubuntu" {
-    image = "ubuntu:22.04"
-
-    # Also export as tar
-    export_path = "composabl.tar"
+source "googlecompute" "ubuntu" {
+  project_id = "your_project_id"
+  source_image_family = "ubuntu-2204-lts"
+  zone        = "us-central1-a"
+  ssh_username = "your_ssh_username"
 }
 
 build {
     sources = [
-        "source.docker.ubuntu"
+        "source.googlecompute.ubuntu"
     ]
 
     // Add base packages
