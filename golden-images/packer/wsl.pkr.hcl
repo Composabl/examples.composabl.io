@@ -84,6 +84,7 @@ build {
         scripts         = [
             "${path.root}/scripts/installers/root/wsl.sh",
             "${path.root}/scripts/installers/root/motd.sh",
+            "${path.root}/scripts/installers/root/python.sh",
             "${path.root}/scripts/installers/root/docker.sh",
             "${path.root}/scripts/installers/root/kubernetes-tools.sh",
         ]
