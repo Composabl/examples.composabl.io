@@ -3,4 +3,4 @@
 ##  File:  python.sh
 ##  Desc:  Install Python dependencies
 ################################################################################
-apt-get install -y python3-pip
+
