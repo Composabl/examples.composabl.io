@@ -1,0 +1,12 @@
+[project]
+name = "composabl-skill-cstr-drl-py"
+version = "0.1.0"
+description = "A Composabl Demo Portable Teacher Skill"
+authors = [{ name = "Xavier Geerinck", email = "xavier@composabl.io" }]
+dependencies = [
+    "composabl-core"
+]
+
+[composabl]
+type = "teacher"
+entrypoint = "composabl_skill_cstr_drl_py.teacher:Teacher"
