@@ -3,7 +3,7 @@
 ##  File:  composabl.sh
 ##  Desc:  Configure Composabl Specific things (e.g., install libs, examples, ...)
 ################################################################################
-echo "Running $0"
+echo "Running composabl.sh"
 
 # Install the composabl package
 pip install composabl==${VERSION_PIP_COMPOSABL}

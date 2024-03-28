@@ -3,7 +3,7 @@
 ##  File:  bashrc.sh
 ##  Desc:  Configure bashrc for on-boot behavior
 ################################################################################
-echo "Running $0"
+echo "Running bashrc.sh"
 
 # Enable Custom MOTD
 echo "cat /etc/update-motd.d/01-custom.txt" >> /home/${SSH_USER}/.zshrc

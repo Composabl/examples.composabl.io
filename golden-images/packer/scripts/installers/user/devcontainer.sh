@@ -3,7 +3,7 @@
 ##  File:  devcontainer.sh
 ##  Desc:  Configure DevContainer Specific things
 ################################################################################
-echo "Running $0"
+echo "Running devcontainer.sh"
 
 # Remove PyTorch and Reinstall with only CPU Support
 # Note: we do this as the disk space is limited and we don't need GPU support for testing

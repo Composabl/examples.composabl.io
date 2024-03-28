@@ -3,7 +3,7 @@
 ##  File:  zsh.sh
 ##  Desc:  Installs zsh and oh-my-zsh
 ################################################################################
-echo "Running $0"
+echo "Running zsh.sh"
 
 echo "Installing zsh..."
 sudo apt-get install -y zsh
