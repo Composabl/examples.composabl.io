@@ -1,6 +1,6 @@
 {
   "name": "Composabl Dev Environment",
-  "image": "composabl/devcontainer:latest",
+  "image": "composabl/golden-image-devcontainer:latest",
   "hostRequirements": {
     "cpus": 4,
     "memory": "16gb"
@@ -45,7 +45,7 @@
   // On Linux, this will prevent new files getting created as root, but you
   // may need to update the USER_UID and USER_GID in docker/Dockerfile-dev
   // to match your user if not 1000.
-  // "remoteUser": "composabl",
+  "remoteUser": "composabl",
   "runArgs": [
     // Enable ptrace-based debugging for go
     "--cap-add=SYS_PTRACE",
