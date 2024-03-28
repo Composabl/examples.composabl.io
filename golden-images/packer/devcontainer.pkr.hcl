@@ -101,7 +101,8 @@ build {
         environment_vars = [
             "DEBIAN_FRONTEND=noninteractive",
             "HELPER_SCRIPTS=${local.helper_script_folder}",
-            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}",
+            "SSH_USER=${var.ssh_username}",
             "VERSION_PYTHON=${var.version_python}",
             "VERSION_COMPOSABL=${var.version_composabl}",
         ]
