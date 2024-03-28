@@ -18,7 +18,7 @@ cat << 'EOF' > /etc/update-motd.d/01-custom.txt
 👋 Welcome to the Composabl Dev Image!
 It includes everything to provide demonstrations around the Composabl SDK.
 
-📚 If you are looking for the Composabl documentation, head over to https://docs.composabl.io.
+📚 If you are looking for the Composabl documentation, head over to https://docs.composabl.com.
 
 🎓 If you are looking to run the Composabl quickstarts and tutorials, head over to
 https://github.com/Composabl/examples.composabl.io instead.
