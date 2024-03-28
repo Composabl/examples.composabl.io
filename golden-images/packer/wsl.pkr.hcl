@@ -32,6 +32,10 @@ source "docker" "ubuntu" {
 
     # Also export as tar
     export_path = "composabl.tar"
+
+    # Run the bash terminal as default (it's a devcontainer)
+    entrypoint = ["/bin/bash", "-c"]
+    cmd = ["bash"]
 }
 
 build {

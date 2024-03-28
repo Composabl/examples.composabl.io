@@ -34,6 +34,10 @@ source "docker" "ubuntu" {
     # buster = 10
     image = "python:3.11-bookworm"
     commit = true
+
+    # Run the bash terminal as default (it's a devcontainer)
+    entrypoint = ["/bin/bash", "-c"]
+    cmd = ["bash"]
 }
 
 build {
