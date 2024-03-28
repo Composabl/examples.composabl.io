@@ -3,11 +3,10 @@
 ##  File:  composabl.sh
 ##  Desc:  Configure Composabl Specific things (e.g., install libs, examples, ...)
 ################################################################################
-echo $VERSION_PIP_COMPOSABL
-printenv
+echo "Running $0"
 
 # Install the composabl package
-pip install --upgrade composabl==${VERSION_PIP_COMPOSABL}
+pip install composabl==${VERSION_PIP_COMPOSABL}
 
 # Install the composabl examples repo
 git clone https://github.com/Composabl/examples.composabl.io.git /home/${SSH_USER}/examples.composabl.io
