@@ -3,6 +3,9 @@
 ##  File:  composabl.sh
 ##  Desc:  Configure Composabl Specific things (e.g., install libs, examples, ...)
 ################################################################################
+echo $VERSION_COMPOSABL
+printenv
+
 # Install the composabl package
 pip install --upgrade composabl==${VERSION_COMPOSABL}
 
