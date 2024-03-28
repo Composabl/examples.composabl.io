@@ -18,9 +18,8 @@ variables {
     ssh_username = "composabl"
     ssh_password = "composabl"
 
-    version_nvm = "0.39.7"
-    // version_python = "3.11.8"
-    version_python = "3.8.18"
+    version_python = "3.11.8"
+    version_composabl = "0.7.0"
 }
 
 source "docker" "ubuntu" {
