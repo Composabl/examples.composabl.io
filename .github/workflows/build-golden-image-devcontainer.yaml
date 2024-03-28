@@ -52,7 +52,7 @@ jobs:
             -on-error=abort \
             -var docker_repository=$docker_repository \
             -var docker_username=$docker_username \
-            -var docker_password=$docker_password
+            -var docker_password=$docker_password \
             ${{ env.PACKER_PATH }}
         # https://developer.hashicorp.com/packer/docs/templates/hcl_templates/variables#environment-variables
         env:
