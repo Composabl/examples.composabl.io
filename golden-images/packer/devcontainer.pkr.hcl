@@ -27,11 +27,12 @@ variables {
 }
 
 source "docker" "ubuntu" {
+    # https://hub.docker.com/_/python
     # https://www.debian.org/releases/
     # bookworm = 12
     # bullseye = 11
     # buster = 10
-    image = "python:3.8-bookworm"
+    image = "python:3.11-bookworm"
     commit = true
 }
 

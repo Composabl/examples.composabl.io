@@ -23,7 +23,12 @@ variables {
 }
 
 source "docker" "ubuntu" {
-    image = "python:3.8-bookworm"
+    # https://hub.docker.com/_/python
+    # https://www.debian.org/releases/
+    # bookworm = 12
+    # bullseye = 11
+    # buster = 10
+    image = "python:3.11-bookworm"
 
     # Also export as tar
     export_path = "composabl.tar"
