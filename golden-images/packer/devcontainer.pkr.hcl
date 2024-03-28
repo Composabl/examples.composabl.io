@@ -36,8 +36,10 @@ source "docker" "ubuntu" {
     commit = true
 
     # Run the bash terminal as default (it's a devcontainer)
-    entrypoint = ["/bin/bash", "-c"]
-    cmd = ["bash"]
+    changes = [
+        "CMD [\"bash\"]",
+        "ENTRYPOINT [\"/bin/bash\", \"-c\"]",
+    ]
 }
 
 build {

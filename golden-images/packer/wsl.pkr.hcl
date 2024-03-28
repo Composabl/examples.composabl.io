@@ -34,8 +34,10 @@ source "docker" "ubuntu" {
     export_path = "composabl.tar"
 
     # Run the bash terminal as default (it's a devcontainer)
-    entrypoint = ["/bin/bash", "-c"]
-    cmd = ["bash"]
+    changes = [
+        "CMD [\"bash\"]",
+        "ENTRYPOINT [\"/bin/bash\", \"-c\"]",
+    ]
 }
 
 build {
