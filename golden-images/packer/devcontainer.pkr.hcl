@@ -19,7 +19,7 @@ variables {
     ssh_password = "composabl"
 
     version_python = "3.11.8"
-    version_composabl = "0.7.0"
+    version_pip_composabl = "0.7.0"
 
     docker_repository = ""
     docker_username = ""
@@ -104,7 +104,7 @@ build {
             "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}",
             "SSH_USER=${var.ssh_username}",
             "VERSION_PYTHON=${var.version_python}",
-            "VERSION_COMPOSABL=${var.version_composabl}",
+            "VERSION_PIP_COMPOSABL=${var.version_pip_composabl}",
         ]
         scripts         = [
             "${path.root}/scripts/installers/user/zsh.sh",
