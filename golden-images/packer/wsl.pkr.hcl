@@ -33,10 +33,10 @@ source "docker" "ubuntu" {
     # Also export as tar
     export_path = "composabl.tar"
 
-    # Run the bash terminal as default (it's a devcontainer)
+    # Run the bash terminal as default
     changes = [
-        "CMD [\"bash\"]",
-        "ENTRYPOINT [\"/bin/bash\", \"-c\"]",
+        "CMD [\"sleep\", \"infinity\"]",
+        "ENTRYPOINT [\"/docker-entrypoint.sh\"]",
     ]
 }
 
@@ -70,6 +70,18 @@ build {
     provisioner "shell" {
         environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}"]
         script           = "${path.root}/scripts/base/configure-environment.sh"
+    }
+
+    // Install Entrypoint
+    provisioner "file" {
+        source      = "${path.root}/scripts/docker-entrypoint.sh"
+        destination = "/docker-entrypoint.sh"
+    }
+
+    provisioner "shell" {
+        inline = [
+            "chmod +x /docker-entrypoint.sh"
+        ]
     }
 
     // Install helpers and installer scripts

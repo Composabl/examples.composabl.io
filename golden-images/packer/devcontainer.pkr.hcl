@@ -37,8 +37,8 @@ source "docker" "ubuntu" {
 
     # Run the bash terminal as default (it's a devcontainer)
     changes = [
-        "CMD [\"bash\"]",
-        "ENTRYPOINT [\"/bin/bash\", \"-c\"]",
+        "CMD [\"sleep\", \"infinity\"]",
+        "ENTRYPOINT [\"/docker-entrypoint.sh\"]",
     ]
 }
 
@@ -74,15 +74,27 @@ build {
         script           = "${path.root}/scripts/base/configure-environment.sh"
     }
 
+    // Install Entrypoint
+    provisioner "file" {
+        source      = "${path.root}/scripts/docker-entrypoint.sh"
+        destination = "/docker-entrypoint.sh"
+    }
+
+    provisioner "shell" {
+        inline = [
+            "chmod +x /docker-entrypoint.sh"
+        ]
+    }
+
     // Install helpers and installer scripts
     provisioner "file" {
-        destination = "${local.helper_script_folder}"
         source      = "${path.root}/scripts/helpers"
+        destination = "${local.helper_script_folder}"
     }
 
     provisioner "file" {
-        destination = "${local.installer_script_folder}"
         source      = "${path.root}/scripts/installers"
+        destination = "${local.installer_script_folder}"
     }
 
     // Run installers (as root)
