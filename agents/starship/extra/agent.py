@@ -42,11 +42,11 @@ def start():
         }
     ]
 
-    Navigation_skill = Skill("Navigation", NavigationTeacher, trainable=True)
-    Alignment_skill = Skill("Alignment", AlignmentTeacher, trainable=True)
-    SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher, trainable=True)
-    Stabilization_skill = Skill("Stabilization", StabilizationTeacher, trainable=True)
-    #selector_skill = Skill("selector", Navigation_reward(), trainable=True) #using the same reward
+    Navigation_skill = Skill("Navigation", NavigationTeacher)
+    Alignment_skill = Skill("Alignment", AlignmentTeacher)
+    SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher)
+    Stabilization_skill = Skill("Stabilization", StabilizationTeacher)
+    selector_skill = Skill("selector", NavigationTeacher) #using the same reward
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
@@ -54,19 +54,25 @@ def start():
         Alignment_skill.add_scenario(scenario)
         SpeedControl_skill.add_scenario(scenario)
         Stabilization_skill.add_scenario(scenario)
-        # selector_skill.add_scenario(scenario)
+        selector_skill.add_scenario(scenario)
 
     config = {
         "license": license_key,
         "target": {
             "docker": {
                 "image": "composabl/sim-starship"
+            },
+            "local": {
+               "address": "localhost:1337"
             }
         },
         "env": {
             "name": "starship",
         },
-        "training": {}
+        "training": {},
+        "runtime": {
+            "workers": 1
+        }
     }
     runtime = Runtime(config)
     agent = Agent()
@@ -74,11 +80,11 @@ def start():
 
     agent.add_skill(Navigation_skill)
     agent.add_skill(Alignment_skill)
-    agent.add_skill(SpeedControl_skill)
-    agent.add_skill(Stabilization_skill)
-    # agent.add_selector_skill(selector_skill, [Navigation_skill, Alignment_skill], fixed_order=True, repeat=False)
+    #agent.add_skill(SpeedControl_skill)
+    #agent.add_skill(Stabilization_skill)
+    agent.add_selector_skill(selector_skill, [Navigation_skill, Alignment_skill], fixed_order=True)
 
-    runtime.train(agent, train_iters=5)
+    runtime.train(agent, train_iters=1)
 
 
 if __name__ == "__main__":

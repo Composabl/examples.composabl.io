@@ -19,7 +19,7 @@ class NavigationTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
@@ -37,7 +37,7 @@ class NavigationTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        return len(self.obs_history) > 100
+        return False
 
     def compute_termination(self, transformed_obs, action):
         return False
@@ -61,7 +61,7 @@ class AlignmentTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
@@ -105,7 +105,7 @@ class SpeedControlTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
@@ -149,7 +149,7 @@ class StabilizationTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
