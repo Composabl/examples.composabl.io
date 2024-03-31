@@ -1,28 +1,35 @@
 from composabl import Teacher
+import math
 import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt, rc
 from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
 from ipywidgets import IntProgress
 from IPython.display import display
-import math
 import numpy as np
 import pandas as pd
+import pickle
 
-class NavigationTeacher(Teacher):
+class DRLMPCTeacher(Teacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
-        self.count = 0
-        self.t = 0
-        self.a = 0
         self.action_history = []
         self.thrust_history = []
-        self.reward_history = []
         self.angle_history = []
-
+        self.t = 0.4
+        self.a = -3.14/2
+        self.count = 0
+        self.cnt_mpc = 0
         self.plot = True
         self.metrics = 'fast' #standard, fast
+
+        with open('./starship/data/data_mpc.pkl', 'rb') as file:
+            self.mpc_values = pickle.load(file)
+        file.close()
+
+        self.a_model = pickle.load(open('./starship/data/angle_model.pkl', 'rb'))
+        self.t_model = pickle.load(open('./starship/data/thrust_model.pkl','rb'))
 
         if not self.plot:
             plt.close("all")
@@ -31,56 +38,76 @@ class NavigationTeacher(Teacher):
 
         # create metrics db
         try:
-            self.df = pd.read_pickle('./starship/history.pkl')
+            self.df = pd.read_pickle('./starship/mpc_history.pkl')
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
             self.df = pd.DataFrame()
 
-
     def transform_obs(self, obs, action):
         return obs
 
     def transform_action(self, transformed_obs, action):
+        if type(transformed_obs) != dict:
+            X = transformed_obs
+        else:
+            X = pd.DataFrame(data=[[transformed_obs['x'], transformed_obs['x_speed'], transformed_obs['y'],
+            transformed_obs['y_speed'], transformed_obs['angle'], transformed_obs['ang_speed']]],
+            columns=['x_obs','x_speed', 'y_obs', 'y_speed', 'angle', 'ang_speed'])
+
+        t = self.t_model.predict([X])[0] + action[0]
+        a = self.a_model.predict([X])[0] + action[1]
+
+        action = [t, a]
+        #action = [self.mpc_values['angle'][self.cnt_mpc+1],self.mpc_values['angle'][self.cnt_mpc+1]]
         return action
 
     def filtered_observation_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    def compute_reward(self, transformed_obs, action):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0.0
+            return 0
         else:
             self.obs_history.append(transformed_obs)
 
-        error_1 = abs((0 - float(transformed_obs["x"]) )/400)
-        error_2 = abs((0 - float(transformed_obs["x_speed"]))/100)
-        error_3 = abs((0 - float(transformed_obs["y"]) )/1000)
-        error_4 = abs((5 - float(transformed_obs["y_speed"]))/1000)
-        error_5 = abs((0 - float(transformed_obs["angle"]))/3.15)
-        error_6 = abs((0 - float(transformed_obs["ang_speed"]))/1)
+        r1 = math.e**(-1*(transformed_obs["angle"] - self.mpc_values['angle'][self.cnt_mpc+1])**2)
+        r2 = math.e**(-1*(transformed_obs["ang_speed"] - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2)
+        r3 = math.e**(-1*(transformed_obs["x"] - self.mpc_values['x'][self.cnt_mpc+1])**2)
+        r4 = math.e**(-1*(transformed_obs["x_speed"] - self.mpc_values['x_speed'][self.cnt_mpc+1])**2)
+        r5 = math.e**(-1*(transformed_obs["y"] - self.mpc_values['y'][self.cnt_mpc+1])**2)
+        r6 = math.e**(-1*(transformed_obs["y_speed"] - self.mpc_values['y_speed'][self.cnt_mpc+1])**2)
 
-        reward = 0.3 * error_1 + 0.1 * error_2 + 0.3 * error_3 + 0.1 * error_4 + 0.1 * error_5 + 0.1 * error_6
+        '''if transformed_obs["y"] <= 300:
+            reward = (r1 + r3 + 2*r4 + 2*r5 + 2*r6) /8
+        elif transformed_obs["y"] > 300 :
+            reward = (2*r1 + 2*r3 + r5 + r6) /6'''
 
-        self.t += action[0]
-        self.a += action[1]
+        reward = (r1 + r2 + r3 + r4 + r5 + r6) / 6
+
+        #self.t += action[0]
+        #self.a += action[1]
+        self.t = action[0]
+        self.a = action[1]
+
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)
 
         self.action_history.append(action)
         self.thrust_history.append([self.t, self.a])
+
         self.reward_history.append(reward)
         self.angle_history.append(transformed_obs['angle'])
-
         self.count += 1
-
+        self.cnt_mpc += 1
         # history metrics
         df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
                                data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
                                       transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
         self.df = pd.concat([self.df, df_temp])
-        #self.df.to_pickle("./starship/history.pkl")
+        self.df.to_pickle("./starship/mpc_history.pkl")
+
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
@@ -94,7 +121,7 @@ class NavigationTeacher(Teacher):
         if self.obs_history == None:
             return False
         else:
-            success = False
+            success = len(self.obs_history) >= 400
 
             if self.metrics == 'standard':
                 try:
@@ -105,7 +132,10 @@ class NavigationTeacher(Teacher):
             return success
 
     def compute_termination(self, transformed_obs, action):
-        return False
+        if abs(transformed_obs['angle']) > 5:
+            return True
+        else:
+            return False
 
     def plot_metrics(self):
         plt.clf()
@@ -121,6 +151,13 @@ class NavigationTeacher(Teacher):
         plt.scatter(self.df.reset_index()['time'],self.df.reset_index()['y'],s=0.5, alpha=0.2)
         plt.ylabel('X and Y')
         plt.legend(['x', 'y'],loc='best')
+
+        plt.subplot(3,1,3)
+        plt.scatter(self.df.reset_index()['time'],self.df.reset_index()['angle'],s=0.6, alpha=0.2)
+        plt.plot(self.angle_history, 'r.-')
+        plt.ylabel('angle')
+        plt.legend(['angle'],loc='best')
+        plt.xlabel('iteration')
 
         plt.subplot(3,1,3)
         plt.scatter(self.df.reset_index()['time'],self.df.reset_index()['angle'],s=0.6, alpha=0.2)

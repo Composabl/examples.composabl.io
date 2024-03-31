@@ -50,7 +50,7 @@ def start():
     agent.add_skill(Navigation_skill)
 
     # Start training the agent
-    runtime.train(agent, train_iters=5)
+    runtime.train(agent, train_iters=20)
 
 
 if __name__ == "__main__":
