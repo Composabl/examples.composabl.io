@@ -1,7 +1,7 @@
 packer {
   required_plugins {
-    docker = {
-      source  = "github.com/hashicorp/docker"
+    azure = {
+      source  = "github.com/hashicorp/azure"
       version = "~> 1"
     }
   }
@@ -16,23 +16,39 @@ locals {
 
 variables {
     ssh_username = "composabl"
-    ssh_password = "composabl"
+    ssh_password = "composabl123!"
 
     version_nvm = "0.39.7"
-    // version_python = "3.11.8"
-    version_python = "3.8.18"
+    version_python = "3.11.8"
 }
 
-source "docker" "ubuntu" {
-    image = "ubuntu:22.04"
+# https://developer.hashicorp.com/packer/integrations/hashicorp/azure/latest/components/builder/arm
+source "azure-arm" "ubuntu" {
+    client_id       = "your_client_id"
+    client_secret   = "your_client_secret"
+    subscription_id = "your_subscription_id"
+    tenant_id       = "your_tenant_id"
 
-    # Also export as tar
-    export_path = "composabl.tar"
+    managed_image_resource_group_name = "your_resource_group"
+    managed_image_name                = "your_image_name"
+
+    # The resource group to create the temporary resources in
+    # we use the same as else we need a new SP
+    build_resource_group_name          = "your_resource_group"
+
+    os_type            = "Linux"
+    image_publisher    = "Canonical"
+    image_offer        = "0001-com-ubuntu-server-jammy"
+    image_sku          = "22_04-lts-gen2"
+
+    vm_size           = "Standard_D8_v5"
+
+    ssh_username      = "${var.ssh_username}"
 }
 
 build {
     sources = [
-        "source.docker.ubuntu"
+        "source.azure-arm.ubuntu"
     ]
 
     // Add base packages

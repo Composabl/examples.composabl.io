@@ -1,7 +1,7 @@
 packer {
   required_plugins {
-    docker = {
-      source  = "github.com/hashicorp/docker"
+    amazon = {
+      source  = "github.com/hashicorp/amazon"
       version = "~> 1"
     }
   }
@@ -16,23 +16,32 @@ locals {
 
 variables {
     ssh_username = "composabl"
-    ssh_password = "composabl"
+    ssh_password = "composabl123!"
 
     version_nvm = "0.39.7"
-    // version_python = "3.11.8"
-    version_python = "3.8.18"
+    version_python = "3.11.8"
 }
 
-source "docker" "ubuntu" {
-    image = "ubuntu:22.04"
-
-    # Also export as tar
-    export_path = "composabl.tar"
+source "amazon-ebs" "ubuntu" {
+  access_key = "your_aws_access_key"
+  secret_key = "your_aws_secret_key"
+  region     = "us-west-2"
+  source_ami_filter {
+    filters = {
+      virtualization-type = "hvm"
+      name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
+      root-device-type    = "ebs"
+    }
+    owners      = ["099720109477"] // Ubuntu
+    most_recent = true
+  }
+  instance_type = "t2.micro"
+  ssh_username  = "ubuntu"
 }
 
 build {
     sources = [
-        "source.docker.ubuntu"
+        "source.amazon-ebs.ubuntu"
     ]
 
     // Add base packages

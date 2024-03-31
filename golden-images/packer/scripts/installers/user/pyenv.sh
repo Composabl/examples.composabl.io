@@ -1,10 +1,10 @@
 #!/bin/bash -e
 ################################################################################
 ##  File:  pyenv.sh
-##  Desc:  Installs Python 2/3
+##  Desc:  Installs Python via pyenv
 ##  Ref: https://github.com/actions/runner-images/blob/71e9516cb7fc9345b5e1787d44557fde50c128f4/images/linux/scripts/installers/python.sh
 ################################################################################
-VERSION_PYTHON=${VERSION_PYTHON:-"3.8.17"}
+VERSION_PYTHON=${VERSION_PYTHON:-"3.11.8"}
 
 # Source the helpers for use with the script
 source $HELPER_SCRIPTS/etc-environment.sh
