@@ -2,16 +2,14 @@ from asyncore import loop
 import os
 import sys
 import asyncio
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "..",".."))
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Skill
 from sensors import sensors
+from config import config
+from scenarios import reaction_scenarios
 from teacher import CSTRTeacher
-
-from utils.cleanup import cleanup_folder
-from utils.config import generate_config
-
-license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -22,29 +20,9 @@ DELETE_OLD_HISTORY_FILES: bool = True
 async def start():
     """Starting the agent."""
 
-    #if DELETE_OLD_HISTORY_FILES:
-    #    cleanup_folder(PATH_HISTORY)
-    #else:
-    #    print("|-- Skipping deletion of old history files...")
-
-    # `Cref_signal` is a configuration variable for concentration
-    # and temperature set points.
-    reaction_scenarios = [{"Cref_signal": "complete"}]
-
     reaction_skill = Skill("reaction", CSTRTeacher)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
-
-    DOCKER_IMAGE: str = "composabl/sim-cstr-local:latest"
-
-    config = generate_config(
-        license_key=license_key,
-        target="local",
-        image=DOCKER_IMAGE,
-        env_name="sim-cstr",
-        workers=1,
-        num_gpus=0,
-    )
 
     runtime = Runtime(config)
     agent = Agent()
