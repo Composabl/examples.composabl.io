@@ -5,10 +5,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Skill
 from sensors import sensors
+from config import config
 from scenarios import bake_scenarios
 from teacher import BaseTeacher
-
-license_key = os.environ["COMPOSABL_KEY"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -31,25 +30,6 @@ def start():
     for scenario_dict in bake_scenarios:
         produce_skill.add_scenario(Scenario(scenario_dict))
 
-    config = {
-        "license": license_key,
-        "target": {
-            "docker": {
-                "image": "composabl/sim-whisky-local:latest"
-            },
-            #"local": {
-            #   "address": "localhost:1337"
-            #}
-        },
-        "env": {
-            "name": "sim-whisky",
-        },
-        "runtime": {
-            "workers": 1,
-            "num_gpus": 0
-        }
-    }
-
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
@@ -65,7 +45,6 @@ def start():
 
     if len(files) > 0:
         agent.load(PATH_CHECKPOINTS)
-
 
     runtime.train(agent, train_iters=10)
 
