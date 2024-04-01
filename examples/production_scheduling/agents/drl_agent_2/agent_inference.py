@@ -1,4 +1,7 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
@@ -8,7 +11,7 @@ import numpy as np
 import math
 from gymnasium import spaces
 import matplotlib.pyplot as plt
-import pickle 
+import pickle
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -53,7 +56,7 @@ def start():
 
     # Prepare the loaded agent for inference
     trained_agent = runtime.package(agent)
-    
+
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
@@ -78,8 +81,8 @@ def start():
         'Cp_demand': cp_dm,
         'Ck_demand':ck_dm
     }
-    
-    sim.set_scenario(Scenario({ 
+
+    sim.set_scenario(Scenario({
             "cookies_demand": co_dm,
             "cupcake_demand": cp_dm,
             "cake_demand": ck_dm,
@@ -94,10 +97,10 @@ def start():
     reward_history = []
     sensors_name = [s.name for s in sensors]
     obs_base = {}
-    
+
     for s in sensors_name:
         obs_base[s] = None
-    
+
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
         action = trained_agent.execute(obs)
@@ -141,8 +144,8 @@ def start():
 
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
-    
-        
+
+
 
         if done:
             break
@@ -168,9 +171,9 @@ def start():
     plt.title('Live Control')
 
     plt.subplot(4,1,2)
-    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]), 
-                                                float(obs_history[-1]["completed_cupcakes"]), 
-                                                float(obs_history[-1]["completed_cake"]) 
+    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]),
+                                                float(obs_history[-1]["completed_cupcakes"]),
+                                                float(obs_history[-1]["completed_cake"])
                                                 ])'''
     plt.plot([ x[observation_dict[5]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[6]] for x in obs_history],'k.-',lw=2)
@@ -201,7 +204,7 @@ def start():
     plt.legend(['Reward'],loc='best')
 
     plt.savefig(f"{PATH}/img/inference_figure.png")
-    
+
 
 if __name__ == "__main__":
     start()

@@ -1,7 +1,7 @@
 import os
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
+from examples.production_scheduling.sensors import sensors
 
 from composabl_core.grpc.client.client import make
 import numpy as np
@@ -53,7 +53,7 @@ def start():
 
     # Prepare the loaded agent for inference
     trained_agent = runtime.package(agent)
-    
+
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
@@ -113,8 +113,8 @@ def start():
             }
 
             sim.init()
-            
-            sim.set_scenario(Scenario({ 
+
+            sim.set_scenario(Scenario({
                     "cookies_demand": co_dm,
                     "cupcake_demand": cp_dm,
                     "cake_demand": ck_dm,
@@ -131,10 +131,10 @@ def start():
 
             sensors_name = [s.name for s in sensors]
             obs_base = {}
-            
+
             for s in sensors_name:
                 obs_base[s] = None
-            
+
             for i in range(480):
                 # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
                 action = trained_agent.execute(obs)
@@ -171,7 +171,7 @@ def start():
 
                 obs, sim_reward, done, terminated, info =  sim.step(action)
                 reward_history.append(sim_reward)
-                
+
                 old_obs = obs.copy()
                 obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
                 obs_history.append(obs)
@@ -179,9 +179,9 @@ def start():
                 ccup = obs['completed_cupcakes']
                 ccak = obs['completed_cake']
                 revenue = min(ccok,co_dm) * float(obs['cookies_price']) + min(ccup, cp_dm) * float(obs['cupcake_price']) + min(ccak, ck_dm) * float(obs['cake_price'])
-                
+
                 obs = old_obs
-                
+
                 #if done:
                 #    break
 
@@ -206,8 +206,8 @@ def start():
     mean_reward = [np.mean((np.array(last_reward_history_total)[:,i])) for i in range(7)]
     std_reward = [np.std((np.array(last_reward_history_total)[:,i])) for i in range(7)]
 
-    #profit Margin 
-    
+    #profit Margin
+
     profit_margin = [ (mean_reward[i]/last_revenue_history[i])*100 for i in range(7)]
     profit_margin = [ x if last_revenue_history[i] != 0 else -1 for i,x in enumerate(profit_margin)]
 
@@ -216,7 +216,7 @@ def start():
         pickle.dump(metrics, f)
 
     #print("Done", ccok, ccup, ccak)
-    
+
     plt.figure(4,figsize=(10,7))
     x = np.arange(len(last_revenue_history))
     plt.subplot(4,1,1)
@@ -240,7 +240,7 @@ def start():
     plt.axhline(y=0, color='k', linestyle='--')
     plt.ylabel('Profit Margin')
     plt.xticks(x, ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
-    
+
     plt.subplot(4,1,4)
     #plt.bar(['cookies','cupcakes', 'cakes'], [float(ccok), float(ccup), float(ccak)])
     w = 0.35
@@ -257,7 +257,7 @@ def start():
     plt.xlabel('Day of the week')
 
     plt.savefig(f"{PATH}/img/benchmarks.png")
-    
+
 
 if __name__ == "__main__":
     start()

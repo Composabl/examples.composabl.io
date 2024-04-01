@@ -1,7 +1,11 @@
 import os
+import sys
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from composabl import Agent, Runtime, Scenario, Skill
 from sensors import sensors
+from scenarios import bake_scenarios
 from teacher import BaseTeacher
 
 license_key = os.environ["COMPOSABL_KEY"]
@@ -23,45 +27,6 @@ def start():
     except:
         pass
 
-    # dt=1 minute, we are running for 8hours=480 mins
-    bake_scenarios = [
-        {   # High Demand
-            "cookies_demand": 100,
-            "cupcake_demand": 18,
-            "cake_demand": 5,
-        },
-        {   # Std Demand
-            "cookies_demand": 60,
-            "cupcake_demand": 18,
-            "cake_demand": 2,
-        },
-        {   # Low Demand
-            "cookies_demand": 20,
-            "cupcake_demand": 6,
-            "cake_demand": 1,
-        },
-        {   # Xmas Demand
-            "cookies_demand": 260,
-            "cupcake_demand": 10,
-            "cake_demand": 1,
-        },
-        {   # Cupcake Wars
-            "cookies_demand": 0,
-            "cupcake_demand": 96,
-            "cake_demand": 0,
-        },
-        {   # Cookie Wars
-            "cookies_demand": 396,
-            "cupcake_demand": 0,
-            "cake_demand": 0,
-        },
-        {   # November Birthday
-            "cookies_demand": 0,
-            "cupcake_demand": 0,
-            "cake_demand": 11,
-        }
-    ]
-
     produce_skill = Skill("produce", BaseTeacher)
     for scenario_dict in bake_scenarios:
         produce_skill.add_scenario(Scenario(scenario_dict))
@@ -69,12 +34,12 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            #"docker": {
-            #    "image": "composabl/sim-whisky-local:latest"
-            #},
-            "local": {
-               "address": "localhost:1337"
-            }
+            "docker": {
+                "image": "composabl/sim-whisky-local:latest"
+            },
+            #"local": {
+            #   "address": "localhost:1337"
+            #}
         },
         "env": {
             "name": "sim-whisky",
@@ -90,7 +55,7 @@ def start():
     agent.add_sensors(sensors)
 
     agent.add_skill(produce_skill)
-    
+
     files = os.listdir(PATH_CHECKPOINTS)
 
     if '.DS_Store' in files:
@@ -103,7 +68,7 @@ def start():
 
 
     runtime.train(agent, train_iters=10)
-    
+
     agent.export(PATH_CHECKPOINTS)
 
 
