@@ -18,8 +18,8 @@ variables {
     ssh_username = "composabl"
     ssh_password = "composabl"
 
-    version_python = "3.11.8"
-    version_pip_composabl = "0.7.0"
+    version_nvm = "0.39.5"
+    version_python = "3.8.17"
 
     docker_repository = ""
     docker_username = ""
@@ -27,30 +27,15 @@ variables {
 }
 
 source "docker" "ubuntu" {
-    # https://hub.docker.com/_/python
-    # https://www.debian.org/releases/
-    # bookworm = 12
-    # bullseye = 11
-    # buster = 10
-    image = "python:3.11-bookworm"
+    image = "ubuntu:22.04"
     commit = true
-
-    # Run the bash terminal as default (it's a devcontainer)
-    changes = [
-        "CMD [\"sleep\", \"infinity\"]",
-        "ENTRYPOINT [\"/docker-entrypoint.sh\"]",
-    ]
+    // export_path = "composabl.tar" # This is the path where the image will be exported as a tar file
 }
 
 build {
     sources = [
         "source.docker.ubuntu"
     ]
-
-    // Create a folder to store temporary data
-    provisioner "shell" {
-        inline          = ["mkdir ${local.image_folder}", "chmod 777 ${local.image_folder}"]
-    }
 
     // Add base packages
     provisioner "shell" {
@@ -61,6 +46,11 @@ build {
     provisioner "shell" {
         environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}", "SSH_USER=${var.ssh_username}"]
         script          = "${path.root}/scripts/base/configure-user.sh"
+    }
+
+    // Create a folder to store temporary data
+    provisioner "shell" {
+        inline          = ["mkdir ${local.image_folder}", "chmod 777 ${local.image_folder}"]
     }
 
     // Configure limits
@@ -74,27 +64,15 @@ build {
         script           = "${path.root}/scripts/base/configure-environment.sh"
     }
 
-    // Install Entrypoint
-    provisioner "file" {
-        source      = "${path.root}/scripts/docker-entrypoint.sh"
-        destination = "/docker-entrypoint.sh"
-    }
-
-    provisioner "shell" {
-        inline = [
-            "chmod +x /docker-entrypoint.sh"
-        ]
-    }
-
     // Install helpers and installer scripts
     provisioner "file" {
-        source      = "${path.root}/scripts/helpers"
         destination = "${local.helper_script_folder}"
+        source      = "${path.root}/scripts/helpers"
     }
 
     provisioner "file" {
-        source      = "${path.root}/scripts/installers"
         destination = "${local.installer_script_folder}"
+        source      = "${path.root}/scripts/installers"
     }
 
     // Run installers (as root)
@@ -106,8 +84,8 @@ build {
             "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
         ]
         scripts         = [
+            // "${path.root}/scripts/installers/root/wsl.sh",
             "${path.root}/scripts/installers/root/motd.sh",
-            "${path.root}/scripts/installers/root/python.sh",
             "${path.root}/scripts/installers/root/docker.sh",
             "${path.root}/scripts/installers/root/kubernetes-tools.sh",
         ]
@@ -119,14 +97,12 @@ build {
         environment_vars = [
             "DEBIAN_FRONTEND=noninteractive",
             "HELPER_SCRIPTS=${local.helper_script_folder}",
-            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}",
-            "SSH_USER=${var.ssh_username}",
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
             "VERSION_PYTHON=${var.version_python}",
-            "VERSION_PIP_COMPOSABL=${var.version_pip_composabl}",
         ]
         scripts         = [
             "${path.root}/scripts/installers/user/zsh.sh",
-            "${path.root}/scripts/installers/user/devcontainer.sh",
+            "${path.root}/scripts/installers/user/pyenv.sh",
             "${path.root}/scripts/installers/user/composabl.sh",
             "${path.root}/scripts/installers/user/bashrc.sh",
         ]

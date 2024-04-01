@@ -1,6 +1,6 @@
 {
   "name": "Composabl Dev Environment",
-  "image": "composabl/devcontainer:latest",
+  "image": "composabl/golden-image-devcontainer:latest",
   "hostRequirements": {
     "cpus": 4,
     "memory": "16gb"

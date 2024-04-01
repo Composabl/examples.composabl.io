@@ -18,16 +18,26 @@ variables {
     ssh_username = "composabl"
     ssh_password = "composabl"
 
-    version_nvm = "0.39.7"
-    // version_python = "3.11.8"
-    version_python = "3.8.18"
+    version_python = "3.11.8"
+    version_pip_composabl = "0.7.0"
 }
 
 source "docker" "ubuntu" {
-    image = "ubuntu:22.04"
+    # https://hub.docker.com/_/python
+    # https://www.debian.org/releases/
+    # bookworm = 12
+    # bullseye = 11
+    # buster = 10
+    image = "python:3.11-bookworm"
 
     # Also export as tar
     export_path = "composabl.tar"
+
+    # Run the bash terminal as default
+    changes = [
+        "CMD [\"sleep\", \"infinity\"]",
+        "ENTRYPOINT [\"/docker-entrypoint.sh\"]",
+    ]
 }
 
 build {
@@ -62,6 +72,18 @@ build {
         script           = "${path.root}/scripts/base/configure-environment.sh"
     }
 
+    // Install Entrypoint
+    provisioner "file" {
+        source      = "${path.root}/scripts/docker-entrypoint.sh"
+        destination = "/docker-entrypoint.sh"
+    }
+
+    provisioner "shell" {
+        inline = [
+            "chmod +x /docker-entrypoint.sh"
+        ]
+    }
+
     // Install helpers and installer scripts
     provisioner "file" {
         destination = "${local.helper_script_folder}"
@@ -84,6 +106,7 @@ build {
         scripts         = [
             "${path.root}/scripts/installers/root/wsl.sh",
             "${path.root}/scripts/installers/root/motd.sh",
+            "${path.root}/scripts/installers/root/python.sh",
             "${path.root}/scripts/installers/root/docker.sh",
             "${path.root}/scripts/installers/root/kubernetes-tools.sh",
         ]
@@ -95,12 +118,13 @@ build {
         environment_vars = [
             "DEBIAN_FRONTEND=noninteractive",
             "HELPER_SCRIPTS=${local.helper_script_folder}",
-            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}",
+            "SSH_USER=${var.ssh_username}",
             "VERSION_PYTHON=${var.version_python}",
+            "VERSION_PIP_COMPOSABL=${var.version_pip_composabl}",
         ]
         scripts         = [
             "${path.root}/scripts/installers/user/zsh.sh",
-            "${path.root}/scripts/installers/user/pyenv.sh",
             "${path.root}/scripts/installers/user/composabl.sh",
             "${path.root}/scripts/installers/user/bashrc.sh",
         ]
