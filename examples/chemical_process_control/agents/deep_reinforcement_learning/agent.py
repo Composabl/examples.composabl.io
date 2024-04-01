@@ -1,7 +1,8 @@
+from asyncore import loop
 import os
 import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+import asyncio
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "..",".."))
 
 from composabl import Agent, Runtime, Scenario, Skill
 from sensors import sensors
@@ -18,13 +19,13 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 DELETE_OLD_HISTORY_FILES: bool = True
 
-def start():
+async def start():
     """Starting the agent."""
 
-    if DELETE_OLD_HISTORY_FILES:
-        cleanup_folder(PATH_HISTORY)
-    else:
-        print("|-- Skipping deletion of old history files...")
+    #if DELETE_OLD_HISTORY_FILES:
+    #    cleanup_folder(PATH_HISTORY)
+    #else:
+    #    print("|-- Skipping deletion of old history files...")
 
     # `Cref_signal` is a configuration variable for concentration
     # and temperature set points.
@@ -34,11 +35,11 @@ def start():
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
-    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
+    DOCKER_IMAGE: str = "composabl/sim-cstr-local:latest"
 
     config = generate_config(
         license_key=license_key,
-        target="docker",
+        target="local",
         image=DOCKER_IMAGE,
         env_name="sim-cstr",
         workers=1,
@@ -52,19 +53,20 @@ def start():
     agent.add_skill(reaction_skill)
 
     # Load a pre-trained agent
-    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
-    try:
-        if len(os.listdir(PATH_CHECKPOINTS)) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        print("|-- No checkpoints found. Training from scratch...")
+    #cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
+    #try:
+    #    if len(os.listdir(PATH_CHECKPOINTS)) > 0:
+    #        agent.load(PATH_CHECKPOINTS)
+    #except Exception:
+    #    print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=5)
+    await runtime.train(agent, train_iters=5)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start())

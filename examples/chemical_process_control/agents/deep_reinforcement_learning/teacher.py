@@ -33,16 +33,16 @@ class CSTRTeacher(Teacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -71,10 +71,10 @@ class CSTRTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             success = False
         else:
@@ -88,10 +88,10 @@ class CSTRTeacher(Teacher):
 
         return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.figure(1, figsize=(7, 5))
         plt.clf()
         plt.subplot(3, 1, 1)
@@ -117,7 +117,7 @@ class CSTRTeacher(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self):
+    async def plot_obs(self):
         plt.figure(2,figsize=(7,5))
         plt.clf()
         plt.subplot(3,1,1)
