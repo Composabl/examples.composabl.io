@@ -1,7 +1,5 @@
-from asyncore import loop
 import os
 import sys
-import asyncio
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -17,7 +15,7 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 DELETE_OLD_HISTORY_FILES: bool = True
 
-async def start():
+def run_agent():
     """Starting the agent."""
 
     reaction_skill = Skill("reaction", CSTRTeacher)
@@ -39,12 +37,11 @@ async def start():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    await runtime.train(agent, train_iters=100)
+    runtime.train(agent, train_iters=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start())
+    run_agent()

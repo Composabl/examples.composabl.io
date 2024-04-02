@@ -1,78 +1,61 @@
-# Copyright (C) Composabl, Inc - All Rights Reserved
-# Unauthorized copying of this file, via any medium is strictly prohibited
-# Proprietary and confidential
-
 from typing import Any, Dict, SupportsFloat, Tuple
 
+import composabl_core.utils.logger as logger_util
 import gymnasium as gym
 
-from composabl_core.agent.scenario.scenario import Scenario
-from composabl_core.networking.server_composabl import ServerComposabl
+from composabl_core.agent.scenario import Scenario
+from composabl_core.grpc.server.server_composabl import ServerComposabl
+from gymnasium.envs.registration import EnvSpec
 
 from sim import CSTREnv
 
+logger = logger_util.get_logger(__name__)
+
+
 class ServerImpl(ServerComposabl):
-    """
-    Define the way how Composabl (ServerComposabl) can interact with the simulation environment (SimEnv)
-    """
-    env: CSTREnv
-
-    def __init__(self, env_init: dict = {}):
-        self.env_init = env_init
-
-    async def make(self, env_id: str, env_init: dict):
-        self.env_id = env_id if env_id else self.env_id
-        self.env_init = env_init if env_init else self.env_init
-
-        print("Creating env_init: ", self.env_init)
+    def __init__(self):
         self.env = CSTREnv()
 
-        return {
-            "id": "sim-cstr",
-            "max_episode_steps": 90
-        }
+    def Make(self, env_id: str, env_init: dict) -> EnvSpec:
+        spec = {'id': 'cstr', 'max_episode_steps': 90}
+        return spec
 
-    async def observation_space_info(self) -> gym.Space:
-
+    def ObservationSpaceInfo(self) -> gym.Space:
         return self.env.observation_space
 
-    async def action_space_info(self) -> gym.Space:
+    def ActionSpaceInfo(self) -> gym.Space:
         return self.env.action_space
 
-    async def action_space_sample(self) -> Any:
+    def ActionSpaceSample(self) -> Any:
         return self.env.action_space.sample()
 
-    async def reset(self) -> Tuple[Any, Dict[str, Any]]:
-        return self.env.reset()
+    def Reset(self) -> Tuple[Any, Dict[str, Any]]:
+        obs, info = self.env.reset()
+        return obs, info
 
-    async def step(self, action) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
-        if self.env_id == "case-error":
-            raise Exception("Random Error")
-
+    def Step(self, action) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
         return self.env.step(action)
 
-    async def close(self):
+    def Close(self):
         self.env.close()
 
-    async def set_scenario(self, scenario):
+    def SetScenario(self, scenario):
         self.env.scenario = scenario
 
-    async def get_scenario(self):
+    def GetScenario(self):
         if self.env.scenario is None:
-            return Scenario({
-                "dummy": 0
-            })
+            return Scenario({"dummy": 0})
 
         return self.env.scenario
 
-    async def set_reward_func(self, reward_func):
+    def SetRewardFunc(self, reward_func):
         self.env.set_reward_func(reward_func)
 
-    async def set_render_mode(self, render_mode):
+    def SetRenderMode(self, render_mode):
         self.env.render_mode = render_mode
 
-    async def get_render_mode(self):
+    def GetRenderMode(self):
         return self.env.render_mode
 
-    async def get_render(self):
+    def GetRender(self):
         return self.env.render_frame()

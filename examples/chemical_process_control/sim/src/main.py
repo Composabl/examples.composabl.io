@@ -1,45 +1,35 @@
-# Copyright (C) Composabl, Inc - All Rights Reserved
-# Unauthorized copying of this file, via any medium is strictly prohibited
-# Proprietary and confidential
+import argparse
+import os
 
-import asyncio
-from argparse import ArgumentParser
-
-from composabl_core.networking import server as server_make
-
+import grpc
+from composabl_core.grpc.server.server import Server
 from server_impl import ServerImpl
 
-async def start(host, port, protocol, env_init: dict = {}):
-    server = server_make.make(
-        server_impl=ServerImpl,
-        host=host,
-        port=port,
-        protocol=protocol,
-        env_init=env_init
+
+def start():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", default=os.environ.get("HOST") or "[::]")
+    parser.add_argument("--port", default=os.environ.get("PORT") or 1337, type=int)
+    parser.add_argument(
+        "--timeout", default=os.environ.get("TIMEOUT") or None, type=int
     )
+    args = parser.parse_args()
 
-    await server.start()
+    print(f"Starting with arguments {args}")
 
-    # Wait forever
-    while True:
-        await asyncio.sleep(1)
+    try:
+        server = Server(ServerImpl, args.host, args.port, args.timeout)
+        server.start()
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt, Gracefully stopping the server")
+        server.stop()
+    except grpc.RpcError as e:
+        print(f"gRPC error: {e}, Gracefully stopping the server")
+        server.stop()
+    except Exception as e:
+        print(f"Unknown error: {e}, Gracefully stopping the server")
+        server.stop()
 
 
 if __name__ == "__main__":
-    # Create the parser
-    parser = ArgumentParser(description="Start the server with specified arguments")
-
-    # Add arguments for host, port, and protocol
-    parser.add_argument("--host", default="0.0.0.0", help="Host address to bind the server to")
-    parser.add_argument("--port", type=int, default=1337, help="Port number to bind the server to")
-    parser.add_argument("--protocol", default="grpc", help="Protocol to use (e.g., grpc)")
-    parser.add_argument("--env_init", type=str, default="{}", help="Environment initialization (e.g., {})")
-
-    # Parse the arguments
-    args = parser.parse_args()
-
-    # Covnert from str to dict
-    args.env_init = eval(args.env_init)
-
-    # Run the start function with the parsed arguments
-    asyncio.run(start(args.host, args.port, args.protocol, args.env_init))
+    start()
