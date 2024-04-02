@@ -1,17 +1,17 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
+from config import config
+from scenarios import ss1_scenarios, ss2_scenarios, transition_scenarios, selector_scenarios
 from teacher import SS1Teacher, SS2Teacher, TransitionTeacher
 from composabl import Controller
 
-from utils.cleanup import cleanup_folder
-from utils.config import generate_config
-
-license_key = os.environ["COMPOSABL_LICENSE"]
+#from utils.cleanup import cleanup_folder
+#from utils.config import generate_config
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -48,36 +48,10 @@ class ProgrammedSelector(Controller):
 
 
 def start():
-    if DELETE_OLD_HISTORY_FILES:
-        cleanup_folder(PATH_HISTORY)
-    else:
-        print("|-- Skipping deletion of old history files...")
-
-
-    # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-    ss1_scenarios = [
-        {
-            "Cref_signal": "ss1"
-        }
-    ]
-
-    ss2_scenarios = [
-        {
-            "Cref_signal": "ss2"
-        }
-    ]
-
-    transition_scenarios = [
-        {
-            "Cref_signal": "transition"
-        }
-    ]
-
-    selector_scenarios = [
-        {
-            "Cref_signal": "complete"
-        }
-    ]
+    #if DELETE_OLD_HISTORY_FILES:
+    #    cleanup_folder(PATH_HISTORY)
+    #else:
+    #    print("|-- Skipping deletion of old history files...")
 
     ss1_skill = Skill("ss1", SS1Teacher)
     for scenario_dict in ss1_scenarios:
@@ -95,17 +69,6 @@ def start():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
-
-    config = generate_config(
-        license_key=license_key,
-        target="docker",
-        image=DOCKER_IMAGE,
-        env_name="sim-cstr",
-        workers=8,
-        num_gpus=0,
-    )
-
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
@@ -116,7 +79,8 @@ def start():
     agent.add_selector_skill(selector_skill, [ss2_skill, transition_skill, ss1_skill], fixed_order=False, fixed_order_repeat=False)
 
     # Load a pre-trained agent
-    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
+    #cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
+
     try:
         if len(os.listdir(PATH_CHECKPOINTS)) > 0:
             agent.load(PATH_CHECKPOINTS)
