@@ -53,6 +53,8 @@ HISTORIAN_MONIKER_MQTT_CONSUMER_ID=$SIM_ID
 # Print startup information
 echo "- SIM_ID: $SIM_ID"
 echo "- MODE: $MODE"
+echo "- HOST: $HOST"
+echo "- PORT: $PORT"
 echo "- IS_HISTORIAN_ENABLED: $IS_HISTORIAN_ENABLED"
 echo "- V_COMPOSABL_CORE: $(pip show "composabl-core-dev" | grep '^Version:' | awk '{print $2}')"
 echo "- V_COMPOSABL_SIM: $V_COMPOSABL_SIM"
@@ -72,4 +74,4 @@ cd "$APP_PATH"
 echo "Starting $APP_NAME"
 echo '===================================================================='
 
-$APP_CMD
+$APP_CMD --host $HOST --port $PORT

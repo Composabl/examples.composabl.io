@@ -49,7 +49,6 @@ class CSTRTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
 
-
         error = (float(transformed_obs['Cref']) - float(transformed_obs['Ca']))**2
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))

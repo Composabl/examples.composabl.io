@@ -32,14 +32,14 @@ async def start():
 
     # Load a pre-trained agent
     #cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
-    #try:
-    #    if len(os.listdir(PATH_CHECKPOINTS)) > 0:
-    #        agent.load(PATH_CHECKPOINTS)
-    #except Exception:
-    #    print("|-- No checkpoints found. Training from scratch...")
+    try:
+        if len(os.listdir(PATH_CHECKPOINTS)) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    await runtime.train(agent, train_iters=5)
+    await runtime.train(agent, train_iters=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
