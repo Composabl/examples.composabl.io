@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
@@ -10,7 +10,7 @@ from scenarios import bake_scenarios
 from perceptors import perceptors
 from teacher import BaseTeacher
 import datetime
-from examples.production_scheduling.agents.perceptors import perceptors
+from perceptors import perceptors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"

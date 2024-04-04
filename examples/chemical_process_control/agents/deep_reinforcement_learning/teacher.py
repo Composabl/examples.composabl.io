@@ -26,7 +26,7 @@ class CSTRTeacher(Teacher):
 
         # create metrics db
         try:
-            self.df = pd.read_pickle(f"{PATH_HISTORY}/db.pkl")
+            self.df = pd.read_pickle(f"{PATH_HISTORY}/history.pkl")
 
             if self.metrics == 'fast':
                 self.plot_metrics()
@@ -67,7 +67,7 @@ class CSTRTeacher(Teacher):
         # history metrics
         df_temp = pd.DataFrame(columns=['time', 'Ca', 'Cref', 'reward', 'rms'], data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(f"{PATH_HISTORY}/db.pkl")
+        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
 
         return reward
 

@@ -1,52 +1,22 @@
-from composabl.core import Agent, Skill, Sensor, Scenario
-from composabl.ray import Runtime
-from teacher import CSTRTeacher
-
-from composabl import Controller
-
 import os
-import numpy as np
+import sys
 
-os.environ["COMPOSABL_EULA_AGREED"] = "1"
-license_key = os.environ["COMPOSABL_LICENSE"]
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
+from composabl import Agent, Skill, Sensor, Scenario, Controller, Runtime
+from teacher import CSTRTeacher
+from sensors import sensors
+from config import config
+from scenarios import reaction_scenarios
 
-def start():
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
+PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY: str = f"{PATH}/history"
+PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
-    sensors = [T, Tc, Ca, Cref, Tref]
-
-    # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-    control_scenarios = [
-        {
-            "Cref_signal": "complete",
-            "noise_percentage": 0.0
-        }
-    ]
-
+def run_agent():
     control_skill = Skill("control", CSTRTeacher)
-    for scenario_dict in control_scenarios:
+    for scenario_dict in reaction_scenarios:
         control_skill.add_scenario(Scenario(scenario_dict))
-
-    config = {
-        "license": license_key,
-        "target": {
-            "local": {
-            "address": "localhost:1337"
-            }
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-
-        "flags": {
-            "print_debug_info": True
-        },
-    }
 
     runtime = Runtime(config)
     agent = Agent()
@@ -54,25 +24,19 @@ def start():
 
     agent.add_skill(control_skill)
 
-    checkpoint_path = './cstr/skill_group_drl_mpc/saved_agents/'
+    files = os.listdir(PATH_CHECKPOINTS)
 
-    try:
-        files = os.listdir(PATH_CHECKPOINTS)
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-        if '.DS_Store' in files:
-            files.remove('.DS_Store')
-            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
-
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
-
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
+    if len(files) > 0:
+        agent.load(PATH_CHECKPOINTS)
 
     runtime.train(agent, train_iters=1)
 
     #save agent
-    agent.export(checkpoint_path)
+    agent.export(PATH_CHECKPOINTS)
 
 if __name__ == "__main__":
-    start()
+    run_agent()

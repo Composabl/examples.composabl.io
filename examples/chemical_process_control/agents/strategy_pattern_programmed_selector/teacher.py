@@ -1,8 +1,12 @@
+import os
 from composabl import Teacher
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import pandas as pd
+
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
 
 class BaseCSTR(Teacher):
     def __init__(self):
@@ -14,7 +18,7 @@ class BaseCSTR(Teacher):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control'
-        self.history_path = './cstr/multiple_learned_skills_programmed/history.pkl'
+        self.history_path = f"{PATH_HISTORY}/history.pkl"
         self.metrics = 'none' #standard, fast, none
 
         # create metrics db
@@ -58,9 +62,9 @@ class BaseCSTR(Teacher):
         self.count += 1
 
         # history metrics
-        #df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        #self.df = pd.concat([self.df, df_temp])
-        #self.df.to_pickle(self.history_path)
+        df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle(self.history_path)
 
         return reward
 
@@ -83,10 +87,7 @@ class BaseCSTR(Teacher):
         return success
 
     def compute_termination(self, transformed_obs, action):
-        if abs((float(transformed_obs['Ca']) - float(transformed_obs['Cref']))/float(transformed_obs['Cref'])) > 0.05:
-            return True
-        else:
-            return False
+        return False
 
     def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
@@ -145,7 +146,7 @@ class SS1Teacher(BaseCSTR):
     def __init__(self):
         super().__init__()
         self.title = 'CSTR Live Control - SS1 skill'
-        self.history_path = './cstr/multiple_learned_skills_programmed/ss1_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/ss1_history.pkl"
         self.metrics = 'fast' #standard, fast, none
 
         # create metrics db
@@ -175,24 +176,20 @@ class SS1Teacher(BaseCSTR):
         self.count += 1
 
         # history metrics
-        #df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        #self.df = pd.concat([self.df, df_temp])
-        #self.df.to_pickle(self.history_path)
+        df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle(self.history_path)
 
         return reward
 
     def compute_termination(self, transformed_obs, action):
-        if abs((float(transformed_obs['Ca']) - float(transformed_obs['Cref']))/float(transformed_obs['Cref'])) > 0.05:
-            return True
-        else:
-            return False
-
+        return False
 
 class SS2Teacher(BaseCSTR):
     def __init__(self):
         super().__init__()
         self.title = 'CSTR Live Control - SS2 skill'
-        self.history_path = './cstr/multiple_learned_skills_programmed/ss2_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/ss2_history.pkl"
         self.metrics = 'fast' #standard, fast, none
 
         # create metrics db
@@ -222,23 +219,19 @@ class SS2Teacher(BaseCSTR):
         self.count += 1
 
         # history metrics
-        #df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        #self.df = pd.concat([self.df, df_temp])
-        #self.df.to_pickle(self.history_path)
+        df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle(self.history_path)
 
         return reward
 
     def compute_termination(self, transformed_obs, action):
-        if abs((float(transformed_obs['Ca']) - float(transformed_obs['Cref']))/float(transformed_obs['Cref'])) > 0.05:
-            return True
-        else:
-            return False
-
+        return False
 class TransitionTeacher(BaseCSTR):
     def __init__(self):
         super().__init__()
         self.title = 'CSTR Live Control - Transition skill'
-        self.history_path = './cstr/multiple_learned_skills_programmed/transition_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/transition_history.pkl"
         self.metrics = 'fast' #standard, fast, none
 
         # create metrics db
@@ -259,7 +252,7 @@ class CSTRTeacher(BaseCSTR):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control - Selector skill'
-        self.history_path = './cstr/multiple_learned_skills_programmed/selector_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/selector_history.pkl"
         self.plot = False
         self.metrics = 'none' #standard, fast, none
 

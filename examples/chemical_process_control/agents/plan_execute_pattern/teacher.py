@@ -1,11 +1,17 @@
-import math
-import numpy as np 
+import os
 
-from composabl_core.agent import Teacher
+import math
+import numpy as np
+
+from composabl import Teacher
 from mpc_model import mpc
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
+PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY: str = f"{PATH}/history"
+PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 class CSTRTeacher(Teacher):
     def __init__(self):
@@ -15,15 +21,15 @@ class CSTRTeacher(Teacher):
         self.last_reward = 0
         self.count = 0
         self.metrics = 'none' #standard, fast, none
-        
+
         # create metrics db
         try:
-            self.df = pd.read_pickle('./cstr/skill_group_drl_mpc/history.pkl')
+            self.df = pd.read_pickle(f"{PATH_HISTORY}/history.pkl")
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
             self.df = pd.DataFrame()
-        
+
 
     def transform_obs(self, obs, action):
         return obs
@@ -33,26 +39,26 @@ class CSTRTeacher(Teacher):
             if 'observation' in list(transformed_obs.keys()):
                 transformed_obs = transformed_obs['observation'][0]
                 #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-                MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2], 
+                MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2],
                                                         transformed_obs[0], transformed_obs[1] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
             else:
                 #Import MPC
-                MPC_Tc = mpc(0, transformed_obs['Cref'], transformed_obs['Ca'], 
+                MPC_Tc = mpc(0, transformed_obs['Cref'], transformed_obs['Ca'],
                                                         transformed_obs['T'], transformed_obs['Tc'] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
-        
+
         else:
             #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-            MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2], 
+            MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2],
                                                     transformed_obs[0], transformed_obs[1] + action[0])
             dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
 
-            
+
         #limit MPC actions between -10 and 10 degrees Celsius
         dTc_MPC = np.clip(dTc_MPC,-10,10)
         action = dTc_MPC
-        
+
         return action
 
     def filtered_observation_space(self):
@@ -76,7 +82,7 @@ class CSTRTeacher(Teacher):
         # history metrics
         df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./cstr/skill_group_drl_mpc/history.pkl")  
+        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
         return reward
 
     def compute_action_mask(self, transformed_obs, action):
@@ -97,7 +103,7 @@ class CSTRTeacher(Teacher):
 
     def compute_termination(self, transformed_obs, action):
         return False
-    
+
     def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
         plt.clf()
@@ -107,7 +113,7 @@ class CSTRTeacher(Teacher):
         plt.ylabel('Reward')
         plt.legend(['reward'],loc='best')
         plt.title('Metrics')
-        
+
         plt.subplot(3,1,2)
         plt.plot(self.rms_history, 'r.-')
         plt.scatter(self.df.reset_index()['time'],self.df.reset_index()['rms'],s=0.5, alpha=0.2)
@@ -120,7 +126,7 @@ class CSTRTeacher(Teacher):
         plt.ylabel('Ca')
         plt.legend(['Ca'],loc='best')
         plt.xlabel('iteration')
-        
+
         plt.draw()
         plt.pause(0.001)
 
@@ -132,7 +138,7 @@ class CSTRTeacher(Teacher):
         plt.ylabel('Cooling Tc (K)')
         plt.legend(['Jacket Temperature'],loc='best')
         plt.title('CSTR Live Control')
-        
+
 
         plt.subplot(3,1,2)
         plt.plot([ x["Ca"] for x in self.obs_history],'b.-',lw=3)
@@ -146,6 +152,6 @@ class CSTRTeacher(Teacher):
         plt.ylabel('T (K)')
         plt.xlabel('Time (min)')
         plt.legend(['Temperature Setpoint','Reactor Temperature'],loc='best')
-        
+
         plt.draw()
         plt.pause(0.001)

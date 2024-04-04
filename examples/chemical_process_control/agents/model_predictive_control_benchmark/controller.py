@@ -1,3 +1,5 @@
+import os
+
 from composabl import Controller
 
 import numpy as np
@@ -10,13 +12,15 @@ import random
 import pandas as pd
 import copy
 
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
 
 class MPCController(Controller):
     def __init__(self):
         self.count = 0
         # create metrics db
         try:
-            self.df = pd.read_pickle('./cstr/linear_mpc/history.pkl')
+            self.df = pd.read_pickle(f"{PATH_HISTORY}/history.pkl")
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
@@ -24,7 +28,7 @@ class MPCController(Controller):
 
         #initialize variables
         self.display_mpc_vals = False
-        remote_server = True # use a remote server to process calculations 
+        remote_server = True # use a remote server to process calculations
 
         # Steady State Initial Condition
         u_ss = 280.0
@@ -96,7 +100,7 @@ class MPCController(Controller):
 
         T_ = interpolate.interp1d([0,p1,p2,time,time+1], [311.2612,311.2612,373.1311,373.1311,373.1311])
         C = interpolate.interp1d([0,p1,p2,time, time+1], [8.57,8.57,2,2,2])
-        
+
     def compute_action(self, obs):
         #print(obs) #self.T, self.Tc, self.Ca, self.Cref, self.Tref
         obs = {
@@ -106,7 +110,7 @@ class MPCController(Controller):
             'Cref': obs[3],
             'Tref': obs[4]
         }
-        
+
         df = pd.DataFrame()
         t = self.t
         i = self.count
@@ -124,11 +128,11 @@ class MPCController(Controller):
         obs['Ca']  = obs['Ca'] + σ_Ca
 
         # insert measurement
-        self.m.T.MEAS = obs['T'] 
+        self.m.T.MEAS = obs['T']
         # update setpoint
-        self.m.T.SP = obs['Tref'] 
-        Tref = obs['Tref'] 
-        Cref = obs['Cref'] 
+        self.m.T.SP = obs['Tref']
+        Tref = obs['Tref']
+        Cref = obs['Cref']
         # solve MPC
         self.m.solve(disp=self.display_mpc_vals)
         # change to a fixed starting point for trajectory
@@ -148,7 +152,7 @@ class MPCController(Controller):
         #generate dataframe
         df_t = pd.DataFrame([[i,self.Ca[i+1],self.T[i+1],newTc, Tref,Cref ]], columns = ['time','Ca','T','Tc','Tref','Cref'])
         self.df = pd.concat([self.df, df_t])
-        #self.df.to_pickle("./cstr/linear_mpc/history.pkl") 
+        #self.df.to_pickle("./cstr/linear_mpc/history.pkl")
 
         self.count += 1
         dTc = float(newTc) - float(obs['Tc'])
@@ -159,11 +163,9 @@ class MPCController(Controller):
 
     def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
-    
+
     def compute_success_criteria(self, transformed_obs, action):
-        if self.counter > 100:
-            return True
+        return False
 
     def compute_termination(self, transformed_obs, action):
         return False
-    

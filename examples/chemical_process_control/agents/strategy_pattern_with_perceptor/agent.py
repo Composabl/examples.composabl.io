@@ -1,17 +1,15 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from perceptors import perceptors\
+from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from sensors import sensors
 from scenarios import ss1_scenarios, ss2_scenarios, transition_scenarios, selector_scenarios
 from config import config
+from perceptors import perceptors
 
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
-
-from composabl import Controller
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -83,18 +81,15 @@ def run_agent():
     agent.add_skill(transition_skill)
     agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
 
-    try:
-        files = os.listdir(PATH_CHECKPOINTS)
+    files = os.listdir(PATH_CHECKPOINTS)
 
-        if '.DS_Store' in files:
-            files.remove('.DS_Store')
-            os.remove(PATH_CHECKPOINTS + '/.DS_Store')
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-        if len(files) > 0:
-            agent.load(PATH_CHECKPOINTS)
+    if len(files) > 0:
+        agent.load(PATH_CHECKPOINTS)
 
-    except Exception:
-        os.mkdir(PATH_CHECKPOINTS)
 
     # train agent
     runtime.train(agent, train_iters=10)

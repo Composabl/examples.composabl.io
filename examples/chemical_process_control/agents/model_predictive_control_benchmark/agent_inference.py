@@ -1,59 +1,28 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl_core.grpc.client.client import make
 from controller import MPCController
+from sensors import sensors
+from config import config
+from scenarios import reaction_scenarios
 
-from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import matplotlib.pyplot as plt
 
-license_key = os.environ["COMPOSABL_LICENSE"]
-
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
+PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
 def start():
-    # delete old history files
-    dir = './cstr/linear_mpc'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
-
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
-
-    sensors = [T, Tc, Ca, Cref, Tref]
-
-    # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-    reaction_scenarios = [
-        {
-            "Cref_signal": "complete",
-            "noise_percentage": 0.01
-        }
-    ]
-
     reaction_skill = Skill("reaction", MPCController)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
-    config = {
-        "license": license_key,
-        "target": {
-            "local": {
-            "address": "localhost:1337"
-            }
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-
-        "flags": {
-            "print_debug_info": True
-        },
-    }
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
@@ -63,11 +32,20 @@ def start():
     # Inference
     noise = 0.0
     cont = MPCController()
-    sim = CSTREnv()
-    sim.scenario = Scenario({
+    sim = make(
+        "run-benchmark",
+        "sim-benchmark",
+        "",
+        "localhost:1337",
+        {
+            "render_mode": "rgb_array"
+        },
+    )
+    sim.init()
+    sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
-        })
+        }))
     df = pd.DataFrame()
     obs, info= sim.reset()
 
@@ -80,8 +58,9 @@ def start():
         if done:
             break
 
+    sim.close()
     # save history data
-    df.to_pickle("./cstr/linear_mpc/inference_data.pkl")
+    df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
 
     # plot
     plt.figure(figsize=(10,5))
@@ -104,7 +83,7 @@ def start():
     plt.ylabel('Concentration')
     plt.xlabel('iteration')
 
-    plt.savefig('./cstr/linear_mpc/inference_figure.png')
+    plt.savefig(f"{PATH_BENCHMARKS}/img/inference_figure.png")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# CSTR - Continuous Stirred Tank Reactor
+# Chemical Process Control (CSTR - Continuous Stirred Tank Reactor)
 
 CSTR Sim is a Python simulator made from ODE functions that control an Exothermic Chemical Reaction in a Continuous Stirred Tank Reactor.<br>
 The reaction consistis in transform the raw material A into product B (A -> B + heat) by controlling the temperature of collant fluid in a specific CSTR operation with the goal of increasing the conversion rate. During this process we have a strongly non linear transition from a low conversion rate area (low B production) to a high productivity rate area (high B production) and the temperature can quickly get out of control.

@@ -91,10 +91,7 @@ class BaseCSTR(Teacher):
         return success
 
     def compute_termination(self, transformed_obs, action):
-        if abs((float(transformed_obs['Ca']) - float(transformed_obs['Cref']))/float(transformed_obs['Cref'])) > 0.05:
-            return True
-        else:
-            return False
+        return False
 
     def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
@@ -192,10 +189,7 @@ class SS1Teacher(BaseCSTR):
         return reward
 
     def compute_termination(self, transformed_obs, action):
-        if abs((float(transformed_obs['Ca']) - float(transformed_obs['Cref']))/float(transformed_obs['Cref'])) > 0.05:
-            return True
-        else:
-            return False
+        return False
 
 
 class SS2Teacher(BaseCSTR):
@@ -240,10 +234,7 @@ class SS2Teacher(BaseCSTR):
         return reward
 
     def compute_termination(self, transformed_obs, action):
-        if abs((float(transformed_obs['Ca']) - float(transformed_obs['Cref']))/float(transformed_obs['Cref'])) > 0.05:
-            return True
-        else:
-            return False
+        return False
 
 class TransitionTeacher(BaseCSTR):
     def __init__(self):
