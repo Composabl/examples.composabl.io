@@ -1,4 +1,8 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from composabl import Teacher
 import numpy as np
 import math
@@ -46,9 +50,9 @@ class BaseTeacher(Teacher):
             return 0.0
         else:
             self.obs_history.append(transformed_obs)
-        
+
         reward = sim_reward
-    
+
         self.reward_history.append(reward)
         self.action_history.append(action)
 
@@ -67,7 +71,7 @@ class BaseTeacher(Teacher):
 
         # history metrics
         if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'], 
+            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'],
                                    data=[[self.count,float(transformed_obs["completed_cookies"]), float(transformed_obs["completed_cupcakes"]),
                                           float(transformed_obs["completed_cake"]),
                                            reward]])
@@ -132,9 +136,9 @@ class BaseTeacher(Teacher):
         plt.title('Live Control')
 
         plt.subplot(6,1,2)
-        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]), 
-                                                  float(self.obs_history[-1]["completed_cupcakes"]), 
-                                                  float(self.obs_history[-1]["completed_cake"]) 
+        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]),
+                                                  float(self.obs_history[-1]["completed_cupcakes"]),
+                                                  float(self.obs_history[-1]["completed_cake"])
                                                   ])
         plt.plot([ float(self.obs_history[-1]["cookies_demand"])] * 3,'b--',lw=1)
         plt.plot([ float(self.obs_history[-1]["cupcake_demand"])] * 3,'r--',lw=1)
@@ -143,9 +147,9 @@ class BaseTeacher(Teacher):
         plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
         plt.subplot(6,1,3)
-        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]) * float(self.obs_history[-1]["cookies_price"]), 
-                                                  float(self.obs_history[-1]["completed_cupcakes"])  * float(self.obs_history[-1]["cupcake_price"]), 
-                                                  float(self.obs_history[-1]["completed_cake"])  * float(self.obs_history[-1]["cake_price"]) 
+        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]) * float(self.obs_history[-1]["cookies_price"]),
+                                                  float(self.obs_history[-1]["completed_cupcakes"])  * float(self.obs_history[-1]["cupcake_price"]),
+                                                  float(self.obs_history[-1]["completed_cake"])  * float(self.obs_history[-1]["cake_price"])
                                                   ])
         plt.ylabel('Income')
         plt.legend(['cookie','cupcake','cake'],loc='best')
@@ -169,7 +173,7 @@ class BaseTeacher(Teacher):
         plt.legend(['baker1','baker2','baker3', 'baker4'],loc='best')
 
         plt.xlabel('Time (min)')
-        
+
 
         plt.draw()
         plt.pause(0.001)

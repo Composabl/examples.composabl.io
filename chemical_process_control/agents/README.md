@@ -30,7 +30,7 @@ Machine Learning Constraint
 
 ![SP perceptor](img/sp_perceptor.png)
 
-## Model Predictive Control Benchmark
+### Model Predictive Control Benchmark
 
 ![linear mpc](img/linear_mpc.png)
 

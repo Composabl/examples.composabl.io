@@ -1,4 +1,8 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from composabl import Teacher
 import numpy as np
 import math
@@ -40,24 +44,13 @@ class BaseTeacher(Teacher):
     def transform_action(self, transformed_obs, action):
         sensors_name = [s.name for s in sensors]
         transformed_obs = self.obs
-        #if (type(transformed_obs) == dict) and ('observation' in transformed_obs.keys()):
-        #    transformed_obs = transformed_obs['observation']
 
-        #if type(transformed_obs) != dict:
-        #    transformed_obs = dict(map(lambda i,j : (i,j), sensors_name, transformed_obs))
-
-        #print(transformed_obs)
-        #print(transformed_obs['completed_cookies'])
         # add noise to transform_action
         transformed_obs['cookies_demand'] = float(transformed_obs['cookies_demand']) * (1 + action * 0.01)
         transformed_obs['cupcake_demand'] = float(transformed_obs['cupcake_demand']) * (1 + action * 0.01)
         transformed_obs['cake_demand'] = float(transformed_obs['cake_demand']) * (1 + action * 0.01)
-        #print('AFTER: ', transformed_obs['cookies_demand'])
-        #print('AFTER: ', transformed_obs['cupcake_demand'])
-        #print('AFTER: ', transformed_obs['cake_demand'])
 
         # get controller action
-        #action = self.cont.compute_action(list(transformed_obs.values()))
         action = self.cont.compute_action(transformed_obs)
         return action
 
@@ -70,9 +63,9 @@ class BaseTeacher(Teacher):
             return 0.0
         else:
             self.obs_history.append(transformed_obs)
-        
+
         reward = sim_reward
-    
+
         self.reward_history.append(reward)
         self.action_history.append(action)
 
@@ -91,7 +84,7 @@ class BaseTeacher(Teacher):
 
         # history metrics
         if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'], 
+            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'],
                                    data=[[self.count,float(transformed_obs["completed_cookies"]), float(transformed_obs["completed_cupcakes"]),
                                           float(transformed_obs["completed_cake"]),
                                            reward]])
@@ -153,9 +146,9 @@ class BaseTeacher(Teacher):
         plt.title('Live Control')
 
         plt.subplot(6,1,2)
-        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]), 
-                                                  float(self.obs_history[-1]["completed_cupcakes"]), 
-                                                  float(self.obs_history[-1]["completed_cake"]) 
+        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]),
+                                                  float(self.obs_history[-1]["completed_cupcakes"]),
+                                                  float(self.obs_history[-1]["completed_cake"])
                                                   ])
         plt.plot([ float(self.obs_history[-1]["cookies_demand"])] * 3,'b--',lw=1)
         plt.plot([ float(self.obs_history[-1]["cupcake_demand"])] * 3,'r--',lw=1)
@@ -164,9 +157,9 @@ class BaseTeacher(Teacher):
         plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
         plt.subplot(6,1,3)
-        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]) * float(self.obs_history[-1]["cookies_price"]), 
-                                                  float(self.obs_history[-1]["completed_cupcakes"])  * float(self.obs_history[-1]["cupcake_price"]), 
-                                                  float(self.obs_history[-1]["completed_cake"])  * float(self.obs_history[-1]["cake_price"]) 
+        plt.bar(['cookies','cupcakes', 'cakes'], [float(self.obs_history[-1]["completed_cookies"]) * float(self.obs_history[-1]["cookies_price"]),
+                                                  float(self.obs_history[-1]["completed_cupcakes"])  * float(self.obs_history[-1]["cupcake_price"]),
+                                                  float(self.obs_history[-1]["completed_cake"])  * float(self.obs_history[-1]["cake_price"])
                                                   ])
         plt.ylabel('Income')
         plt.legend(['cookie','cupcake','cake'],loc='best')
@@ -190,7 +183,7 @@ class BaseTeacher(Teacher):
         plt.legend(['baker1','baker2','baker3', 'baker4'],loc='best')
 
         plt.xlabel('Time (min)')
-        
+
 
         plt.draw()
         plt.pause(0.001)
@@ -199,16 +192,16 @@ class BaseTeacher(Teacher):
 class SelectorTeacher(BaseTeacher):
     def transform_action(self, transformed_obs, action):
         return action
-    
+
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
         else:
             self.obs_history.append(transformed_obs)
-        
+
         reward = sim_reward
-    
+
         self.reward_history.append(reward)
         self.action_history.append(action)
 
@@ -229,7 +222,7 @@ class SelectorTeacher(BaseTeacher):
 
         # history metrics
         if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'], 
+            df_temp = pd.DataFrame(columns=['time', "completed_cookies", "completed_cupcakes","completed_cake" ,'reward'],
                                    data=[[self.count,float(transformed_obs["completed_cookies"]), float(transformed_obs["completed_cupcakes"]),
                                           float(transformed_obs["completed_cake"]),
                                            reward]])
@@ -250,7 +243,7 @@ class SelectorTeacher(BaseTeacher):
             #    if self.reward_history[-1] > -100:
             #        success = True
             #        #print('SUCESS TRUE')
-            
+
             #if transformed_obs['completed_cookies'] > 100:
             if self.metrics == 'standard':
                 try:

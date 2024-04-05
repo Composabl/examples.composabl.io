@@ -1,61 +1,23 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
 
 from composabl_core.grpc.client.client import make
-import numpy as np
-import math
 from gymnasium import spaces
 import matplotlib.pyplot as plt
 import pickle
-from controller_test import OrderController
-
-license_key = os.environ["COMPOSABL_KEY"]
+from order_controller import OrderController
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
-PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 # INFERENCE FOR OPTIMIZATION CONTROLLER
 
-def start():
-    # Define the right configuration
-    config = {
-        "license": license_key,
-        "target": {
-            #"docker": {
-            #    "image": "composabl/sim-cstr:latest"
-            #},
-            "local": {
-               "address": "localhost:1337"
-            }
-        },
-        "env": {
-            "name": "sim-whisky",
-        },
-        "runtime": {
-            "workers": 1
-        }
-    }
-
-    # Remove unused files from path (mac only)
-    files = os.listdir(PATH_CHECKPOINTS)
-
-    if '.DS_Store' in files:
-        files.remove('.DS_Store')
-        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
-
-    # Start Runtime
-    #runtime = Runtime(config)
-    #directory = PATH_CHECKPOINTS
-
-    # Load the pre trained agent
-    #agent = Agent.load(directory)
-
-    # Prepare the loaded agent for inference
-    #trained_agent = runtime.package(agent)
-    
+def run_agent():
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
@@ -65,8 +27,6 @@ def start():
         "localhost:1337",
         {
             "render_mode": "rgb_array",
-            #"observation_space": _create_observation_space(),
-            #"action_space": _create_action_space()
         },
     )
 
@@ -80,8 +40,8 @@ def start():
         'Cp_demand': cp_dm,
         'Ck_demand':ck_dm
     }
-    
-    sim.set_scenario(Scenario({ 
+
+    sim.set_scenario(Scenario({
             "cookies_demand": co_dm,
             "cupcake_demand": cp_dm,
             "cake_demand": ck_dm,
@@ -90,31 +50,24 @@ def start():
     obs, info = sim.reset()
     print("Initialized")
     # Get a sim action sample if needed (debug)
-    #a = sim.action_space_sample()
     obs_history = []
     action_history = []
     reward_history = []
     sensors_name = [s.name for s in sensors]
     obs_base = {}
     cont = OrderController()
-    
+
     for s in sensors_name:
         obs_base[s] = None
-    
+
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
-        #action = trained_agent.execute(obs)
         action = cont.compute_action(obs)
         print(action)
-        #action_history.append(list(action.values()))
-        #action = [action]
-        #action = sim.action_space_sample()[0]
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
-        #ccok = obs[sensor_names.index('completed_cookies')] if obs[sensor_names.index('completed_cookies')] > 0 else 0
-        #ccup = obs[sensor_names.index('completed_cupcakes')] if obs[sensor_names.index('completed_cupcakes')] > 0 else 0
-        #ccak = obs[sensor_names.index('completed_cake')] if obs[sensor_names.index('completed_cake')] > 0 else 0
+
         ccok = obs['completed_cookies']
         ccup = obs['completed_cupcakes']
         ccak = obs['completed_cake']
@@ -148,15 +101,15 @@ def start():
 
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
-        
-        #if done:
-        #    break
+
+        if done:
+            break
 
     metrics['completed_cookies'] = ccok
     metrics['completed_cupcakes'] = ccup
     metrics['completed_cake'] = ccak
 
-    with open('metrics.pkl', 'wb') as f:
+    with open('history/metrics.pkl', 'wb') as f:
         pickle.dump(metrics, f)
 
     print("Done", ccok, ccup, ccak)
@@ -173,10 +126,6 @@ def start():
     plt.title('Live Control')
 
     plt.subplot(4,1,2)
-    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]), 
-                                                float(obs_history[-1]["completed_cupcakes"]), 
-                                                float(obs_history[-1]["completed_cake"]) 
-                                                ])'''
     plt.plot([ x[observation_dict[5]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[6]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[9]] for x in obs_history],'r.-',lw=2)
@@ -187,18 +136,6 @@ def start():
     plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
     plt.subplot(4,1,3)
-    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]) * float(obs_history[-1]["cookies_price"]), 
-                                                float(obs_history[-1]["completed_cupcakes"])  * float(obs_history[-1]["cupcake_price"]), 
-                                                float(obs_history[-1]["completed_cake"])  * float(obs_history[-1]["cake_price"]) 
-                                                ])'''
-    '''plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
-    plt.plot([ x[observation_dict[8]] for x in obs_history],'k.-',lw=2)
-    plt.plot([ x[observation_dict[11]] for x in obs_history],'r.-',lw=2)
-    plt.plot([ x[observation_dict[12]] for x in obs_history],'r.-',lw=2)
-    plt.plot([ x[observation_dict[13]] for x in obs_history],'b.-',lw=2)
-    plt.plot([ x[observation_dict[14]] for x in obs_history],'b.-',lw=2)
-    plt.plot([ x[observation_dict[17]] for x in obs_history],'g.-',lw=2)
-    plt.plot([ x[observation_dict[18]] for x in obs_history],'g.-',lw=2)'''
     plt.plot(action_history)
     plt.ylabel('Income')
     plt.legend(['cookie','cupcake','cake'],loc='best')
@@ -210,8 +147,8 @@ def start():
     plt.legend(['Reward'],loc='best')
 
     plt.savefig(f"{PATH}/img/inference_figure.png")
-    
+
 
 if __name__ == "__main__":
-    start()
+    run_agent()
 

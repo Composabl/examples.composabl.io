@@ -46,8 +46,8 @@ def run_agent():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    #if len(files) > 0:
-    #   agent.load(PATH_CHECKPOINTS)
+    if len(files) > 0:
+       agent.load(PATH_CHECKPOINTS)
 
     runtime.train(agent, train_iters=2)
 

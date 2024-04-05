@@ -47,11 +47,11 @@ def run_agent():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    #if len(files) > 0:
-    #   agent.load(PATH_CHECKPOINTS)
+    if len(files) > 0:
+       agent.load(PATH_CHECKPOINTS)
 
 
-    runtime.train(agent, train_iters=2)
+    runtime.train(agent, train_iters=10)
 
     agent.export(PATH_CHECKPOINTS)
     end_time = datetime.datetime.now()
