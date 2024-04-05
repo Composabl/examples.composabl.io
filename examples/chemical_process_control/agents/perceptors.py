@@ -19,19 +19,19 @@ class ThermalRunawayPredict():
         if self.last_Tc == 0:
             self.ΔTc = 5
         else:
-            self.ΔTc = obs['Tc'] - self.last_Tc
+            self.ΔTc = float(obs['Tc']) - self.last_Tc
 
         y = 0
 
         if obs['T'] >= 340:
-            X = [[obs['Ca'], obs['T'], obs['Tc'], self.ΔTc]]
+            X = [[float(obs['Ca']), float(obs['T']), float(obs['Tc']), self.ΔTc]]
             y = self.ml_model.predict(X)[0]
             #print(self.ml_model.predict_proba(X))
             if self.ml_model.predict_proba(X)[0][1] >= 0.3:
                 y = 1
                 self.y = y
 
-        self.last_Tc = obs['Tc']
+        self.last_Tc = float(obs['Tc'])
 
         return {"thermal_runaway_predict": y}
 

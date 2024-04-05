@@ -47,13 +47,6 @@ class ProgrammedSelector(Controller):
 
 
 def run_agent():
-    # delete old history files
-    dir = './cstr/multiple_skills_perceptor'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
 
     ss1_skill = Skill("ss1", SS1Teacher)
     for scenario_dict in ss1_scenarios:
@@ -87,12 +80,12 @@ def run_agent():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    if len(files) > 0:
-        agent.load(PATH_CHECKPOINTS)
+    #if len(files) > 0:
+    #    agent.load(PATH_CHECKPOINTS)
 
 
     # train agent
-    runtime.train(agent, train_iters=10)
+    runtime.train(agent, train_iters=1)
 
     # save agent
     agent.export(PATH_CHECKPOINTS)

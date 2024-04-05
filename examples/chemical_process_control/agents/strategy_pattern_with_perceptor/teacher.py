@@ -1,3 +1,5 @@
+import os
+
 from composabl import Teacher, Scenario
 import numpy as np
 import math
@@ -7,7 +9,9 @@ import pickle
 import logging
 import copy
 
-from cstr.external_sim.sim import CSTREnv
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 class BaseCSTR(Teacher):
     def __init__(self):
@@ -19,27 +23,19 @@ class BaseCSTR(Teacher):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control'
-        self.history_path = './cstr/multiple_skills_perceptor/history.pkl'
+        self.history_path = f"{PATH_HISTORY}/history.pkl"
         self.plot = False
         self.metrics = 'none' #standard, fast, none
 
         self.y = 0
-        #self.ml_model = pickle.load(open('./cstr/multiple_skills_perceptor/ml_models/ml_predict_temperature.pkl', 'rb'))
         self.ML_list = []
-
-        #self.sim = CSTREnv()
-        #self.sim.scenario = Scenario({
-        #    "Cref_signal": "complete",
-        #    "noise_percentage": 0.05
-        #})
-        #obs, info = self.sim.reset()
 
         if self.plot:
             plt.close("all")
             plt.figure(figsize=(7,5))
             plt.title(self.title)
             plt.ion()
-        
+
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
@@ -47,25 +43,27 @@ class BaseCSTR(Teacher):
                 self.plot_metrics()
         except:
             self.df = pd.DataFrame()
-        
+
     def transform_obs(self, obs, action):
         return obs
 
     def transform_action(self, transformed_obs, action):
         self.ΔTc = action[0]
+
         if type(transformed_obs) == dict:
-            #file = open('read.txt', 'w') 
-            #file.write(str(transformed_obs)) 
-            #file.close() 
-            y = transformed_obs['thermal_runaway_predict']
+            if 'observation' in list(transformed_obs.keys()):
+                transformed_obs = transformed_obs['observation']
+                y = transformed_obs[5]
+            else:
+                y = transformed_obs['thermal_runaway_predict']
         else:
-            y = transformed_obs[0]
-            
+            y = transformed_obs[5]
+
         # Smart Constraints - ML
         if y == 1 :
             ###self.ML_list.append(self.count)
             self.ΔTc -= 0.1 * abs(self.ΔTc) * np.sign(self.ΔTc)
-        
+
         action = np.array([self.ΔTc])
         return action
 
@@ -75,17 +73,17 @@ class BaseCSTR(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
-        
-        error = (transformed_obs['Cref'] - transformed_obs['Ca'])**2
+
+        error = (float(transformed_obs['Cref']) - float(transformed_obs['Ca']))**2
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
         self.rms_history.append(rms)
         # minimize rms error
-        reward = 1 / rms
+        reward = 1 / error
         self.reward_history.append(reward)
 
         self.count += 1
@@ -93,7 +91,7 @@ class BaseCSTR(Teacher):
         # history metrics
         df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(self.history_path)  
+        self.df.to_pickle(self.history_path)
 
         return reward
 
@@ -104,7 +102,7 @@ class BaseCSTR(Teacher):
         success = False
         if self.obs_history is None:
             success = False
-        else: 
+        else:
             success = len(self.obs_history) > 100
             if self.metrics == 'standard':
                 try:
@@ -112,12 +110,12 @@ class BaseCSTR(Teacher):
                     self.plot_metrics()
                 except Exception as e:
                     print('Error: ', e)
-        
+
         return success
 
     def compute_termination(self, transformed_obs, action):
         return False
-    
+
     def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
         plt.clf()
@@ -127,7 +125,7 @@ class BaseCSTR(Teacher):
         plt.ylabel('Reward')
         plt.legend(['reward'],loc='best')
         plt.title('Metrics')
-        
+
         plt.subplot(3,1,2)
         plt.plot(self.rms_history, 'r.-')
         plt.scatter(self.df.reset_index()['time'],self.df.reset_index()['rms'],s=0.5, alpha=0.2)
@@ -140,7 +138,7 @@ class BaseCSTR(Teacher):
         plt.ylabel('Ca')
         plt.legend(['Ca'],loc='best')
         plt.xlabel('iteration')
-        
+
         plt.draw()
         plt.pause(0.001)
 
@@ -168,7 +166,7 @@ class BaseCSTR(Teacher):
         plt.ylabel('T (K)')
         plt.xlabel('Time (min)')
         plt.legend(['Temperature Setpoint','Reactor Temperature'],loc='best')
-        
+
         plt.draw()
         plt.pause(0.001)
 
@@ -184,7 +182,7 @@ class SS1Teacher(BaseCSTR):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control - SS1 skill'
-        self.history_path = './cstr/multiple_skills_perceptor/ss1_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/ss1_history.pkl"
         self.plot = False
         self.metrics = 'none' #standard, fast, none
 
@@ -193,7 +191,7 @@ class SS1Teacher(BaseCSTR):
             plt.figure(figsize=(7,5))
             plt.title(self.title)
             plt.ion()
-        
+
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
@@ -201,8 +199,8 @@ class SS1Teacher(BaseCSTR):
                 self.plot_metrics()
         except:
             self.df = pd.DataFrame()
-            
-    
+
+
 
 
 class SS2Teacher(BaseCSTR):
@@ -216,7 +214,7 @@ class SS2Teacher(BaseCSTR):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control - SS2 skill'
-        self.history_path = './cstr/multiple_skills_perceptor/ss2_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/ss2_history.pkl"
         self.plot = False
         self.metrics = 'none' #standard, fast, none
 
@@ -225,7 +223,7 @@ class SS2Teacher(BaseCSTR):
             plt.figure(figsize=(7,5))
             plt.title(self.title)
             plt.ion()
-        
+
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
@@ -248,7 +246,7 @@ class TransitionTeacher(BaseCSTR):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control - Transition skill'
-        self.history_path = './cstr/multiple_skills_perceptor/transition_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/transition_history.pkl"
         self.plot = False
         self.metrics = 'none' #standard, fast, none
 
@@ -257,7 +255,7 @@ class TransitionTeacher(BaseCSTR):
             plt.figure(figsize=(7,5))
             plt.title(self.title)
             plt.ion()
-        
+
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
@@ -277,7 +275,7 @@ class CSTRTeacher(BaseCSTR):
         self.last_reward = 0
         self.count = 0
         self.title = 'CSTR Live Control - Selector skill'
-        self.history_path = './cstr/multiple_skills_perceptor/selector_history.pkl'
+        self.history_path = f"{PATH_HISTORY}/selector_history.pkl"
         self.plot = False
         self.metrics = 'none' #standard, fast, none
 
@@ -286,7 +284,7 @@ class CSTRTeacher(BaseCSTR):
             plt.figure(figsize=(7,5))
             plt.title(self.title)
             plt.ion()
-        
+
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
@@ -298,6 +296,6 @@ class CSTRTeacher(BaseCSTR):
     def transform_action(self, transformed_obs, action):
         return action
 
-    
+
 
 

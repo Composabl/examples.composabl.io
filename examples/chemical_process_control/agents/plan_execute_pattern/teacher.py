@@ -37,11 +37,12 @@ class CSTRTeacher(Teacher):
     def transform_action(self, transformed_obs, action):
         if type(transformed_obs) == dict:
             if 'observation' in list(transformed_obs.keys()):
-                transformed_obs = transformed_obs['observation'][0]
+                transformed_obs = transformed_obs['observation']
                 #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
                 MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2],
                                                         transformed_obs[0], transformed_obs[1] + action[0])
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
+                dTc_MPC = 0
             else:
                 #Import MPC
                 MPC_Tc = mpc(0, float(transformed_obs['Cref']), float(transformed_obs['Ca']),
@@ -53,7 +54,6 @@ class CSTRTeacher(Teacher):
             MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2],
                                                     transformed_obs[0], transformed_obs[1] + action[0])
             dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
-
 
         #limit MPC actions between -10 and 10 degrees Celsius
         dTc_MPC = np.clip(dTc_MPC,-10,10)
