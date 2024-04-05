@@ -1,40 +1,22 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from config import config
 from composabl_core.grpc.client.client import make
-
 import pandas as pd
 import matplotlib.pyplot as plt
-
-from utils.cleanup import cleanup_folder
-from utils.config import generate_config
-
-license_key = os.environ["COMPOSABL_LICENSE"]
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
+PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
 DELETE_OLD_HISTORY_FILES: bool = True
 
 def start():
-    DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
-
-    config = generate_config(
-        license_key=license_key,
-        target="docker",
-        image=DOCKER_IMAGE,
-        env_name="sim-cstr",
-        workers=1,
-        num_gpus=0,
-    )
-
-    # Remove unused files from path (mac only)
-    cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
-
     # Start Runtime
     runtime = Runtime(config)
 
@@ -45,20 +27,20 @@ def start():
     trained_agent = runtime.package(agent)
 
     # Inference
-    print("Creating Environment")
+    #"Creating Environment"
     sim = make(
         "run-benchmark",
         "sim-benchmark",
         "",
         "localhost:1337",
         {
-            "render_mode": "rgb_array"
+            "render_mode": "rgb_array",
         },
     )
 
-    print("Initializing Environment")
+    #"Initializing Environment"
     sim.init()
-    print("Initialized")
+    #"Initialized"
 
     noise = 0.0
     sim.set_scenario(Scenario({
@@ -66,7 +48,7 @@ def start():
             "noise_percentage": noise
         }))
     df = pd.DataFrame()
-    print("Resetting Environment")
+    #"Resetting Environment"
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
@@ -77,7 +59,6 @@ def start():
         if done:
             break
 
-    print("Closing")
     sim.close()
 
     # save history data
@@ -89,7 +70,7 @@ def start():
     plt.plot(df.reset_index()['time'],df.reset_index()['Tc'])
     plt.ylabel('Tc')
     plt.legend(['reward'],loc='best')
-    plt.title('Agent Inference Multiple Learned Skills' + f" - Noise: {noise}")
+    plt.title('Agent Inference DRL' + f" - Noise: {noise}")
 
     plt.subplot(3,1,2)
     plt.plot(df.reset_index()['time'],df.reset_index()['T'])
@@ -104,7 +85,7 @@ def start():
     plt.ylabel('Concentration')
     plt.xlabel('iteration')
 
-    plt.savefig(f"{PATH}/img/inference_figure.png")
+    plt.savefig(f"{PATH_BENCHMARKS}/inference_figure.png")
 
 
 if __name__ == "__main__":

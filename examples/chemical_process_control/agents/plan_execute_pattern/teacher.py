@@ -44,9 +44,9 @@ class CSTRTeacher(Teacher):
                 dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
             else:
                 #Import MPC
-                MPC_Tc = mpc(0, transformed_obs['Cref'], transformed_obs['Ca'],
-                                                        transformed_obs['T'], transformed_obs['Tc'] + action[0])
-                dTc_MPC = MPC_Tc[0][0] - transformed_obs['Tc']
+                MPC_Tc = mpc(0, float(transformed_obs['Cref']), float(transformed_obs['Ca']),
+                                                        float(transformed_obs['T']), float(transformed_obs['Tc']) + action[0])
+                dTc_MPC = MPC_Tc[0][0] - float(transformed_obs['Tc'])
 
         else:
             #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
@@ -57,7 +57,7 @@ class CSTRTeacher(Teacher):
 
         #limit MPC actions between -10 and 10 degrees Celsius
         dTc_MPC = np.clip(dTc_MPC,-10,10)
-        action = dTc_MPC
+        action = [dTc_MPC]
 
         return action
 
@@ -67,13 +67,13 @@ class CSTRTeacher(Teacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
-        reward = math.e ** (-abs(transformed_obs['Cref'] - transformed_obs['Ca']))
+        reward = math.e ** (-abs(float(transformed_obs['Cref']) - float(transformed_obs['Ca'])))
 
-        error = (transformed_obs['Cref'] - transformed_obs['Ca'])**2
+        error = (float(transformed_obs['Cref']) - float(transformed_obs['Ca']))**2
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
         self.last_reward = reward
@@ -99,7 +99,7 @@ class CSTRTeacher(Teacher):
                 except Exception as e:
                     print('Error: ', e)
 
-            return len(self.obs_history) > 100
+            return False
 
     def compute_termination(self, transformed_obs, action):
         return False

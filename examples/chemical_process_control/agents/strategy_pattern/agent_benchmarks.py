@@ -1,50 +1,30 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from composabl_core.grpc.client.client import make
-
+from config import config
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils.cleanup import cleanup_folder
-from utils.config import generate_config
-
-license_key = os.environ["COMPOSABL_LICENSE"]
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
-
-
-DOCKER_IMAGE: str = "composabl/sim-cstr:latest"
-
-config = generate_config(
-    license_key=license_key,
-    target="docker",
-    image=DOCKER_IMAGE,
-    env_name="sim-cstr",
-    workers=1,
-    num_gpus=0,
-)
-
-# Remove unused files from path (mac only)
-cleanup_folder(PATH_CHECKPOINTS, ".DS_Store")
+PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
 # Start Runtime
 runtime = Runtime(config)
-directory = PATH_CHECKPOINTS
 
 # Load the pre trained agent
-agent = Agent.load(directory)
+agent = Agent.load(PATH_CHECKPOINTS)
 
 # Prepare the loaded agent for inference
 trained_agent = runtime.package(agent)
 
 # Inference
-print("Creating Environment")
 sim = make(
     "run-benchmark",
     "sim-benchmark",
@@ -55,9 +35,7 @@ sim = make(
     },
 )
 
-print("Initializing Environment")
 sim.init()
-print("Initialized")
 
 noise = 0.05
 sim.set_scenario(Scenario({
@@ -66,7 +44,7 @@ sim.set_scenario(Scenario({
     }))
 df = pd.DataFrame()
 
-for i in range(100):
+for i in range(10):
     obs, info= sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
@@ -77,7 +55,6 @@ for i in range(100):
         if done:
             break
 
-print("Closing")
 sim.close()
 
 # calculate error
@@ -112,4 +89,4 @@ plt.plot([i for i in range(90)],Cref_list,'k--',lw=2,label=r'$C_{sp}$')
 plt.plot([i for i in range(90)],mean_Cr,'b.-',lw=1,label=r'$C_{sp}$')
 plt.ylabel('Concentration')
 
-plt.savefig(f"{PATH}/img/benchmark_figure.png")
+plt.savefig(f"{PATH_BENCHMARKS}/benchmark_figure.png")

@@ -4,12 +4,8 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from composabl_core.grpc.client.client import make
-from controller import MPCController
-from sensors import sensors
 from config import config
-from scenarios import reaction_scenarios
-
+from composabl_core.grpc.client.client import make
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -18,39 +14,44 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
+DELETE_OLD_HISTORY_FILES: bool = True
+
 def start():
-    reaction_skill = Skill("reaction", MPCController)
-    for scenario_dict in reaction_scenarios:
-        reaction_skill.add_scenario(Scenario(scenario_dict))
-
+    # Start Runtime
     runtime = Runtime(config)
-    agent = Agent()
-    agent.add_sensors(sensors)
 
-    agent.add_skill(reaction_skill)
+    # Load the pre trained agent
+    agent = Agent.load(PATH_CHECKPOINTS)
+
+    # Prepare the loaded agent for inference
+    trained_agent = runtime.package(agent)
 
     # Inference
-    noise = 0.0
-    cont = MPCController()
+    #"Creating Environment"
     sim = make(
         "run-benchmark",
         "sim-benchmark",
         "",
         "localhost:1337",
         {
-            "render_mode": "rgb_array"
+            "render_mode": "rgb_array",
         },
     )
+
+    #"Initializing Environment"
     sim.init()
+    #"Initialized"
+
+    noise = 0.0
     sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
         }))
     df = pd.DataFrame()
+    #"Resetting Environment"
     obs, info= sim.reset()
-
-    for i in range(90-1):
-        action = cont.compute_action(obs)
+    for i in range(90):
+        action = trained_agent.execute(obs)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
@@ -59,6 +60,7 @@ def start():
             break
 
     sim.close()
+
     # save history data
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
 
@@ -68,7 +70,7 @@ def start():
     plt.plot(df.reset_index()['time'],df.reset_index()['Tc'])
     plt.ylabel('Tc')
     plt.legend(['reward'],loc='best')
-    plt.title('Agent Inference Linear MPC' + f" - Noise: {noise}")
+    plt.title('Agent Inference DRL' + f" - Noise: {noise}")
 
     plt.subplot(3,1,2)
     plt.plot(df.reset_index()['time'],df.reset_index()['T'])

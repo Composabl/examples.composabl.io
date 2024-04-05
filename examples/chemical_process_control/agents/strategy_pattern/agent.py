@@ -51,7 +51,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=120)
+    runtime.train(agent, train_iters=2)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

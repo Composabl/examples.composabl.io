@@ -21,14 +21,18 @@ class BaseCSTR(Teacher):
         self.history_path = f"{PATH_HISTORY}/history.pkl"
         self.metrics = 'none' #standard, fast, none
 
+        # Create history folder if it doesn't exist
+        if not os.path.exists(PATH_HISTORY):
+            os.mkdir(PATH_HISTORY)
+
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
+
             if self.metrics == 'fast':
                 self.plot_metrics()
-        except:
+        except Exception:
             self.df = pd.DataFrame()
-
 
     def transform_obs(self, obs, action):
         return obs
@@ -51,8 +55,8 @@ class BaseCSTR(Teacher):
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
         self.rms_history.append(rms)
-        # minimize rms error
-        #reward = 1 / rms
+
+        # minimize error
         if error == 0:
             reward = float(1/(math.sqrt(error + 0.00000000001)))
         else:
@@ -62,9 +66,10 @@ class BaseCSTR(Teacher):
         self.count += 1
 
         # history metrics
-        df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(self.history_path)
+        if self.metrics != 'none':
+            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(self.history_path)
 
         return reward
 
@@ -76,7 +81,6 @@ class BaseCSTR(Teacher):
         if self.obs_history is None:
             success = False
         else:
-            success = len(self.obs_history) > 100
             if self.metrics == 'standard':
                 try:
                     self.plot_obs()
@@ -147,14 +151,14 @@ class SS1Teacher(BaseCSTR):
         super().__init__()
         self.title = 'CSTR Live Control - SS1 skill'
         self.history_path = f"{PATH_HISTORY}/ss1_history.pkl"
-        self.metrics = 'fast' #standard, fast, none
 
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
+
             if self.metrics == 'fast':
                 self.plot_metrics()
-        except:
+        except Exception:
             self.df = pd.DataFrame()
 
     def compute_reward(self, transformed_obs, action, sim_reward):
@@ -169,35 +173,38 @@ class SS1Teacher(BaseCSTR):
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
         self.rms_history.append(rms)
-        # minimize rms error
+
+        # minimize error
         reward = 1 / rms
         self.reward_history.append(reward)
 
         self.count += 1
 
         # history metrics
-        df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(self.history_path)
+        if self.metrics != 'none':
+            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(self.history_path)
 
         return reward
 
     def compute_termination(self, transformed_obs, action):
         return False
+
 
 class SS2Teacher(BaseCSTR):
     def __init__(self):
         super().__init__()
         self.title = 'CSTR Live Control - SS2 skill'
         self.history_path = f"{PATH_HISTORY}/ss2_history.pkl"
-        self.metrics = 'fast' #standard, fast, none
 
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
+
             if self.metrics == 'fast':
                 self.plot_metrics()
-        except:
+        except Exception:
             self.df = pd.DataFrame()
 
     def compute_reward(self, transformed_obs, action, sim_reward):
@@ -212,34 +219,36 @@ class SS2Teacher(BaseCSTR):
         self.error_history.append(error)
         rms = math.sqrt(np.mean(self.error_history))
         self.rms_history.append(rms)
-        # minimize rms error
+        # minimize error
         reward = 1 / rms
         self.reward_history.append(reward)
 
         self.count += 1
 
         # history metrics
-        df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-        self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(self.history_path)
+        if self.metrics != 'none':
+            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
+            self.df = pd.concat([self.df, df_temp])
+            self.df.to_pickle(self.history_path)
 
         return reward
 
     def compute_termination(self, transformed_obs, action):
         return False
+
 class TransitionTeacher(BaseCSTR):
     def __init__(self):
         super().__init__()
         self.title = 'CSTR Live Control - Transition skill'
         self.history_path = f"{PATH_HISTORY}/transition_history.pkl"
-        self.metrics = 'fast' #standard, fast, none
 
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
+
             if self.metrics == 'fast':
                 self.plot_metrics()
-        except:
+        except Exception:
             self.df = pd.DataFrame()
 
 class CSTRTeacher(BaseCSTR):
@@ -265,7 +274,8 @@ class CSTRTeacher(BaseCSTR):
         # create metrics db
         try:
             self.df = pd.read_pickle(self.history_path)
+
             if self.metrics == 'fast':
                 self.plot_metrics()
-        except:
+        except Exception:
             self.df = pd.DataFrame()

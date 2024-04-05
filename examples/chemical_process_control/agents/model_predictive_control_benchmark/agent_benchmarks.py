@@ -1,52 +1,23 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from controller import MPCController
-
+from sensors import sensors
+from config import config
+from scenarios import reaction_scenarios
 from cstr.external_sim.sim import CSTREnv
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-license_key = os.environ["COMPOSABL_LICENSE"]
-
 
 def start():
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
-
-    sensors = [T, Tc, Ca, Cref, Tref]
-
-    # Cref_signal is a configuration variable for Concentration and Temperature setpoints
-    reaction_scenarios = [
-        {
-            "Cref_signal": "complete",
-            "noise_percentage": 0.01
-        }
-    ]
-
     reaction_skill = Skill("reaction", MPCController)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
-
-    config = {
-        "license": license_key,
-        "target": {
-            "local": {
-            "address": "localhost:1337"
-            }
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-
-        "flags": {
-            "print_debug_info": True
-        },
-    }
 
     runtime = Runtime(config)
     agent = Agent()
