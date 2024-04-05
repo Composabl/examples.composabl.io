@@ -1,2 +1,0 @@
-composabl-core==0.6.3
-scipy
