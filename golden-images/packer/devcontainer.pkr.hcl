@@ -19,7 +19,7 @@ variables {
     ssh_password = "composabl"
 
     version_python = "3.11.8"
-    version_pip_composabl = "0.7.0"
+    version_pip_composabl = "0.6.3"
 
     docker_repository = ""
     docker_username = ""
