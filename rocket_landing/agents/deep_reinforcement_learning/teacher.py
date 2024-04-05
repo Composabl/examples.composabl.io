@@ -1,3 +1,8 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from composabl import Teacher
 import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt, rc
@@ -7,6 +12,10 @@ from IPython.display import display
 import math
 import numpy as np
 import pandas as pd
+
+PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY: str = f"{PATH}/history"
+PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 class NavigationTeacher(Teacher):
     def __init__(self):
@@ -31,7 +40,7 @@ class NavigationTeacher(Teacher):
 
         # create metrics db
         try:
-            self.df = pd.read_pickle('./starship/history.pkl')
+            self.df = pd.read_pickle(f"{PATH_HISTORY}/history.pkl")
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
