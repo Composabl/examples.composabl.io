@@ -1,38 +1,17 @@
-# Composabl Examples
+# Composabl Platform for Industrial-Strength Intelligent Agents
+Composabl is a function orchestrator for creating intelligent agents from any Python algorithm or machine learning model.
 
-This repository holds different examples for how you can get started with the Composabl SDK!
+We provide three on-ramps to get started with Composabl:
 
-## Structure
+## :motorway: Try
 
-- **agents/:** holds examples on how to train an agent
-- **simulators/:** holds examples on how to create a custom simulator
-- **docker/:** scripts used to create a dev container
+1. Set up the environment and start training your first agent in 2 minutes or less.
+2. Build one of our project agents from scratch in a 30 minute tutorial.
 
-## Getting Started
+## :motorway: Learn
 
-You can get started with an example by following the commands below:
+Follow along with the Machine Teaching methodology to build and test one of our project agents from scratch (30 minutes).
 
-```bash
-# Start the historian
-composabl historian start
+## :motorway: Build
 
-# Start a sim
-# e.g., composabl sim start sim-demo
-composabl sim start sim-NAME
-
-# Train an agent
-# e.g., poetry run demo
-cd agents/
-export COMPOSABL_LICENSE="<YOUR_KEY>"
-python cstr/agent.py
-```
-
-## Codespaces (Devcontainer)
-
-A Codespace is available for use to test out the Composabl SDK. Just click the Code -> Codespaces -> + button
-
-![](./images/demo-codespace.png)
-
-## More Info
-
-You can find more info on the Composabl SDK on our [Documentation](https://docs.composabl.io)
+Jump right in and start building with the Composabl Python SDK. Refer back to our advanced project example, build an agent, test it and appear on our leaderboard!
