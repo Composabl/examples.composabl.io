@@ -18,7 +18,7 @@ variables {
     ssh_username = "composabl"
     ssh_password = "composabl"
 
-    version_python = "3.11.8"
+    version_python = "3.9.8"
     version_pip_composabl = "0.6.3"
 
     docker_repository = ""
@@ -32,7 +32,7 @@ source "docker" "ubuntu" {
     # bookworm = 12
     # bullseye = 11
     # buster = 10
-    image = "python:3.11-bookworm"
+    image = "python:3.9-bookworm"
     commit = true
 
     # Run the bash terminal as default (it's a devcontainer)
