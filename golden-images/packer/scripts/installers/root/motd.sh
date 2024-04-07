@@ -18,10 +18,14 @@ cat << 'EOF' > /etc/update-motd.d/01-custom.txt
 👋 Welcome to the Composabl Dev Image!
 It includes everything to provide demonstrations around the Composabl SDK.
 
-📚 If you are looking for the Composabl documentation, head over to https://docs.composabl.com.
+🔑 Request a License at https://forms.microsoft.com/r/SLFGXm1Ggp and configure it with
+`export COMPOSABL_LICENSE="YOUR_KEY"`.
 
-🎓 If you are looking to run the Composabl quickstarts and tutorials, head over to
-https://github.com/Composabl/examples.composabl.io instead.
+Next things to do:
+- 📄 Approve the EULA: `export COMPOSABL_EULA_AGREED=1`
+- 📚 Read Documentation: https://docs.composabl.com.
+- 🎓 Explore Quickstarts: https://github.com/Composabl/examples.composabl.io
+- 🚀 Run your first Agent: `cd agents/cstr/deep_reinforcement_learning/; python agent.py`
 EOF
 
 # Make the printer
