@@ -10,4 +10,5 @@ echo "Running devcontainer.sh"
 # pip list | grep nvidia | awk '{print $1}' | xargs pip uninstall -y
 
 # Install PyTorch CPU
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cpu
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
