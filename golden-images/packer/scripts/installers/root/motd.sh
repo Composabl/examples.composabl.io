@@ -26,6 +26,7 @@ Next things to do:
 - 📚 Read Documentation: https://docs.composabl.com.
 - 🎓 Explore Quickstarts: https://github.com/Composabl/examples.composabl.io
 - 🚀 Run your first Agent: `cd agents/cstr/deep_reinforcement_learning/; python agent.py`
+
 EOF
 
 # Make the printer
