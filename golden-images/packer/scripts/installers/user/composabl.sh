@@ -8,5 +8,9 @@ echo "Running composabl.sh"
 # Install the composabl package
 pip install composabl==${VERSION_PIP_COMPOSABL}
 
+# Remove PyTorch and Reinstall with only CPU Support
+# Note: we do this as the disk space is limited and we don't need GPU support for testing
+pip list | grep nvidia | awk '{print $1}' | xargs pip uninstall -y
+
 # Install the composabl examples repo
 git clone https://github.com/Composabl/examples.composabl.io.git /home/${SSH_USER}/examples.composabl.io
