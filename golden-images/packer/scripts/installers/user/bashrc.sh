@@ -16,6 +16,9 @@ cd /home/${SSH_USER}/examples.composabl.io
 echo "Accepting the EULA automatically for you..."
 echo "note: you can always unset this variable with 'unset COMPOSABL_EULA_AGREED'"
 export COMPOSABL_EULA_AGREED=1
+
+# Start Docker
+sudo service docker start
 EOF
 
 cat << 'EOF' >> /home/${SSH_USER}/.zshrc
@@ -29,6 +32,9 @@ cd /home/${SSH_USER}/examples.composabl.io
 echo "Accepting the EULA automatically for you..."
 echo "note: you can always unset this variable with 'unset COMPOSABL_EULA_AGREED'"
 export COMPOSABL_EULA_AGREED=1
+
+# Start Docker
+sudo service docker start
 EOF
 
 
