@@ -39,10 +39,10 @@ async def start():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    await runtime.train(agent, train_iters=10)
+    runtime.train(agent, train_iters=2)
 
     # Save the trained agent
-    agent.export(PATH_CHECKPOINTS)
+    #agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
