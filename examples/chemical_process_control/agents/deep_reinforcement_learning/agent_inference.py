@@ -1,8 +1,7 @@
 import os
 import sys
-import asyncio
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 
@@ -19,11 +18,11 @@ import matplotlib.pyplot as plt
 #print('PATH: ', os.path.join(os.path.dirname(__file__), "..", "checkpoints"))
 PATH = os.path.dirname(os.path.realpath(__file__))
 #PATH_HISTORY = f"{PATH}/history"
-PATH_CHECKPOINTS = os.path.join(os.path.dirname(__file__), "..", "checkpoints")
-
+#PATH_CHECKPOINTS = os.path.join(os.path.dirname(__file__), "..", "checkpoints")
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 DELETE_OLD_HISTORY_FILES: bool = True
 
-async def start():
+def start():
     # Start Runtime
     runtime = Runtime(config)
 
@@ -32,7 +31,7 @@ async def start():
     agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
-    trained_agent = await runtime.package(agent)
+    trained_agent = runtime.package(agent)
 
     # Inference
     print("Creating Environment")
@@ -57,10 +56,10 @@ async def start():
         }))
     df = pd.DataFrame()
     print("Resetting Environment")
-    obs, info = await sim.reset()
+    obs, info = sim.reset()
     for i in range(90):
-        action = await trained_agent.execute(obs)
-        obs, reward, done, truncated, info = await sim.step(action)
+        action = trained_agent.execute(obs)
+        obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
 
@@ -68,7 +67,7 @@ async def start():
             break
 
     print("Closing")
-    await sim.close()
+    sim.close()
 
     # save history data
     #df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
@@ -94,9 +93,8 @@ async def start():
     plt.ylabel('Concentration')
     plt.xlabel('iteration')
 
-    plt.savefig(f"{PATH}/img/inference_figure.png")
+    plt.savefig(f"{PATH}/benchmarks/inference_figure.png")
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start())
+    start()
