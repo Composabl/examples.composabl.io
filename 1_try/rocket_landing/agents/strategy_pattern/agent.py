@@ -4,37 +4,22 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from config import config
 from sensors import sensors
+from config import config
 from scenarios import Navigation_scenarios
-from teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher,
-                     StabilizationTeacher)
+from teacher import (AlignmentTeacher, SelectorTeacher, SpeedControlTeacher, StabilizationTeacher,NavigationTeacher)
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
 PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
-def selector(x, y, angle, angle_speed):
-    if abs(x) > 100 or y > 500:
-        return "Navigation_skill"
-
-    elif abs(angle) > 0.1 or abs(angle_speed) > 0.1:
-        return "Stabilization_skill"
-
-    elif y > 100:
-        return "Alignment_skill"
-
-    else:
-        return "SpeedControl_skill"
-
-
 def run_agent():
-    # Define Skills
+    # delete old history files
+    Stabilization_skill = Skill("Stabilization", StabilizationTeacher)
     Navigation_skill = Skill("Navigation", NavigationTeacher)
     Alignment_skill = Skill("Alignment", AlignmentTeacher)
     SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher)
-    Stabilization_skill = Skill("Stabilization", StabilizationTeacher)
-    selector_skill = Skill("selector", NavigationTeacher)
+    selector_skill = Skill("selector", SelectorTeacher)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
@@ -49,10 +34,10 @@ def run_agent():
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
+    agent.add_skill(Stabilization_skill)
     agent.add_skill(Alignment_skill)
     agent.add_skill(SpeedControl_skill)
-    agent.add_skill(Stabilization_skill)
-    agent.add_selector_skill(selector_skill, [Navigation_skill, Alignment_skill], fixed_order=True)
+    agent.add_selector_skill(selector_skill, [Stabilization_skill, Alignment_skill], fixed_order=False, fixed_order_repeat=False)
 
     # Load a pre-trained agent
     try:

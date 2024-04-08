@@ -24,12 +24,12 @@ class DRLMPCTeacher(Teacher):
         self.plot = True
         self.metrics = 'fast' #standard, fast
 
-        with open('./starship/data/data_mpc.pkl', 'rb') as file:
+        with open('./data/data_mpc.pkl', 'rb') as file:
             self.mpc_values = pickle.load(file)
         file.close()
 
-        self.a_model = pickle.load(open('./starship/data/angle_model.pkl', 'rb'))
-        self.t_model = pickle.load(open('./starship/data/thrust_model.pkl','rb'))
+        self.a_model = pickle.load(open('./data/angle_model.pkl', 'rb'))
+        self.t_model = pickle.load(open('./data/thrust_model.pkl','rb'))
 
         if not self.plot:
             plt.close("all")
@@ -38,7 +38,7 @@ class DRLMPCTeacher(Teacher):
 
         # create metrics db
         try:
-            self.df = pd.read_pickle('./starship/mpc_history.pkl')
+            self.df = pd.read_pickle('./mpc_history.pkl')
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
@@ -106,7 +106,7 @@ class DRLMPCTeacher(Teacher):
                                data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
                                       transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./starship/mpc_history.pkl")
+        self.df.to_pickle("./history/mpc_history.pkl")
 
         return reward
 
