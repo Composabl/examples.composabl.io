@@ -76,6 +76,8 @@ class CSTRTeacher(Teacher):
     async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             success = False
+        #elif self.count > 10:
+        #    success = True
         else:
             success = False
             if self.metrics == 'standard':
