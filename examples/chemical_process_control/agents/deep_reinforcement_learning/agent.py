@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Skill
 from sensors import sensors
-from config import config
+from config import config, config_kub
 from scenarios import reaction_scenarios
 from teacher import CSTRTeacher
 
@@ -39,7 +39,7 @@ async def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    runtime.train(agent, train_iters=5)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

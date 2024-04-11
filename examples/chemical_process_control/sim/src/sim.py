@@ -35,7 +35,7 @@ class CSTREnv(gym.Env):
 
 
     def reset(self):
-        print("Scenario before: ", self.scenario, self.noise_percentage)
+        #print("Scenario before: ", self.scenario, self.noise_percentage)
         # Define scenario in the simulation
         if isinstance(self.scenario, Scenario):
             sample = self.scenario.sample()
@@ -45,7 +45,7 @@ class CSTREnv(gym.Env):
 
         noise_percentage = self.noise_percentage
 
-        print("Scenario after: ", self.scenario, self.noise_percentage)
+        #print("Scenario after: ", self.scenario, self.noise_percentage)
 
         # initial conditions
         Ca0: float = 8.5698  # kmol/m3

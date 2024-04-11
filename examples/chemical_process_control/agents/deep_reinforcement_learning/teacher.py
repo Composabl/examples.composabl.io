@@ -34,9 +34,11 @@ class CSTRTeacher(Teacher):
             self.df = pd.DataFrame()
 
     async def transform_obs(self, obs, action):
+        #print('OBS: ', obs)
         return obs
 
     async def transform_action(self, transformed_obs, action):
+        #print('Trans Action obs: ', transformed_obs)
         return action
 
     async def filtered_observation_space(self):

@@ -1,19 +1,28 @@
+from asyncore import loop
 import os
+import sys
+import asyncio
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from sensors import sensors
+from config import config
 from perceptors import perceptors
 
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
 
-license_key = os.environ["COMPOSABL_LICENSE"]
+from composabl import SkillController
 
-from composabl import Controller
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
-class ProgrammedSelector(Controller):
+class ProgrammedSelector(SkillController):
     def __init__(self):
         self.counter = 0
 
-    def compute_action(self, obs):
+    async def compute_action(self, obs):
         if self.counter < 22:
             action = [0]
         elif self.counter < 74 : #transition
@@ -25,38 +34,22 @@ class ProgrammedSelector(Controller):
 
         return action
 
-    def transform_obs(self, obs):
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.counter > 100:
             return True
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 
 
-def start():
-    # delete old history files
-    dir = './cstr/multiple_skills_perceptor'
-    files = os.listdir(dir)
-    pkl_files = [file for file in files if file.endswith('.pkl')]
-    for file in pkl_files:
-        file_path = os.path.join(dir, file)
-        os.remove(file_path)
-
-    T = Sensor("T", "")
-    Tc = Sensor("Tc", "")
-    Ca = Sensor("Ca", "")
-    Cref = Sensor("Cref", "")
-    Tref = Sensor("Tref", "")
-
-    sensors = [T, Tc, Ca, Cref, Tref]
-
+async def start():
     # Cref_signal is a configuration variable for Concentration and Temperature setpoints
     ss1_scenarios = [
         {
@@ -98,30 +91,6 @@ def start():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    config = {
-        "license": license_key,
-        "target": {
-            "docker": {
-                "image": "composabl/sim-cstr:latest"
-            },
-            #"local": {
-            #    "address": "localhost:1337"
-            #}
-        },
-        "env": {
-            "name": "sim-cstr",
-        },
-        "runtime": {
-            "ray": {
-                "workers": 4
-            }
-        },
-
-        "flags": {
-            "print_debug_info": True
-        }
-    }
-
     runtime = Runtime(config)
     agent = Agent()
     agent.add_sensors(sensors)
@@ -131,8 +100,6 @@ def start():
     agent.add_skill(ss2_skill)
     agent.add_skill(transition_skill)
     agent.add_selector_skill(selector_skill, [ss1_skill, transition_skill, ss2_skill], fixed_order=False, fixed_order_repeat=False)
-
-    checkpoint_path = './cstr/multiple_skills_perceptor/saved_agents/'
 
     try:
         files = os.listdir(PATH_CHECKPOINTS)
@@ -148,11 +115,12 @@ def start():
         os.mkdir(PATH_CHECKPOINTS)
 
     # train agent
-    runtime.train(agent, train_iters=10)
+    runtime.train(agent, train_iters=3)
 
     # save agent
-    agent.export(checkpoint_path)
+    agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start())
