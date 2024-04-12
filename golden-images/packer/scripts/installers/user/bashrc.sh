@@ -19,6 +19,9 @@ export COMPOSABL_EULA_AGREED=1
 
 # Start Docker
 sudo service docker start
+
+# Ensure the bin location is added to the PATH
+export PATH=$PATH:~/.local.bin
 EOF
 
 cat << EOF >> /home/${SSH_USER}/.zshrc
@@ -35,6 +38,9 @@ export COMPOSABL_EULA_AGREED=1
 
 # Start Docker
 sudo service docker start
+
+# Ensure the bin location is added to the PATH
+export PATH=$PATH:~/.local.bin
 EOF
 
 
