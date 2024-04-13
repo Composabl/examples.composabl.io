@@ -18,7 +18,7 @@ class CSTRTeacher(Teacher):
         self.rms_history = []
         self.last_reward = 0
         self.count = 0
-        self.metrics = 'none' # standard, fast, none
+        self.metrics = 'standard' # standard, fast, none
 
         # Create history folder if it doesn't exist
         if not os.path.exists(PATH_HISTORY):

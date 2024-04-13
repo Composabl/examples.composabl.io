@@ -1,7 +1,11 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from composabl import Perceptor, PerceptorImpl
 import pickle
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -13,9 +17,11 @@ class ThermalRunawayPredict(PerceptorImpl):
         self.ML_list = []
         self.last_Tc = 0
 
-    def compute(self, obs):
+    async def compute(self, obs_spec, obs):
         #get the action - add action to perception
-        #self.ΔTc = action[0]
+        if type(obs) != dict:
+            obs = dict(map( lambda i,j: (i,j), [s.name for s in sensors], obs))
+
         if self.last_Tc == 0:
             self.ΔTc = 5
         else:
@@ -23,10 +29,11 @@ class ThermalRunawayPredict(PerceptorImpl):
 
         y = 0
 
-        if obs['T'] >= 340:
+        #print('OBS: ', obs)
+        if float(obs['T']) >= 340:
             X = [[float(obs['Ca']), float(obs['T']), float(obs['Tc']), self.ΔTc]]
             y = self.ml_model.predict(X)[0]
-            #print(self.ml_model.predict_proba(X))
+            #print('ML PROB: ',self.ml_model.predict_proba(X))
             if self.ml_model.predict_proba(X)[0][1] >= 0.3:
                 y = 1
                 self.y = y
