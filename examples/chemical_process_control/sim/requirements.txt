@@ -1,0 +1,2 @@
+composabl-core-dev==0.7.3.dev10
+scipy
