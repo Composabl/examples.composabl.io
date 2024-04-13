@@ -21,7 +21,7 @@ class DRLMPCTeacher(Teacher):
         self.a = -3.14/2
         self.count = 0
         self.cnt_mpc = 0
-        self.plot = True
+        self.plot = False
         self.metrics = 'fast' #standard, fast
 
         with open('./data/data_mpc.pkl', 'rb') as file:
@@ -51,12 +51,12 @@ class DRLMPCTeacher(Teacher):
         if type(transformed_obs) != dict:
             X = transformed_obs
         else:
-            X = pd.DataFrame(data=[[transformed_obs['x'], transformed_obs['x_speed'], transformed_obs['y'],
-            transformed_obs['y_speed'], transformed_obs['angle'], transformed_obs['ang_speed']]],
+            X = pd.DataFrame(data=[[float(transformed_obs['x']), float(transformed_obs['x_speed']), float(transformed_obs['y']),
+            float(transformed_obs['y_speed']), float(transformed_obs['angle']), float(transformed_obs['ang_speed'])]],
             columns=['x_obs','x_speed', 'y_obs', 'y_speed', 'angle', 'ang_speed'])
 
-        t = self.t_model.predict([X])[0] + action[0]
-        a = self.a_model.predict([X])[0] + action[1]
+        t = self.t_model.predict(X)[0] + action[0]
+        a = self.a_model.predict(X)[0] + action[1]
 
         action = [t, a]
         #action = [self.mpc_values['angle'][self.cnt_mpc+1],self.mpc_values['angle'][self.cnt_mpc+1]]
@@ -65,19 +65,19 @@ class DRLMPCTeacher(Teacher):
     def filtered_observation_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
-            return 0
+            return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
-        r1 = math.e**(-1*(transformed_obs["angle"] - self.mpc_values['angle'][self.cnt_mpc+1])**2)
-        r2 = math.e**(-1*(transformed_obs["ang_speed"] - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2)
-        r3 = math.e**(-1*(transformed_obs["x"] - self.mpc_values['x'][self.cnt_mpc+1])**2)
-        r4 = math.e**(-1*(transformed_obs["x_speed"] - self.mpc_values['x_speed'][self.cnt_mpc+1])**2)
-        r5 = math.e**(-1*(transformed_obs["y"] - self.mpc_values['y'][self.cnt_mpc+1])**2)
-        r6 = math.e**(-1*(transformed_obs["y_speed"] - self.mpc_values['y_speed'][self.cnt_mpc+1])**2)
+        r1 = math.e**(-1*(float(transformed_obs["angle"]) - self.mpc_values['angle'][self.cnt_mpc+1])**2)
+        r2 = math.e**(-1*(float(transformed_obs["ang_speed"]) - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2)
+        r3 = math.e**(-1*(float(transformed_obs["x"]) - self.mpc_values['x'][self.cnt_mpc+1])**2)
+        r4 = math.e**(-1*(float(transformed_obs["x_speed"]) - self.mpc_values['x_speed'][self.cnt_mpc+1])**2)
+        r5 = math.e**(-1*(float(transformed_obs["y"]) - self.mpc_values['y'][self.cnt_mpc+1])**2)
+        r6 = math.e**(-1*(float(transformed_obs["y_speed"]) - self.mpc_values['y_speed'][self.cnt_mpc+1])**2)
 
         '''if transformed_obs["y"] <= 300:
             reward = (r1 + r3 + 2*r4 + 2*r5 + 2*r6) /8
@@ -85,6 +85,7 @@ class DRLMPCTeacher(Teacher):
             reward = (2*r1 + 2*r3 + r5 + r6) /6'''
 
         reward = (r1 + r2 + r3 + r4 + r5 + r6) / 6
+        reward = float(reward)
 
         #self.t += action[0]
         #self.a += action[1]
@@ -115,8 +116,8 @@ class DRLMPCTeacher(Teacher):
 
     def compute_success_criteria(self, transformed_obs, action):
         if self.plot:
-            if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
-                self.plot_obs('Stabilization')
+            if len(self.obs_history) > 100 and len(self.obs_history) % 10 == 100:
+                self.plot_obs('Rocket Landing')
 
         if self.obs_history == None:
             return False

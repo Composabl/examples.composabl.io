@@ -15,7 +15,7 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 def run_agent():
     # Define the Skill
-    mpc_skill = Skill('mpc', DRLMPCTeacher, trainable=True)
+    mpc_skill = Skill('mpc', DRLMPCTeacher)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
@@ -35,7 +35,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    runtime.train(agent, train_iters=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
