@@ -13,10 +13,12 @@ Use this on-ramp to quickly validate the Composabl platform, get a feel for trai
 
 The project for this on-ramp is to train an agent to land a starship-like rocket on its tail. Here is the directory structure:
 
+```bash
 examples.composabl.io/1_try
 └── rocket_landing
     ├── agents
     └── sim
+```
 
 The agents directory contains multiple pre-configured agents that you can start training right away or modify in your tutuorial.
 
@@ -36,10 +38,12 @@ Follow along with the Machine Teaching methodology to build and test one of our 
 
 The project for this on-ramp is to train an agent to control an industrial mixer. Here is the directory structure:
 
+```bash
 examples.composabl.io/2_learn
 └── chemical_process_control
     ├── agents
     └── sim
+```
 
 The agents directory contains multiple pre-configured agents that you can will create in your project.
 
@@ -57,10 +61,12 @@ Start here with the [Composabl Python SDK Documentation](<https://docs.composabl
 
 The reference project for this on-ramp is to train an agent to schedule the production for a bakery. Here is the directory structure:
 
+```bash
 examples.composabl.io/3_build
 └── production_scheduling
     ├── agents
     └── sim
+```
 
 The agents directory contains multiple pre-built agents that you can can reference as you build.
 
