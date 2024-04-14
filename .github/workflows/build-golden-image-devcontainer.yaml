@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
 
 env:
-  PACKER_PATH: ./golden-images/packer/devcontainer.pkr.hcl
+  PACKER_PATH: ./.devcontainer/devcontainer/packer/devcontainer.pkr.hcl
 
 jobs:
   build-and-push:

@@ -1,0 +1,196 @@
+packer {
+  required_plugins {
+    docker = {
+      source  = "github.com/hashicorp/docker"
+      version = "~> 1"
+    }
+  }
+}
+
+locals {
+  image_folder            = "/packer"
+  helper_script_folder    = "/packer/helpers"
+  installer_script_folder = "/packer/installers"
+  imagedata_file          = "/packer/imagedata.json"
+}
+
+variables {
+    ssh_username = "composabl"
+    ssh_password = "composabl"
+
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+    version_python = "3.9.8"
+    version_pip_composabl = "0.6.3"
+=======
+    version_nvm = "0.39.5"
+    version_python = "3.8.17"
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+
+    docker_repository = ""
+    docker_username = ""
+    docker_password = ""
+}
+
+source "docker" "ubuntu" {
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+    # https://hub.docker.com/_/python
+    # https://www.debian.org/releases/
+    # bookworm = 12
+    # bullseye = 11
+    # buster = 10
+    image = "python:3.9-bookworm"
+    commit = true
+
+    # Run the bash terminal as default (it's a devcontainer)
+    changes = [
+        "CMD [\"sleep\", \"infinity\"]",
+        "ENTRYPOINT [\"/docker-entrypoint.sh\"]",
+    ]
+=======
+    image = "ubuntu:22.04"
+    commit = true
+    // export_path = "composabl.tar" # This is the path where the image will be exported as a tar file
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+}
+
+build {
+    sources = [
+        "source.docker.ubuntu"
+    ]
+
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+    // Create a folder to store temporary data
+    provisioner "shell" {
+        inline          = ["mkdir ${local.image_folder}", "chmod 777 ${local.image_folder}"]
+    }
+
+=======
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+    // Add base packages
+    provisioner "shell" {
+        script          = "${path.root}/scripts/base/apt.sh"
+    }
+
+    // Configure User and set is as the active user
+    provisioner "shell" {
+        environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}", "SSH_USER=${var.ssh_username}"]
+        script          = "${path.root}/scripts/base/configure-user.sh"
+    }
+
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+=======
+    // Create a folder to store temporary data
+    provisioner "shell" {
+        inline          = ["mkdir ${local.image_folder}", "chmod 777 ${local.image_folder}"]
+    }
+
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+    // Configure limits
+    provisioner "shell" {
+        script          = "${path.root}/scripts/base/limits.sh"
+    }
+
+    // Configure Environment
+    provisioner "shell" {
+        environment_vars = ["HELPER_SCRIPTS=${local.helper_script_folder}"]
+        script           = "${path.root}/scripts/base/configure-environment.sh"
+    }
+
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+    // Install Entrypoint
+    provisioner "file" {
+        source      = "${path.root}/scripts/docker-entrypoint.sh"
+        destination = "/docker-entrypoint.sh"
+    }
+
+    provisioner "shell" {
+        inline = [
+            "chmod +x /docker-entrypoint.sh"
+        ]
+    }
+
+    // Install helpers and installer scripts
+    provisioner "file" {
+        source      = "${path.root}/scripts/helpers"
+        destination = "${local.helper_script_folder}"
+    }
+
+    provisioner "file" {
+        source      = "${path.root}/scripts/installers"
+        destination = "${local.installer_script_folder}"
+=======
+    // Install helpers and installer scripts
+    provisioner "file" {
+        destination = "${local.helper_script_folder}"
+        source      = "${path.root}/scripts/helpers"
+    }
+
+    provisioner "file" {
+        destination = "${local.installer_script_folder}"
+        source      = "${path.root}/scripts/installers"
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+    }
+
+    // Run installers (as root)
+    provisioner "shell" {
+        execute_command = "sudo sh -c '{{ .Vars }} {{ .Path }}'" // Switch to the sudo user
+        environment_vars = [
+            "DEBIAN_FRONTEND=noninteractive",
+            "HELPER_SCRIPTS=${local.helper_script_folder}",
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
+        ]
+        scripts         = [
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+            "${path.root}/scripts/installers/root/motd.sh",
+            "${path.root}/scripts/installers/root/python.sh",
+=======
+            // "${path.root}/scripts/installers/root/wsl.sh",
+            "${path.root}/scripts/installers/root/motd.sh",
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+            "${path.root}/scripts/installers/root/docker.sh",
+            "${path.root}/scripts/installers/root/kubernetes-tools.sh",
+        ]
+    }
+
+    // Run installers (as user)
+    provisioner "shell" {
+        execute_command = "sudo -u ${var.ssh_username} sh -c '{{ .Vars }} {{ .Path }}'" // Switch to the sudo user
+        environment_vars = [
+            "DEBIAN_FRONTEND=noninteractive",
+            "HELPER_SCRIPTS=${local.helper_script_folder}",
+<<<<<<< HEAD:.devcontainer/devcontainer/packer/devcontainer.pkr.hcl.old
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}",
+            "SSH_USER=${var.ssh_username}",
+            "VERSION_PYTHON=${var.version_python}",
+            "VERSION_PIP_COMPOSABL=${var.version_pip_composabl}",
+        ]
+        scripts         = [
+            "${path.root}/scripts/installers/user/zsh.sh",
+            "${path.root}/scripts/installers/user/devcontainer.sh",
+=======
+            "INSTALLER_SCRIPT_FOLDER=${local.installer_script_folder}", "SSH_USER=${var.ssh_username}",
+            "VERSION_PYTHON=${var.version_python}",
+        ]
+        scripts         = [
+            "${path.root}/scripts/installers/user/zsh.sh",
+            "${path.root}/scripts/installers/user/pyenv.sh",
+>>>>>>> main:golden-images/packer/devcontainer.pkr.hcl.old
+            "${path.root}/scripts/installers/user/composabl.sh",
+            "${path.root}/scripts/installers/user/bashrc.sh",
+        ]
+    }
+
+    post-processors {
+        post-processor "docker-tag" {
+            repository = "${var.docker_repository}"
+            tags       = ["latest"]
+        }
+
+        post-processor "docker-push" {
+            login = true
+            login_username = "${var.docker_username}"
+            login_password = "${var.docker_password}"
+            login_server = "docker.io"
+        }
+    }
+}

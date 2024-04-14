@@ -1,0 +1,102 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
+from sensors import sensors
+from config import config
+from scenarios import bake_scenarios
+from teacher import CookiesTeacher, CupcakesTeacher, CakesTeacher, WaitTeacher
+from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController, WaitController
+from perceptors import perceptors
+
+PATH = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY = f"{PATH}/history"
+PATH_CHECKPOINTS = f"{PATH}/checkpoints"
+
+class ProgrammedSelector(Controller):
+    def __init__(self):
+        self.counter = 0
+
+    def compute_action(self, obs):
+        if obs["cake_demand_predict"] < obs['completed_cake']:
+            action = [2]
+        elif obs["cupcake_demand_predict"] < obs['completed_cupcakes']:
+            action = [1]
+        elif obs["cookies_demand_predict"] < obs['completed_cookies']:
+            action = [0]
+        else:
+            action = [3]
+
+        return action
+
+    def transform_obs(self, obs):
+        return obs
+
+    def filtered_observation_space(self):
+        return [s.name for s in sensors]
+
+    def compute_success_criteria(self, transformed_obs, action):
+        return False
+
+    def compute_termination(self, transformed_obs, action):
+        return False
+
+
+def run_agent():
+    # delete old history files
+    try:
+        files = os.listdir(PATH_HISTORY)
+
+        pkl_files = [file for file in files if file.endswith('.pkl')]
+
+        for file in pkl_files:
+            file_path = PATH_HISTORY + '/' + file
+            os.remove(file_path)
+    except:
+        pass
+
+    cookies_skill = Skill("cookies", CookiesTeacher)
+    cupcakes_skill = Skill("cupcakes", CupcakesTeacher)
+    cakes_skill = Skill("cakes", CakesTeacher)
+    wait_skill = Skill("wait", WaitTeacher)
+
+    selector_skill = Skill("selector", ProgrammedSelector)
+    for scenario_dict in bake_scenarios:
+        cookies_skill.add_scenario(Scenario(scenario_dict))
+        cupcakes_skill.add_scenario(Scenario(scenario_dict))
+        cakes_skill.add_scenario(Scenario(scenario_dict))
+        wait_skill.add_scenario(Scenario(scenario_dict))
+
+    runtime = Runtime(config)
+    agent = Agent()
+    agent.add_sensors(sensors)
+    agent.add_perceptors(perceptors)
+
+    agent.add_skill(cookies_skill)
+    agent.add_skill(cupcakes_skill)
+    agent.add_skill(cakes_skill)
+    agent.add_skill(wait_skill)
+    agent.add_selector_skill(selector_skill, [cookies_skill,cupcakes_skill,cakes_skill,wait_skill], fixed_order=False, fixed_order_repeat=False)
+
+    files = os.listdir(PATH_CHECKPOINTS)
+
+    if '.DS_Store' in files:
+        files.remove('.DS_Store')
+        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
+
+    try:
+        if len(files) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        os.mkdir(PATH_CHECKPOINTS)
+
+    runtime.train(agent, train_iters=2)
+
+    agent.export(PATH_CHECKPOINTS)
+
+
+if __name__ == "__main__":
+    run_agent()
+
