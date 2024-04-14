@@ -1,7 +1,7 @@
 # Industrial-Strength Intelligent Agents
 Composabl is a function orchestrator for creating intelligent agents from any Python algorithm or machine learning model.
 
-![Agent Image](agent-animation.png)
+![Agent Image](agent.png)
 
 We provide three on-ramps to get started with Composabl:
 
