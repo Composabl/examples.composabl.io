@@ -1,5 +1,7 @@
-# Industrial-Strength Intelligent Agents
+# Composabl Python SDK for Creating Industrial-Strength Intelligent Agents
 Composabl is a function orchestrator for creating intelligent agents from any Python algorithm or machine learning model.
+
+Composabl agents are modular. You can build trained machine learning models, programmed algorithms into to agents as modules or train any module in a Composabl agent with Deep Reinforcement Learning.
 
 ![Agent Image](agent.png)
 
