@@ -14,9 +14,10 @@
 name: 🪙 Golden Image - DevContainer
 
 on:
+  # We rebuild the devcontainer image on every push to main
   push:
-    tags:
-      - v*
+    branches:
+      - main
   workflow_dispatch:
 
 env:
