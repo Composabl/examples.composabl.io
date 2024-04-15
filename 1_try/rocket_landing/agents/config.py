@@ -6,7 +6,7 @@ config = {
         "license": license_key,
         "target": {
             "docker": {
-                "image": "composabl/sim-starship-local"
+                "image": "composabl/sim-starship"
             },
             #"local": {
             #   "address": "localhost:1337"
