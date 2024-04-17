@@ -1,13 +1,13 @@
+# Copyright (C) Composabl, Inc - All Rights Reserved
+# Unauthorized copying of this file, via any medium is strictly prohibited
+# Proprietary and confidential
+
 from typing import Any, Dict, SupportsFloat, Tuple
 
-import composabl_core.utils.logger as logger_util
 import gymnasium as gym
-from composabl_core.agent.scenario import Scenario
-from composabl_core.grpc.server.server_composabl import ServerComposabl
-from gymnasium.envs.registration import EnvSpec
+from composabl_core.agent.scenario.scenario import Scenario
+from composabl_core.networking.server_composabl import ServerComposabl
 from sim import ProductionSchedulingEnv
-
-logger = logger_util.get_logger(__name__)
 
 
 class ServerImpl(ServerComposabl):

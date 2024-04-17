@@ -1,12 +1,9 @@
-import math
 import random
 
 import gymnasium as gym
 import numpy as np
-import simpy
 from composabl_core.agent.scenario import Scenario
 from rllib.whisky_business_env import WhiskeyBusinessEnv
-from simulation.sim_controller import SimController
 
 
 class ProductionSchedulingEnv(gym.Env):
