@@ -30,7 +30,7 @@ class NavigationTeacher(Teacher):
         self.reward_history = []
         self.angle_history = []
 
-        self.plot = True
+        self.plot = False
         self.metrics = 'fast' #standard, fast
 
         if not self.plot:
@@ -96,14 +96,14 @@ class NavigationTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        if self.plot:
-            if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
-                self.plot_obs('Stabilization')
-
         if self.obs_history == None:
             return False
         else:
             success = False
+
+            if self.plot:
+                if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
+                    self.plot_obs('Stabilization')
 
             if self.metrics == 'standard':
                 try:
