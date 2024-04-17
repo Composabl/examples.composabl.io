@@ -10,14 +10,15 @@
 ######################################################
 # Build stage
 # FROM python:3.8-slim
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies for protobuf
 RUN apt-get update \
-    && apt-get install --yes protobuf-compiler wget curl gettext-base uuid-runtime
+    && apt-get install --yes protobuf-compiler wget curl gettext-base uuid-runtime \
+    build-essential g++ swig
 
 ######################################################
 # Install Python Dependencies
