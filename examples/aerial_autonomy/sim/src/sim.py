@@ -1,13 +1,13 @@
-from typing import Any, Dict, SupportsFloat, Tuple, Optional
 import math
 import random
-import numpy as np
+from typing import Any, Dict, Optional, SupportsFloat, Tuple
 
-from composabl_core.agent.scenario import Scenario
 import gymnasium as gym
+import numpy as np
+from composabl_core.agent.scenario import Scenario
 
 
-class Env(gym.Env):
+class AerialAutonomyEnv(gym.Env):
     def __init__(self):
         self.obs_space_constraints = {
             "x": {'low': -400, 'high': 400},
@@ -237,4 +237,3 @@ class Env(gym.Env):
 
     def render(self, mode='auto'):
         pass
-
