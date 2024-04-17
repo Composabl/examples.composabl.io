@@ -80,10 +80,10 @@ if [[ "$MODE" == "standalone" && "$IS_HISTORIAN_ENABLED" == "true" ]]; then
     dapr run --app-id "$SIM_ID" --app-port 50051 --dapr-http-port 3500 --app-protocol grpc \
         --resources-path /docker/dapr/components \
         -- \
-        $APP_CMD
+        $APP_CMD --host $HOST --port $PORT
 else
     echo "Starting $APP_NAME"
     echo '===================================================================='
 
-    $APP_CMD
+    $APP_CMD --host $HOST --port $PORT
 fi

@@ -72,4 +72,4 @@ cd "$APP_PATH"
 echo "Starting $APP_NAME"
 echo '===================================================================='
 
-$APP_CMD
+$APP_CMD --host $HOST --port $PORT
