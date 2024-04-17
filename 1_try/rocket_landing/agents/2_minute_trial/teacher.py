@@ -70,7 +70,7 @@ class NavigationTeacher(Teacher):
         error_5 = abs((0 - float(transformed_obs["angle"]))/3.15)
         error_6 = abs((0 - float(transformed_obs["ang_speed"]))/1)
 
-        reward = 0.3 * error_1 + 0.1 * error_2 + 0.3 * error_3 + 0.1 * error_4 + 0.1 * error_5 + 0.1 * error_6
+        reward = 1/(0.3 * error_1 + 0.1 * error_2 + 0.1 * error_3 + 0.3 * error_4 + 0.3 * error_5 + 0.2 * error_6)
 
         self.t += action[0]
         self.a += action[1]
