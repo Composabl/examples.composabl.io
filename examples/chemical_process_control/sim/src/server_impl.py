@@ -5,11 +5,10 @@
 from typing import Any, Dict, SupportsFloat, Tuple
 
 import gymnasium as gym
-
 from composabl_core.agent.scenario.scenario import Scenario
 from composabl_core.networking.server_composabl import ServerComposabl
-
 from sim import CSTREnv
+
 
 class ServerImpl(ServerComposabl):
     """
@@ -62,7 +61,6 @@ class ServerImpl(ServerComposabl):
             return Scenario({
                 "dummy": 0
             })
-
         return self.env.scenario
 
     async def set_reward_func(self, reward_func):

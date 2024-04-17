@@ -6,8 +6,8 @@ import asyncio
 from argparse import ArgumentParser
 
 from composabl_core.networking import server as server_make
-
 from server_impl import ServerImpl
+
 
 async def start(host, port, protocol, env_init: dict = {}):
     server = server_make.make(
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
 
-    # Covnert from str to dict
+    # Convert from str to dict
     args.env_init = eval(args.env_init)
 
     # Run the start function with the parsed arguments
