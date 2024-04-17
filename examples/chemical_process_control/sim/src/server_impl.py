@@ -32,7 +32,6 @@ class ServerImpl(ServerComposabl):
         }
 
     async def observation_space_info(self) -> gym.Space:
-
         return self.env.observation_space
 
     async def action_space_info(self) -> gym.Space:
