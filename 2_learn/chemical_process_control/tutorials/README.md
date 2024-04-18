@@ -337,16 +337,25 @@ The [agent](## "definition") file organizes all the code for your agent, and is 
 
 - ```sensors.py``` | The [sensors](## "definition") file organizes the data provided by the simulator or the real system.
 
-
-This tutorial focuses on building the capabilities of the agent that are unique to the Machine Teaching methodology:
-
-- **Breaking the process into separate modular skills**: You will add multiple skills to the agent file.
-- **Orchestrating the skills together**: You will create scenarios to differentiater when each skill should be used and a selector skill to determine which skill should have control based on the scenario.
-- **Selecting the right technolgoy for each skill**: You will build a teacher file to allow the three action skills and the selector to learn in simulation using deep reinforcement learning.
+This tutorial focuses on building the capabilities of the agent that are unique to the Machine Teaching methodology.
+- **Breaking the process into separate modular skills**: Your starter kit agent only has one skill. You will add two additional action skills to complete the strategy pattern.
+- **Orchestrating the skills together**: You will add a selector to enable the agent to use the right skill for the right phase of the process. You will also create scenarios for the selector to use.
+- **Selecting the right technolgoy for each skill**: You will add the additional skills to the teacher so that they can learn with deep reinforcement learning.
 
 The files that are not directly related to these Machine Teaching capabilites are pre-populated and complete. The other files are partially complete, and require you to add additional code to create agent components. As you put the agent together, you will learn about the function and syntax for these agent components.
 
 This tutorial focuses on the basics. You can also refer to the [full SDK documentation]("link") for additional explanations and resources.
 
 ### Steps to Build the Agent
+
+These are the steps you will take the complete the agent:
+
+- Create the scenarios for the additional skills
+- Add the additional skills in the teacher
+- Create the skills in the agent file
+- Add scenarios to the skills in the agent file
+- Add skills to the agent file
+- Add the selector with the skills in the selector to the agent file
+
+#### Step 1: Create Scenarios
 
