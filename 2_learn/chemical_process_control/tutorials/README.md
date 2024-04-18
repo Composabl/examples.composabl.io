@@ -5,7 +5,7 @@ Build an Intelligent Autonomous Agent to Control an Industrial Mixer
 You can use Composabl to build powerful [intelligent agents](## "definition") that solve real problems and beat industrial benchmarks and other AI solutions. This tutorial will teach you how to design and build these agents using the [Machine Teaching](## "definition") methodology and the Composabl platform.
 
 ### Before You Start
-To be ready for this tutorial, you should have already completed the [Try tutorial](/1_try/), including:
+To be ready for this tutorial, you should have already completed the [Try Tutorial](/1_try/), including:
 
 - Setting up your GitHub codespace environment for Composabl
 - Receiving and entering your Composabl license key
@@ -61,8 +61,8 @@ add content here
 1. Question
 
     <details>
-    <summary>Check answer </summary>
-    This is a good use case for machine teaching because there is a need to balance two competing goals.
+    <summary>Need a hint? </summary>
+    This is a use case for machine teaching because there is a need to balance two competing goals.
     </details>
 </br>
 
@@ -77,13 +77,13 @@ An industrial mixer manufactures chemical products by stirring raw materials tog
 
 The chemical reaction also produces heat. The hotter the tank is allowed to get, the more efficiently it produces the product, leaving less wasted reagent behind.
 
-But if the liquid in the tank gets too hot, it can cross a thershhold known as "thermal runaway" and create conditions where the tank will catch fire or explode.
+But if the liquid in the tank gets too hot, it can cross a thershold known as "thermal runaway" and create conditions where the tank will catch fire or explode.
 
 ![tanks on fire](/2_learn/chemical_process_control/tutorials/img/runaway.jpg)
 
 #### Two Competing Goals
 
-Like all Machine Teaching use cases, the process has two separate goals that must be balanced against each other:
+As in all Machine Teaching use cases, the "fuzziness" or nuance in this process can be summarized in the form of two separate goals that must be balanced against each other:
 
 1. Produce as much product as possible
 2. Eliminate the risk of thermal runaway
@@ -92,13 +92,13 @@ The key to balancing these goals is maintaining the right temperature in the tan
 
 #### Controlling the Temperature in the Tank
 
-Your agent controls the termperature in the tank by adjusting the temperature of the mixture using a “jacket” filled with coolant.
+This use case has only one control variable. Your agent controls the termperature in the tank by adjusting the temperature of the mixture using a “jacket” filled with coolant.
 
 ![diagram of tank](/2_learn/chemical_process_control/tutorials/img/mechanism.png)
 
 If the chemicals get too hot and approach thermal runaway, the coolant temperature can be decreased to bring down the temperature in the tank – but the conversion rate will also decrease.
 
-#### Three Different Phases
+#### Three Different Phases with Different Control Needs
 
 One of the reasons this use case is complex is that it occurs in three different phases.
 
@@ -317,4 +317,36 @@ These two skills working together achieve results that are arguably as good or b
 The decision about which of the two high performing agents to use could be a business decision about whether it is more important to maximize conversion, in which case the multiple learned skills agent would be a better choice, or to prioritize safety, in which case the DRL and MPC agent might be preferable.
 
 While there may not be a clear winner between the two multi-skill agents, they both significantly outperform the single-skill agents. Multiple skills and technologies working together make the difference in creating a successful intelligent agent that can effectively control the process.
+
+## Module 3: Build the Strategy Pattern Agent
+
+### The Strategy Pattern Agent Starter Kit
+In this module, you will build the strategy pattern agent from a  starter kit of agent files.
+
+
+Navigate to the strategy_pattern folder. Inside the folder you'll find the following files:
+
+- ```agent.py``` |
+The [agent](## "definition") file organizes all the code for your agent, and is where you will add all the components you develop.
+
+- ```scenarios.py``` | The [scenarios](## "different situations where the agent needs to perform differently to succeed") file identifies the sensor values that define each scenario.
+
+- ```teacher. py``` | The [teacher](## "definition") file contains parameters for how each skill will practice in simulation to get better at the task.
+
+- ```config.py``` | The [config](## "definition") file contains the information that tells the agent how to run, including the Composabl license key and the compute enviornment.
+
+- ```sensors.py``` | The [sensors](## "definition") file organizes the data provided by the simulator or the real system.
+
+
+This tutorial focuses on building the capabilities of the agent that are unique to the Machine Teaching methodology:
+
+- **Breaking the process into separate modular skills**: You will add multiple skills to the agent file.
+- **Orchestrating the skills together**: You will create scenarios to differentiater when each skill should be used and a selector skill to determine which skill should have control based on the scenario.
+- **Selecting the right technolgoy for each skill**: You will build a teacher file to allow the three action skills and the selector to learn in simulation using deep reinforcement learning.
+
+The files that are not directly related to these Machine Teaching capabilites are pre-populated and complete. The other files are partially complete, and require you to add additional code to create agent components. As you put the agent together, you will learn about the function and syntax for these agent components.
+
+This tutorial focuses on the basics. You can also refer to the [full SDK documentation]("link") for additional explanations and resources.
+
+### Steps to Build the Agent
 
