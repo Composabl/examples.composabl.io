@@ -30,13 +30,13 @@ class NavigationTeacher(Teacher):
         self.reward_history = []
         self.angle_history = []
 
-        self.plot = True
+        self.plot = False
         self.metrics = 'fast' #standard, fast
 
-        if not self.plot:
-            plt.close("all")
-            plt.figure(figsize=(10,7))
-            plt.ion()
+        #if self.plot:
+        #    plt.close("all")
+        #    plt.figure(figsize=(10,7))
+        #    plt.ion()
 
         # create metrics db
         try:
@@ -63,14 +63,14 @@ class NavigationTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
 
-        error_1 = abs((0 - float(transformed_obs["x"]) )/400)
-        error_2 = abs((0 - float(transformed_obs["x_speed"]))/100)
-        error_3 = abs((0 - float(transformed_obs["y"]) )/1000)
-        error_4 = abs((5 - float(transformed_obs["y_speed"]))/1000)
-        error_5 = abs((0 - float(transformed_obs["angle"]))/3.15)
-        error_6 = abs((0 - float(transformed_obs["ang_speed"]))/1)
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 0.3 * error_1 + 0.1 * error_2 + 0.3 * error_3 + 0.1 * error_4 + 0.1 * error_5 + 0.1 * error_6
+        reward = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
 
         self.t += action[0]
         self.a += action[1]
@@ -96,14 +96,14 @@ class NavigationTeacher(Teacher):
         return None
 
     def compute_success_criteria(self, transformed_obs, action):
-        if self.plot:
-            if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
-                self.plot_obs('Stabilization')
-
         if self.obs_history == None:
             return False
         else:
             success = False
+
+            if self.plot:
+                if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
+                    self.plot_obs('Stabilization')
 
             if self.metrics == 'standard':
                 try:

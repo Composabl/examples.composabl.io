@@ -17,7 +17,7 @@ class ServerImpl(ServerComposabl):
         self.env = Env()
 
     def Make(self, env_id: str, env_init: dict) -> EnvSpec:
-        spec = {'id': 'starship', 'max_episode_steps': 400}
+        spec = {'id': 'starship', 'max_episode_steps': 401}
         return spec
 
     def ObservationSpaceInfo(self) -> gym.Space:
