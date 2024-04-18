@@ -199,6 +199,9 @@ class Env(gym.Env):
 
         # Increase time
         self.cnt += 1
+        if self.cnt >= 399:
+            self.cnt = 399
+
         #update values
         self.x_obs = self.x[self.cnt, 0]
         self.x_speed = self.x[self.cnt, 1]
@@ -228,8 +231,13 @@ class Env(gym.Env):
         # end the simulation
         if self.y_obs < 0:
             terminated = True
+            #print('TERMINATED Y OBS ', self.y_obs)
         elif not self.obs_space_constraints['x']['low'] <= self.x_obs <= self.obs_space_constraints['x']['high']:
             terminated = True
+            #print('TERMINATED CONSTRAINTS ', self.x_obs)
+        elif self.cnt > 400:
+            terminated = True
+            #print('TERMINATED 400')
 
         self.obs = np.array(list(self.obs.values()))
         info = {}

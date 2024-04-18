@@ -58,7 +58,7 @@ def start():
     #"Resetting Environment"
     obs, info= sim.reset()
     obs_history.append(obs)
-    for i in range(90):
+    for i in range(400):
         action = trained_agent.execute(obs)
         obs, reward, done, truncated, info = sim.step(action)
         df_temp = pd.DataFrame(columns=[s.name for s in sensors] + ['time'],data=[list(obs) + [i]])
