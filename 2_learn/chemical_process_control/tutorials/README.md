@@ -72,7 +72,7 @@ add content here
 
 ![chemical tanks](/2_learn/chemical_process_control/tutorials/img/tanks.jpg)
 
-#### An Exothermic Reaction that Can Get Too Hot
+#### The Use Case
 An industrial mixer manufactures chemical products by stirring raw materials together inside a tank. As the reagents are mixed together, a chemical reaction occurs that creates the end product.
 
 The chemical reaction also produces heat. The hotter the tank is allowed to get, the more efficiently it produces the product, leaving less wasted reagent behind.
@@ -83,12 +83,12 @@ But if the liquid in the tank gets too hot, it can cross a thershhold known as "
 
 #### Two Competing Goals
 
-That means that the process has two separate goals that must be balanced against each other:
+Like all Machine Teaching use cases, the process has two separate goals that must be balanced against each other:
 
 1. Produce as much product as possible
 2. Eliminate the risk of thermal runaway
 
-The key to balancing these goals is maintaining the right temperature in the tank throughout the reaction, so that it's hot enough to be efficient but cool enough that the thermal runaway threshhold is never crossed.
+The key to balancing these goals is maintaining the right temperature in the tank throughout the reaction, so that it's hot enough to be efficient but cool enough that the thermal runaway threshold is never crossed.
 
 #### Controlling the Temperature in the Tank
 
@@ -142,17 +142,15 @@ The transition phase is the most unpredictable and challenging to control, with 
 
 The design of an agent determines its performance. In this section, we will look at five different agent designs and compare how well they control the reaction to balance the competing goals of maximizing throughput while keeping the temperature at a safe level.
 
-#### Agent 1: One Skill - Linear Model Predictive Control
+#### Agent 1: Single Skill - Linear Model Predictive Control
 
-The first agent design is the current automation solution, a linear MPC controller. As the current solution, this agent performance is the benchmark that any other designs need to beat to be successful.
+The first agent design is the current automation solution, a linear MPC controller. As the current solution, this agent performance is the benchmark for the other designs.
 
-The image below shows an MPC controller represented in the visual system of agent designs. The agent takes in sensor information about the temperature in the tank and the concentrations of the chemicals. It passs that information to the skills layer of the agent.
-
-The skills layer contains a single programmed skill: control reactor. This skill uses a mathematical model to determine the desired temperature set point for the tank and the control actions to take to achieve that temperature using the cooling jacket, which the agent outputs as decisions.
+The image below shows an MPC controller represented in the visual system of agent designs. The agent takes in [sensor](## "definition") information about the temperature in the tank and the concentrations of the chemicals. It passs that information to the [skills layer](## "definition") of the agent. The skills layer contains a single programmed skill: control reactor. This skill uses a mathematical model to determine the desired temperature set point for the tank. It also determines the control actions to take to achieve that temperature using the cooling jacket, and outputs those actions as decisions.
 
 ![MPC agent structure](/2_learn/chemical_process_control/tutorials/img/MPC-agent.png)
 
-In simulation, this agent's conversion rate was 82%. That means that 82% of the reagents were turned into product, with 18% waste. Composabl provides visualizations of agent performance. The image below shows how the single-skill MPC agent's temperature control performed in simulation.
+In simulation, this agent's conversion rate was 82%. That means that 82% of the reagents were turned into product, with 18% waste. As you will see when you build this agent later in the tutorial, Composabl provides visualizations of agent performance. The image below shows how the single-skill MPC agent's temperature control performed in simulation.
 
 ><br>
 >
@@ -165,7 +163,7 @@ In simulation, this agent's conversion rate was 82%. That means that 82% of the 
 
 You can see from this graph that the MPC agent doesn’t perform very well. It does a good job at the start, in the first steady state. But then once it hits the challenging transition, it hits thermal runaway almost immediately.
 
-When an MPC controller is used to control this process in the real world, a human operator needs to step in and take over control before the automated system lets the temperature cross the thermal runaway threshhold.
+When an MPC controller is used to control this process in the real world, a human operator needs to step in and take over control before the automated system lets the temperature cross the thermal runaway threshold.
 
 #### Analyzing Agent Performance: Agent 1
 
