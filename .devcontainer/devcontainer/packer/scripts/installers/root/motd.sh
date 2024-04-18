@@ -23,7 +23,7 @@ It includes everything to provide demonstrations around the Composabl SDK.
 
 Next things to do:
 1. 📄 Start the Composabl historian to track agent behavior: composabl historian start
-2. 📚 Navigate to the directory for the two minute trial: cd 1_try/rocket_landing/agents/two_minute_trial/
+2. 📚 Navigate to the directory for the two minute trial: cd 1_try/rocket_landing/agents/2_minute_trial/
 3. 🚀 Start training your first Agent: ; python agent.py
 4.  🎓 Complete the two minute trial: finish training your first agent and analyze its behavior.
 EOF
