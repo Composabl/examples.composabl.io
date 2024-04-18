@@ -22,11 +22,10 @@ It includes everything to provide demonstrations around the Composabl SDK.
 `export COMPOSABL_LICENSE="YOUR_KEY"`.
 
 Next things to do:
-- 📄 Approve the EULA: `export COMPOSABL_EULA_AGREED=1`
-- 📚 Read Documentation: https://docs.composabl.com.
-- 🎓 Explore Quickstarts: https://github.com/Composabl/examples.composabl.io
-- 🚀 Run your first Agent: `cd 1_try/rocket_landing/agents/deep_reinforcement_learning/; python agent.py`
-
+1. 📄 Start the Composabl historian to track agent behavior: composabl historian start
+2. 📚 Navigate to the directory for the two minute trial: cd 1_try/rocket_landing/agents/two_minute_trial/
+3. 🚀 Start training your first Agent: ; python agent.py
+4.  🎓 Complete the two minute trial: finish training your first agent and analyze its behavior.
 EOF
 
 # Make the printer
