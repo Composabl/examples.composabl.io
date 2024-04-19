@@ -1,6 +1,6 @@
 import os
 
-license_key = os.environ["COMPOSABL_KEY"]
+license_key = os.environ["COMPOSABL_LICENSE"]
 
 config = {
         "license": license_key,
@@ -16,7 +16,7 @@ config = {
             "name": "sim-cstr",
         },
         "runtime": {
-            "workers": 10,
+            "workers": 2,
             "num_gpus": 0
         }
     }

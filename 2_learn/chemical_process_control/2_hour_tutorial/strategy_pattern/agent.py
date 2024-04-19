@@ -21,7 +21,7 @@ def run_agent():
     start_reaction_skill = Skill("start_reaction", StartReactionTeacher)
     for scenario_dict in start_reaction_scenarios:
         start_reaction_skill.add_scenario(Scenario(scenario_dict))
-    
+
     selector_skill = Skill("selector", CSTRTeacher)
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
@@ -32,7 +32,7 @@ def run_agent():
 
     agent.add_skill(start_reaction_skill)
     agent.add_selector_skill(selector_skill, [start_reaction_skill], fixed_order=False, fixed_order_repeat=False)
-   
+
     # Load a pre-trained agent
     try:
         if len(os.listdir(PATH_CHECKPOINTS)) > 0:
