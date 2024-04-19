@@ -37,7 +37,7 @@ def run_agent():
     agent.add_skill(Stabilization_skill)
     agent.add_skill(Alignment_skill)
     agent.add_skill(SpeedControl_skill)
-    agent.add_selector_skill(selector_skill, [Stabilization_skill, Alignment_skill], fixed_order=False, fixed_order_repeat=False)
+    agent.add_selector_skill(selector_skill, [Navigation_skill, Stabilization_skill, Alignment_skill, SpeedControl_skill], fixed_order=False, fixed_order_repeat=False)
 
     # Load a pre-trained agent
     try:
@@ -47,7 +47,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    runtime.train(agent, train_iters=50)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
