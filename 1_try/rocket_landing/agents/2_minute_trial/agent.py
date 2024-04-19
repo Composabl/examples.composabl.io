@@ -41,4 +41,5 @@ def run_agent():
 
 
 if __name__ == "__main__":
+    print("the agent")
     run_agent()
