@@ -37,7 +37,7 @@ def start():
             "render_mode": "rgb_array",
         },
     )
-
+    print('Sim Connected')
     #"Initializing Environment"
     sim.init()
     #"Initialized"
@@ -50,6 +50,7 @@ def start():
     df = pd.DataFrame()
     #"Resetting Environment"
     obs, info= sim.reset()
+    print('Running Inference...')
     for i in range(90):
         action = trained_agent.execute(obs)
         obs, reward, done, truncated, info = sim.step(action)
@@ -86,6 +87,7 @@ def start():
     plt.xlabel('iteration')
 
     plt.savefig(f"{PATH_BENCHMARKS}/inference_figure.png")
+    print('Inference figure saved on ' + f"{PATH_BENCHMARKS}/inference_figure.png")
 
 
 if __name__ == "__main__":
