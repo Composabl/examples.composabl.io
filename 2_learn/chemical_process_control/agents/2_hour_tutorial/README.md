@@ -77,7 +77,7 @@ add content here
 
 ### The Industrial Mixer Case Study
 
-![chemical tanks](/img/tanks.jpg)
+![chemical tanks](./img/tanks.jpg)
 
 #### The Use Case
 An industrial mixer manufactures chemical products by stirring raw materials together inside a tank. As the reagents are mixed together, a chemical reaction occurs that creates the end product.
@@ -86,7 +86,7 @@ The chemical reaction also produces heat. The hotter the tank is allowed to get,
 
 But if the liquid in the tank gets too hot, it can cross a thershold known as "thermal runaway" and create conditions where the tank will catch fire or explode.
 
-![tanks on fire](/img/runaway.jpg)
+![tanks on fire](./img/runaway.jpg)
 
 #### Two Competing Goals
 
@@ -101,7 +101,7 @@ The key to balancing these goals is maintaining the right temperature in the tan
 
 This use case has only one control variable. Your agent controls the termperature in the tank by adjusting the temperature of the mixture using a “jacket” filled with coolant.
 
-![diagram of tank](/img/mechanism.png)
+![diagram of tank](./img/mechanism.png)
 
 If the chemicals get too hot and approach thermal runaway, the coolant temperature can be decreased to bring down the temperature in the tank – but the conversion rate will also decrease.
 
@@ -166,7 +166,7 @@ In simulation, this agent's conversion rate was 82%. That means that 82% of the 
 >The black line is the benchmark – the goal temperature if the reaction is being controlled as well as possible. And the blue area shows the actual temperature as controlled by the agent, over the course of 100 different runs through the simulation. Not every run is the same, so at each point along the x axis, the blue area represents all of the different temperatures from the 100 runs.
 >
 >
->![MPC agent performance](/img/MPC-graph.png)
+>![MPC agent performance](./img/MPC-graph.png)
 
 You can see from this graph that the MPC agent doesn’t perform very well. It does a good job at the start, in the first steady state. But then once it hits the challenging transition, it hits thermal runaway almost immediately.
 
@@ -212,13 +212,13 @@ The second agent is also a single-skill agent, but instead of an MPC controller,
 
 As with the MPC agent, the sensors take information into the agent, and then that information is passed to a single skill whose job is to control the reaction. But this time, the skill is not making decisions based on math. Instead, it's using AI's unique capability to learn through practice. The DRL skill has been given parameters that reward for how well its results balance the competing goals, and then used simulation to discover and remember the best way to consisently achieve the reward.
 
-![DRL agent](/img/DRL-agent.png)
+![DRL agent](./img/DRL-agent.png)
 
 #### Analyzing Agent Performance - Agent 2
 
 In simulation, the DRL agent had a 90% conversion rate. Here we can see its performance.
 
-![DRL agent performance](/img/DRL-result.png)
+![DRL agent performance](./img/DRL-result.png)
 
 Compared to the MPC agent, this result is much better. It stays within the safety threshold every time, and it also controls the steady states very well, staying right on the benchmark line.
 
@@ -274,7 +274,7 @@ Agent 3 uses a [design pattern](## "Common agent structure known to successfully
 
 The image below shows a strategy pattern agent with the skills missing. Thinking about the problem, how would you break it into three separate skills to handle different scenarios?
 
-![blank strategy pattern diagram](/img/strategy-blank.png)
+![blank strategy pattern diagram](./img/strategy-blank.png)
     <details>
     <summary>**Need a hint?** </summary>
     There is not one right answer to how to assign skills within an agent design. But a logical way to think about different scenarios for the industrial mixer would be to separate the skills based on the phase of the process.
@@ -285,13 +285,13 @@ In the strategy pattern design for the industrial mixer, the sensor layer takes 
 
 What about assigning the right technology to the skills? In this agent, all of the skills, including the selector, are learned with deep reinforcement learning. But unlike the single skill DRL agent, the skills practice separately, each with simulation data specific to its own phase of the process.
 
-![strategy pattern agent](/img/strategy-agent.png)
+![strategy pattern agent](./img/strategy-agent.png)
 
 #### Analyzing Agent Performance - Agent 3
 
 The strategy-pattern agent had 93% conversion and 0% risk of thermal runaway. As you can see from the results, it has better performance in terms of productivity and temperature control that the single-skill DRL agent.
 
-![strategy pattern results](/img/strategy-result.png)
+![strategy pattern results](./img/strategy-result.png)
 
 
 #### Check Your Understanding
