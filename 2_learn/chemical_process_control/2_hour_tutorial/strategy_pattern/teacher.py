@@ -8,6 +8,9 @@ import pandas as pd
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
+#Skills are the building blocks of intelligent autonomous agents. 
+#Teaching allows you to define these AI building blocks so that your agent can succeed at complex tasks in dynamic conditions
+#This is an example of a base class to show the full structure of a teacher and all the associated elements.
 class BaseCSTR(Teacher):
     def __init__(self):
         self.obs_history = None
@@ -145,7 +148,9 @@ class BaseCSTR(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-
+#This is the teacher for the Start Reaction skill. This will need
+#Copy this entire class 2 times and re-name them to reflect the second and third skills in the agent design.
+#Ensure that the self.title and self.history_path variables are also changed to reflect the names of the skills.
 class StartReactionTeacher(BaseCSTR):
     
     def __init__(self):
@@ -237,7 +242,7 @@ class StartReactionTeacher(BaseCSTR):
     def compute_termination(self, transformed_obs, action):
         return False
     
-    
+#This is the teacher for the Selector Skill.    
 class CSTRTeacher(BaseCSTR):
     def __init__(self):
         self.obs_history = None
