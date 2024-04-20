@@ -155,7 +155,7 @@ The first agent design is the current automation solution, a linear MPC controll
 
 The image below shows an MPC controller represented in the visual system of agent designs. The agent takes in [sensor](## "definition") information about the temperature in the tank and the concentrations of the chemicals. It passs that information to the [skills layer](## "definition") of the agent. The skills layer contains a single programmed skill: control reactor. This skill uses a mathematical model to determine the desired temperature set point for the tank. It also determines the control actions to take to achieve that temperature using the cooling jacket, and outputs those actions as decisions.
 
-![MPC agent structure](/img/MPC-agent.png)
+![MPC agent structure](./img/MPC-agent.png)
 
 In simulation, this agent's conversion rate was 82%. That means that 82% of the reagents were turned into product, with 18% waste. As you will see when you build this agent later in the tutorial, Composabl provides visualizations of agent performance. The image below shows how the single-skill MPC agent's temperature control performed in simulation.
 
