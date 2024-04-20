@@ -37,19 +37,26 @@ This two-hour training is divided into modules.
     - Explain when machine teaching is useful
     - List the three steps for designing agents with machine teaching
 
-2. Industrial Mixer Case Study Agents and Performance (30 minutes)
+2. Industrial Mixer Case Study Agents and Benchmarks (20 minutes)
 
     In this module, you will learn about the industrial mixer use case and review the design and performance of 5 different agents. At the end of this module, you will be able to:
     - Explain the parts of an intelligent agent
     - Explain why different agent designs result in different performance
-    - Recognize two fundamental design patterns
-    - Apply design patterns to problems they can solve
 
-3. Building Agents: Strategy Pattern and Plan-Execute Pattern (80 minutes)
+
+3. Build the Strategy Pattern Agent (60 minutes)
+
+    In this module, you will build an agent using the stragegy design pattern. At the end of this module, you will be able to:
+    - Write Python SDK code that defines the agent structure of a strategy pattern
+    - Train an agent and analyze performance based on training data
+
+4. Design Patterns (30 minutes)
 
     In this module, you will build two different multi-skill agents using the Composabl platform. In this module, you will practice building skills that learn with deep reinforcement learning, matching skills to scenarios, and coding selectors. At the end of this module, you will be able to:
 
-    - Write Python SDK code that defines the agent structure of a strategy pattern or a plan-execute pattern respectively
+    - Recognize two fundamental design patterns
+    - Apply design patterns to problems they can solve
+     or a plan-execute pattern respectively
 	- Operate a trained agent
     - Continue training a partially trained agent
 
@@ -340,7 +347,7 @@ The [agent](## "definition") file organizes all the code for your agent, and is 
 This tutorial focuses on building the capabilities of the agent that are unique to the Machine Teaching methodology.
 - **Breaking the process into separate modular skills**: Your starter kit agent only has one skill. You will add two additional action skills to complete the strategy pattern.
 - **Orchestrating the skills together**: You will add a selector to enable the agent to use the right skill for the right phase of the process. You will also create scenarios for the selector to use.
-- **Selecting the right technolgoy for each skill**: You will add the additional skills to the teacher so that they can learn with deep reinforcement learning.
+- **Selecting the right technology for each skill**: You will add the additional skills to the teacher so that they can learn with deep reinforcement learning.
 
 The files that are not directly related to these Machine Teaching capabilites are pre-populated and complete. The other files are partially complete, and require you to add additional code to create agent components. As you put the agent together, you will learn about the function and syntax for these agent components.
 
