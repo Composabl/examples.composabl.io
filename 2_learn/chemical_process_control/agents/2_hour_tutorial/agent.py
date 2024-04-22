@@ -1,7 +1,4 @@
 import os
-import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
@@ -19,12 +16,12 @@ DELETE_OLD_HISTORY_FILES: bool = True
 
 def run_agent():
     """Starting the agent."""
-   
+
     #copy this 2 times and past below. Update each skill with the right name, add the relevant Teacher and then the scenarios to complete.
     start_reaction_skill = Skill("start_reaction", StartReactionTeacher)
     for scenario_dict in start_reaction_scenarios:
         start_reaction_skill.add_scenario(Scenario(scenario_dict))
-    
+
     selector_skill = Skill("selector", CSTRTeacher)
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
@@ -38,7 +35,7 @@ def run_agent():
 
     #Update the selector skill below to include the 2 new skills defined above.
     agent.add_selector_skill(selector_skill, [start_reaction_skill], fixed_order=False, fixed_order_repeat=False)
-   
+
     # Load a pre-trained agent
     try:
         if len(os.listdir(PATH_CHECKPOINTS)) > 0:
