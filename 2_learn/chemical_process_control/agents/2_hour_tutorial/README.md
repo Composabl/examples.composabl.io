@@ -63,15 +63,16 @@ This two-hour training is divided into modules.
 ## Module 1: Machine Teaching Fundamentals
 add content here
 
+***
 #### Check Your Understanding
 
 1. Question
 
     <details>
-    <summary>Need a hint? </summary>
+    <summary>Check Answer </summary>
     This is a use case for machine teaching because there is a need to balance two competing goals.
     </details>
-</br>
+***
 
 ## Module 2: Agent Design and Performance
 
@@ -117,7 +118,7 @@ The transition phase is the most unpredictable and challenging to control, with 
 
 [More details of the use case](a)
 
-
+***
 #### Check Your Understanding
 
 1. Why is this problem a good use case for machine teaching?
@@ -143,7 +144,7 @@ The transition phase is the most unpredictable and challenging to control, with 
     <summary>Check answer </summary>
     This is a good use case for machine teaching because there is a need to balance two competing goals.
     </details>
-
+***
 
 ### Agent Designs
 
@@ -180,6 +181,7 @@ As you can see from the graph, MPC works well in the straightforward and linear 
 
 However, as the transition phase begins, the agent’s performance starts to fail. Its performance becomes dangerously inconsistent, potentially allowing the temperature to exceed the thermal runaway checkpoint at nearly every point in the reaction.
 
+***
 #### Check Your Understanding
 
 1. What is the "skill" in the single-skill MPC agent?
@@ -196,7 +198,7 @@ However, as the transition phase begins, the agent’s performance starts to fai
     <summary>Check answer </summary>
    The reaction enters into the transition phase, when the relationships between the chemical concentrations and temperature fluctuate in non-linear ways. In some of the training runs, the agent reaches thermal runaway at this point in the reaction.
     </details>
-
+***
 #### Explore Agent 1
 
 Want to go more in depth into Agent 1?  [Explore the agent files](/2_learn/chemical_process_control/agents/deep_reinforcement_learning/) to:
@@ -228,21 +230,20 @@ Deep reinforcement learning’s “personality” is almost the opposite of MPC�
 
 The DRL agent’s skills do better than MPC but still leaves some room for improvement.
 
+***
 #### Check Your Understanding
-
 1. What is the difference between Agent 1 and Agent 2?
 
     <details>
-    <summary>Check answer </summary>
+    <summary>Check answer</summary>
    The skill is an MPC controller that uses a mathematical model to d
     </details>
 </br>
 
 2. The designs you just looked at are autonomous intelligent agents, but they don't reflect the complete Machine Teaching methodology, because they don't use all three steps for designing agents with Machine Teaching.
-
     What are the three steps?
     <details>
-    <summary>Check answer </summary>
+    <summary>Check answer</summary>
     1. Divide the process into skills
     2. Orchestrate skills together
     3. Choose the right technology for each skill
@@ -255,7 +256,7 @@ The DRL agent’s skills do better than MPC but still leaves some room for impro
     <summary>Check answer </summary>
     Orchestrate skills together is missing, since you can't orchestrate skills in a single-skill agent. But without orchestration, you miss out on a lot of the power of machine teaching to use modularity to drive results.
     </details>
-
+***
 
 #### Explore Agent 2
 
@@ -268,70 +269,53 @@ Want to go more in depth into Agent 2? [Explore the agent files](/2_learn/chemic
 
 ### Agent 3: Multi-Skill Agent - Strategy Pattern
 
-Multi-skill agents are where you can truly leverage the power of machine teaching. Orchestrating separate, modular skills  together is what allows Machine Teachign to improve performance, compute efficiency, and explanability.
+Multi-skill agents are where you can truly leverage the power of machine teaching. Orchestrating separate, modular skills  together is what allows Machine Teaching to get results that vastly improve performance, compute efficiency, and explanability compared to other types of automation.
 
-Agent 3 uses a [design pattern](## "Common agent structure known to successfully addresses one or more challenging phenomena") called the [strategy pattern](## "definition"). The strategy pattern is a design in which the agent has several skills to choose from to make the decision, depending on the circumstances. The agent uses a special skill called a [selector](## "definition") that is programmed or trained to distinguish between different [scenarios](## "Scenarios are situations where your agent needs to behave differently to succeed"), conditions with specific characteristics in which different decision-making skills or strategies should be used. Depending on the conditions, the agent will pass control to one of the skills, and it will output the action. The strategy pattern is useful for problems that are challenging because they have variable conditions.
+Most successful automous intelligent agents are structured using one of only a few [design patterns](## "Common agent structure known to successfully addresses one or more challenging phenomena"). Knowing these patterns can greatly accelerate your ability to design agents quickly and successfully for your own use cases.
 
-The image below shows a strategy pattern agent with the skills missing. Thinking about the problem, how would you break it into three separate skills to handle different scenarios?
+Agent 3 uses the [strategy pattern](## "definition"). The strategy pattern works by dividing the process into [scenarios](## "Scenarios are situations where your agent needs to behave differently to succeed"), conditions with specific characteristics in which different decision-making skills or strategies should be used. The agent then uses a special skill called a [selector](## "definition") that is [programmed](## "A programmed skill uses a mathematical model or algorithm to make decisions") or [trained](## "A trained or learned skill uses deep reinforcement learning to make decisions by applying the learning it acquired and stored by practicing in simulation") to distinguish between the different scenarios. Depending on the conditions, the agent will pass control to one of the skills, and it will output the action. The strategy pattern is useful for problems that are challenging because they have variable conditions.
+
+***
+Think about the industrial mixer use case. How would you divide the process into different scenarios?
+    <details>
+    <summary>**Check answer** </summary>
+    The industrial mixer problem divides naturally into three different scenarios, one for each phase of the process: the initial low-productivity steady state, the transition, and the final high-productivity steady state.
+    </details>
+****
+
+The image below shows a strategy pattern agent with the skills missing. Just as in the other designs, the sensor layer takes in the information about the condition in the tank. Then it passes this information to a selector. The selector executes the appropriate strategy by assigning control to the appropriate skill. This is the [orchestration](## "definition") of the skills.
 
 ![blank strategy pattern diagram](./img/strategy-blank.png)
+***
+What skill would you assign to each of the three scenarios?
     <details>
-    <summary>**Need a hint?** </summary>
-    There is not one right answer to how to assign skills within an agent design. But a logical way to think about different scenarios for the industrial mixer would be to separate the skills based on the phase of the process.
+    <summary>**Check answer** </summary>
+    It's usually a good idea to name skills in a way that clearly communicates the scenario and the task. In this case, we are naming the three skills **Start Reaction**, **Navigate Transition**, and **Produce Product**.
     </details>
+***
 
-
-In the strategy pattern design for the industrial mixer, the sensor layer takes in the same information about the condition in the tank as in the other two examples. Then it passes this information to a selector based on the phase of the process. The selector executes the appropriate strategy by assigning control to the appropriate skill. This is the [orchestration](## "definition") of the skills.
 
 What about assigning the right technology to the skills? In this agent, all of the skills, including the selector, are learned with deep reinforcement learning. But unlike the single skill DRL agent, the skills practice separately, each with simulation data specific to its own phase of the process.
 
 ![strategy pattern agent](./img/strategy-agent.png)
 
-#### Analyzing Agent Performance - Agent 3
-
-The strategy-pattern agent had 93% conversion and 0% risk of thermal runaway. As you can see from the results, it has better performance in terms of productivity and temperature control that the single-skill DRL agent.
-
-![strategy pattern results](./img/strategy-result.png)
-
-
+***
 #### Check Your Understanding
 
-1. Agents 2 and 3 use the same technology, deep reinforcement learning. Why do they perform differently?
+1. Agents 2 and 3 use the same technology, deep reinforcement learning. How would you expect their performance to compare, and why?
 
     <details>
     <summary>Check answer </summary>
    Answer
     </details>
+***
 
-#### Build Agent 3
-Later in this tutorial, you will build this agent.
-
-- Skip ahead to build the agent
-- [View pre-built agent files](/2_learn/chemical_process_control/agents/strategy_pattern/)
-
-
-
-### Agent 4: Multi-Skill Agent - Plan-Execute Pattern
-
-There are many ways to combine technologies to create an intelligent agent, and sometimes two technologies that don’t perform well individually can be very successful when paired together.
-
-This is a design for an agent that strategically leverages the unique capabilities of DRL and MPC to achieve better control than either technology can create alone. The agent does this by putting the two technologies together in skill group, a structure that directs the agent to use the skills in sequence in a two-part decision-making process.
-
-In this example, the DRL skill first determines the set point – that is, it uses its powers of learning and experimentation to ascertain the desired temperature at a given moment in the reaction. It then passes this information on to the MPC skill, which uses its powers of control and execution to direct the agent on what action to take to achieve the desired temperature.
-
-These two skills working together achieve results that are arguably as good or better as the multiple learned skills in a hierarchy. In a head-to-head comparison in the same simulation conditions, the agent with DRL and MPC in a skill group converted a lower percentage of the reagents, but also came less close to thermal runaway.
-
-The decision about which of the two high performing agents to use could be a business decision about whether it is more important to maximize conversion, in which case the multiple learned skills agent would be a better choice, or to prioritize safety, in which case the DRL and MPC agent might be preferable.
-
-While there may not be a clear winner between the two multi-skill agents, they both significantly outperform the single-skill agents. Multiple skills and technologies working together make the difference in creating a successful intelligent agent that can effectively control the process.
 
 ## Module 3: Build the Strategy Pattern Agent
 
-### The Strategy Pattern Agent Starter Kit
-In this module, you will build the strategy pattern agent from a  starter kit of agent files.
+Now that you are familiar with the strategy pattern agent design, you are going to build the agent, train it, and then evaluate its performance and compare it to the single-skill agent designs.
 
-
-Navigate to the strategy_pattern folder. Inside the folder you'll find the following files:
+Inside your tutorial folder, you will find a starter kit of agent files.
 
 - ```agent.py``` |
 The [agent](## "definition") file organizes all the code for your agent, and is where you will add all the components you develop.
@@ -344,12 +328,12 @@ The [agent](## "definition") file organizes all the code for your agent, and is 
 
 - ```sensors.py``` | The [sensors](## "definition") file organizes the data provided by the simulator or the real system.
 
-This tutorial focuses on building the capabilities of the agent that are unique to the Machine Teaching methodology.
-- **Breaking the process into separate modular skills**: Your starter kit agent only has one skill. You will add two additional action skills to complete the strategy pattern.
-- **Orchestrating the skills together**: You will add a selector to enable the agent to use the right skill for the right phase of the process. You will also create scenarios for the selector to use.
-- **Selecting the right technology for each skill**: You will add the additional skills to the teacher so that they can learn with deep reinforcement learning.
+Some of the agent has already been built for you. Because this tutorial focuses on building the capabilities of the agent that are unique to the Machine Teaching methodology, files that are not directly related to these Machine Teaching capabilites are pre-populated and complete.
 
-The files that are not directly related to these Machine Teaching capabilites are pre-populated and complete. The other files are partially complete, and require you to add additional code to create agent components. As you put the agent together, you will learn about the function and syntax for these agent components.
+The other files are partially complete, and require you to add additional code to create agent components. As you put the agent together, you will learn about the function and syntax for these agent components. You will focus on:
+- **Breaking the process into separate modular skills**: Your starter kit agent only has one skill. You will add two additional action skills to complete the strategy pattern.
+- **Orchestrating the skills together**: Your selector skill is already ceated, but you will create scenarios for the selector to use to determine which skill to use.
+- **Selecting the right technology for each skill**: You will add the additional skills to the teacher so that they can learn with deep reinforcement learning.
 
 This tutorial focuses on the basics. You can also refer to the [full SDK documentation]("link") for additional explanations and resources.
 
@@ -366,3 +350,108 @@ These are the steps you will take the complete the agent:
 
 #### Step 1: Create Scenarios
 
+
+Open ```sensors.py``` and ```scenarios.py```.
+
+The sensors file is complete, but it is useful for reference. It lists and defines the sensor variables that the agent will use to process information.
+
+The scenarios file tells the agent how to determine the scenario at each moment of the process. This files is where you define the specific sensor values that identify each scenario.
+
+How do you know what these sensor values should be? This is one of the ways that Machine Teaching leverages human knowledge and expertise to make AI effective. If you are already a process expert, you will use your own data to define the scenarios. If not, you will need to interview a process expert to find out the data.
+
+In this case, an engineer has provided the concentration and temperature values that define the different phases so that you can correctly define the scenarios.
+
+Scenario 1: Low-productivity Steady State (ss1 in code)
+
+- T (temperature): need to add range/values  for all or those that are needed
+- Tc:
+- Ca:
+- Cref:
+- Tref:
+
+Scenario 2: Transition (transition in code)
+
+- T (temperature):
+- Tc:
+- Ca:
+- Cref:
+- Tref:
+
+Scenario 3: High-productivity Steady State (ss2 in code)
+
+- T (temperature):
+- Tc:
+- Ca:
+- Cref:
+- Tref:
+
+Using these sensor values and the code that is already in the file for Scenario 1, complete the code for Scenarios 2 and 3.
+
+```Noise_percentage``` refers to NEED DEFINITION.
+
+Save the file when you are done.
+
+#### Step 2: Add Skills in the Teacher
+
+Next, you will edit the teacher file to set up training for the skills in your agent.
+
+Open ```teacher.py```.
+
+There is only 1 teacher defined (StartReactionTeacher) and the selector CSTRTeacher.
+
+This is to give you an idea of what the additional skills will look like that you need to create. The strategy pattern for IM agent contains 3 skills and 1 selector.
+
+You will create the Navigate Transition and Produce Product skills.
+Copy the code for StartReactionTeacher and paste it 2 times. Rename the teachers to NavigateReactionTeacher, ProduceProductTeacher. You will also need to edit the names of the self.title and self.history_path to reflect your new naming convention. See screenshot below for an example.
+
+![code sample](/2_learn/chemical_process_control/agents/img/teacher.png)
+
+Save the file.
+
+#### Step 3: Update the Agent File
+
+Now that you have added skills to the teacher, you need to update the agent file with those skills.
+
+Open ```agent.py```. Then update the code in five places.
+
+1. Import the new teachers you just created (line 9). Follow the syntax for the teachers already in the code.
+
+2. Import the new scenarios you just created (line 11). Follow the syntax for the scenarios already in the code.
+
+3. Add the new skills, along with their scenarios, to the definition of the ```run_agent``` function (line 20). Follow the syntax for the existing skills.
+
+4.
+
+
+
+
+First, import the new skills and their scenarios.
+
+
+
+Edit the agent file – there is only 1 skill defined (start_reaction_skill) with it’s associated scenarios in the run agent section. This is to give you an idea of what the additional skills and their scenarios will look like. The strategy pattern for IM agent contains 3 skills and 1 selector. You will create the Navigate Transition, Produce Product  skills and scenarios to complete the design.
+
+
+
+#### Analyzing Agent Performance - Agent 3
+
+The strategy-pattern agent had 93% conversion and 0% risk of thermal runaway. As you can see from the results, it has better performance in terms of productivity and temperature control that the single-skill DRL agent.
+
+![strategy pattern results](./img/strategy-result.png)
+![strategy pattern results](./img/strategy-result.png)
+
+
+
+### Agent 4: Multi-Skill Agent - Plan-Execute Pattern
+
+There are many ways to combine technologies to create an intelligent agent, and sometimes two technologies that don’t perform well individually can be very successful when paired together.
+
+This is a design for an agent that strategically leverages the unique capabilities of DRL and MPC to achieve better control than either technology can create alone. The agent does this by putting the two technologies together in skill group, a structure that directs the agent to use the skills in sequence in a two-part decision-making process.
+
+In this example, the DRL skill first determines the set point – that is, it uses its powers of learning and experimentation to ascertain the desired temperature at a given moment in the reaction. It then passes this information on to the MPC skill, which uses its powers of control and execution to direct the agent on what action to take to achieve the desired temperature.
+
+These two skills working together achieve results that are arguably as good or better as the multiple learned skills in a hierarchy. In a head-to-head comparison in the same simulation conditions, the agent with DRL and MPC in a skill group converted a lower percentage of the reagents, but also came less close to thermal runaway.
+
+The decision about which of the two high performing agents to use could be a business decision about whether it is more important to maximize conversion, in which case the multiple learned skills agent would be a better choice, or to prioritize safety, in which case the DRL and MPC agent might be preferable.
+
+While there may not be a clear winner between the two multi-skill agents, they both significantly outperform the single-skill agents. Multiple skills and technologies working together make the difference in creating a successful intelligent agent that can effectively control the process.
