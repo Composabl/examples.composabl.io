@@ -3,43 +3,54 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
 from config import config
 from sensors import sensors
 from scenarios import Navigation_scenarios
-from teacher import (AlignmentTeacher, NavigationTeacher, SpeedControlTeacher,
+from teacher import (NavigationTeacher, SpeedControlTeacher,
                      StabilizationTeacher)
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
 PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
-def selector(x, y, angle, angle_speed):
-    if abs(x) > 100 or y > 500:
-        return "Navigation_skill"
+class ProgrammedSelector(Controller):
+    def __init__(self):
+        self.counter = 0
 
-    elif abs(angle) > 0.1 or abs(angle_speed) > 0.1:
-        return "Stabilization_skill"
+    def compute_action(self, obs):
+        if abs(float(obs['x'])) > 10:
+            return [0] #"Navigation_skill"
 
-    elif y > 100:
-        return "Alignment_skill"
+        elif abs(float(obs['angle'])) > 0.1:
+            return [1] #"Stabilization_skill"
 
-    else:
-        return "SpeedControl_skill"
+        else:
+            return [2] #"SpeedControl_skill"
+
+    def transform_obs(self, obs):
+        return obs
+
+    def filtered_observation_space(self):
+        return [s.name for s in sensors]
+
+    def compute_success_criteria(self, transformed_obs, action):
+        return False
+
+    def compute_termination(self, transformed_obs, action):
+        return False
 
 
 def run_agent():
     # Define Skills
     Navigation_skill = Skill("Navigation", NavigationTeacher)
-    Alignment_skill = Skill("Alignment", AlignmentTeacher)
     SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher)
     Stabilization_skill = Skill("Stabilization", StabilizationTeacher)
-    selector_skill = Skill("selector", NavigationTeacher)
+    selector_skill = Skill("selector", ProgrammedSelector)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
         Navigation_skill.add_scenario(scenario)
-        Alignment_skill.add_scenario(scenario)
         SpeedControl_skill.add_scenario(scenario)
         Stabilization_skill.add_scenario(scenario)
         selector_skill.add_scenario(scenario)
@@ -49,10 +60,9 @@ def run_agent():
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
-    agent.add_skill(Alignment_skill)
     agent.add_skill(SpeedControl_skill)
     agent.add_skill(Stabilization_skill)
-    agent.add_selector_skill(selector_skill, [Navigation_skill, Alignment_skill], fixed_order=True)
+    agent.add_selector_skill(selector_skill, [Navigation_skill, Stabilization_skill, SpeedControl_skill], fixed_order=False)
 
     # Load a pre-trained agent
     try:
@@ -62,7 +72,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    runtime.train(agent, train_iters=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

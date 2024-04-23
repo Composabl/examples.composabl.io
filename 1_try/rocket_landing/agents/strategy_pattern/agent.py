@@ -7,7 +7,7 @@ from composabl import Agent, Runtime, Scenario, Sensor, Skill
 from sensors import sensors
 from config import config
 from scenarios import Navigation_scenarios
-from teacher import (AlignmentTeacher, SelectorTeacher, SpeedControlTeacher, StabilizationTeacher,NavigationTeacher)
+from teacher import (SelectorTeacher, SpeedControlTeacher, StabilizationTeacher,NavigationTeacher)
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -17,14 +17,12 @@ def run_agent():
     # delete old history files
     Stabilization_skill = Skill("Stabilization", StabilizationTeacher)
     Navigation_skill = Skill("Navigation", NavigationTeacher)
-    Alignment_skill = Skill("Alignment", AlignmentTeacher)
     SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher)
     selector_skill = Skill("selector", SelectorTeacher)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
         Navigation_skill.add_scenario(scenario)
-        Alignment_skill.add_scenario(scenario)
         SpeedControl_skill.add_scenario(scenario)
         Stabilization_skill.add_scenario(scenario)
         selector_skill.add_scenario(scenario)
@@ -35,9 +33,8 @@ def run_agent():
 
     agent.add_skill(Navigation_skill)
     agent.add_skill(Stabilization_skill)
-    agent.add_skill(Alignment_skill)
     agent.add_skill(SpeedControl_skill)
-    agent.add_selector_skill(selector_skill, [Navigation_skill, Stabilization_skill, Alignment_skill, SpeedControl_skill], fixed_order=False, fixed_order_repeat=False)
+    agent.add_selector_skill(selector_skill, [Navigation_skill, Stabilization_skill, SpeedControl_skill], fixed_order=False, fixed_order_repeat=False)
 
     # Load a pre-trained agent
     try:
