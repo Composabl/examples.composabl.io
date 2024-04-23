@@ -19,11 +19,11 @@ class ProgrammedSelector(Controller):
         self.counter = 0
 
     def compute_action(self, obs):
-        if abs(float(obs['x'])) > 50:
-            return [0] #"Navigation_skill"
-
-        elif abs(float(obs['angle'])) > 0.5:
+        if abs(float(obs['angle'])) > 0.5:
             return [1] #"Stabilization_skill"
+
+        elif abs(float(obs['x'])) > 10:
+            return [0] #"Navigation_skill"
 
         else:
             return [2] #"SpeedControl_skill"
@@ -72,7 +72,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=200)
+    runtime.train(agent, train_iters=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
