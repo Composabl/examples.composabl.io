@@ -113,8 +113,8 @@ def start():
 
     ax1.set_xlim(-400, 400)
     ax1.set_ylim(-50, 1000)
-    ax1.axvline(x=-50, color='black', linestyle='--')
-    ax1.axvline(x=50, color='black', linestyle='--')
+    ax1.axvline(x=-10, color='black', linestyle='--')
+    ax1.axvline(x=10, color='black', linestyle='--')
     ax1.set_aspect(1)
 
     def update(i):
