@@ -2,7 +2,7 @@
 Build an Intelligent Autonomous Agent to Control an Industrial Mixer
 
 ## About This Tutorial
-You can use Composabl to build powerful [intelligent agents](## "definition") that solve real problems and beat industrial benchmarks and other AI solutions. This tutorial will teach you how to design and build these agents using the [Machine Teaching](## "definition") methodology and the Composabl platform.
+You can use Composabl to build powerful [autonomous intelligent agents](## "definition") that solve real problems and beat industrial benchmarks and other AI solutions. This tutorial will teach you how to design and build these agents using the [Machine Teaching](## "definition") methodology and the Composabl platform.
 
 ### Before You Start
 To be ready for this tutorial, you should have already completed the [Try Tutorial](/1_try/), including:
@@ -43,25 +43,83 @@ This two-hour training is divided into modules.
     - Explain the parts of an intelligent agent
     - Explain why different agent designs result in different performance
 
-
-3. Build the Strategy Pattern Agent (60 minutes)
+3. Build the Strategy Pattern Agent (30 minutes)
 
     In this module, you will build an agent using the stragegy design pattern. At the end of this module, you will be able to:
+    - Explain the strategy pattern for agent design and how it addresses the needs of a use case
     - Write Python SDK code that defines the agent structure of a strategy pattern
-    - Train an agent and analyze performance based on training data
 
-4. Design Patterns (30 minutes)
+4. Train and Operate Your Agent (30 minutes)
 
-    In this module, you will build two different multi-skill agents using the Composabl platform. In this module, you will practice building skills that learn with deep reinforcement learning, matching skills to scenarios, and coding selectors. At the end of this module, you will be able to:
+    In this module, you will train and operate the strategy pattern agent you just built. You will learn how to ADD MORE MORE
 
-    - Recognize two fundamental design patterns
-    - Apply design patterns to problems they can solve
-     or a plan-execute pattern respectively
-	- Operate a trained agent
+    - Train an agent
+    - Analyze agent performance based on training data
+    - Operate a trained agent
     - Continue training a partially trained agent
 
+5. Design Patterns (30 minutes)
+
+    In this module, you will learn about additional design patterns for intelligent agents and compare their performance to the strategy pattern.
+
+    - Explain the plan-execute pattern for agent design and how it addresses the needs of a use case
+    - Explain the use of perceptors and how they contribute to agent performance
+    - Make nuanced comparisons of agent performance to select the best agent design for a use case
+
 ## Module 1: Machine Teaching Fundamentals
-add content here
+
+### What Is Machine Teaching?
+
+Machine teaching is the methodology for designing and building [autonomous intelligent agents](## "definition"), decision-making AI that improves equipment and process control by sensing and responding in real time with more human-like decision-making.
+
+Autonomous intelligent agents are more powerful and reliable than chatbots or other AI technology built on large language models. They are "industrial strength" - made for decision-making in high-value and high-risk processes. Compared to both traditional automation and other types of AI, they are more effective at meeting business goals, more compute efficient, and safer and more explainable.
+
+### When Is Machine Teaching Needed?
+The unique structure of agents created with Machine Teaching allows them to succeed in situations where traditional automation fails - when humans need to step in and take over because the situation is too nuanced, fuzzy, or dynamic for existing control systems to handle effectively.
+
+#### How Machines Make Decisions
+
+One of the strengths of Machine Teaching is that you can use any control technology within an intelligent autonomous agent. There are four major types of decision-making technologies that may be used in Machine Teaching agents.
+
+1. **Technologies that calcuate decisions**: Mathematical modeling of decisions, such as in systems like [PID or MPC controllers](## "definition")
+2. **Technologies that search decision options**: Looking up options and choosing according to pre-set criteria, such as in [optimization algorithms](## "definition")
+3. **Technologies that use past experience**: Applying a system of rules determined through human practice, such as in [expert systems](## "definition")
+
+These first three options are all widely used in traditional automation. They are each successful in situations that are well suited to their capabilities, but all fall short when conditions are too fuzzy or when the decision-making needs are too complex. That's when humans need to step in and take over the decision-making.
+
+The fourth decision-making method is the AI innovation that can take agents to the next level.
+
+4. **Technologies that learn decisions**:  Using AI technology, especially [deep reinforcement learning (DRL)](## "definition"), agents can develop human-like *skill* at making certain decisions by practicing in simulation, storing the results of their practice, and getting better and better over time at completing a task.
+
+#### The Superpowers of Autonomous AI Agents
+
+As intelligent autonomous agents practice in simulation and get better at performing skills, they develop human-like characteristics that make them effective at the most challenging tasks in industrial processes. These characteristics are the superpowers of autonomous AI agents.
+
+- **Perception** | Autonomous intelligent agents can take in and draw useful conclusions from information in their surroundings. For example, EXAMPLE.
+
+- **Strategy** | Autonomous intelligent agents can apply different decision-making skills in different situations based on what approach is most effective for the conditions. For example, EXAMPLE.
+
+- **Deduction** | Autonomous intelligent agents can use information they have to draw correct conclusions about information they can't access directly. For example, EXAMPLE.
+
+- **Learning** | Autonomous intelligent agents can store conclusions past experiences and build on them to get better at a task. For example, EXAMPLE.
+
+- **Planning** | Autonomous intelligent agents can plan ahead, taking actions that don't have immediate payoff but are necessary for future success. For example, EXAMPLE.
+
+
+#### How Machine Teaching Is Different
+
+Machine teaching accesses these superpowers by separating tasks into modular skills. Rather than having an AI learn a task all at once, machine teaching breaks the task down and lets the agent practice each learned skill individually, using only the simulation data that is relevant to what it needs to do.
+
+For instance, an agent controlling a drone doesn't need to practice the "Take off" skill in weather conditions in which it wouldn't be cleared to fly. But it does need to practice flying and landing in those conditions, since the weather could change during a flight.
+
+The heart of Machine Teaching is three steps:
+
+1. Identify skills for the agent (break the process down into separate skills)
+2. Orchestrate the skills together (decide the relationships and sequence of the skills)
+3. Assign the right technology to each skill (determine whether each skill should be learned with DRL or programmed with a controller or optimizer)
+
+The next modules of this tutorial will show you how to apply these steps with an example.
+
 
 ***
 #### Check Your Understanding
@@ -341,12 +399,14 @@ This tutorial focuses on the basics. You can also refer to the [full SDK documen
 
 These are the steps you will take the complete the agent:
 
-- Create the scenarios for the additional skills
-- Add the additional skills in the teacher
-- Create the skills in the agent file
-- Add scenarios to the skills in the agent file
-- Add skills to the agent file
-- Add the selector with the skills in the selector to the agent file
+1. Create the scenarios for the additional skills
+2. Add the additional skills in the teacher
+3. Update the agent file
+    - Import the new teachers
+    - Import the new scenarios
+    - Add new skills to the ```run_agent``` function
+    - Add new skills to the agent using the ```add.skill()``` method
+    - Add new skills to the selector
 
 #### Step 1: Create Scenarios
 
@@ -418,40 +478,95 @@ Open ```agent.py```. Then update the code in five places.
 
 2. Import the new scenarios you just created (line 11). Follow the syntax for the scenarios already in the code.
 
-3. Add the new skills, along with their scenarios, to the definition of the ```run_agent``` function (line 20). Follow the syntax for the existing skills.
+3. Add the new skills, along with their scenarios and teachers, to the definition of the ```run_agent``` function (line 20). Follow the same syntax used for the ```start_reaction_skill```.
 
-4.
+4. Add the new skills to the agent using the ```add_skill()``` method (line 36). Follow the syntax used for the ```start_reaction_skill```.
 
+5. Add the new skills to the selector (line 40) by adding them to the bracket containing ```[start_reaction_skill]```. Separate the skills with commas.
 
+Save your file. You are now ready to train your agent!
 
+## Module 4: Training and Operating Your Agent
 
-First, import the new skills and their scenarios.
+### Training Your Agent
 
+You will train and operate your agent from the command line of your Codespace, using these steps.
 
+1. Navigate to the correct folder by entering ```2_learn/chemical_process_control/2_hour_tutorial/strategy_pattern```.
+2. Start the Composabl historian to track agent behavior. Type ```composabl historian start```.
+3. Train your agent by typing ```python agent.py```.
 
-Edit the agent file – there is only 1 skill defined (start_reaction_skill) with it’s associated scenarios in the run agent section. This is to give you an idea of what the additional skills and their scenarios will look like. The strategy pattern for IM agent contains 3 skills and 1 selector. You will create the Navigate Transition, Produce Product  skills and scenarios to complete the design.
+#### Training to and from a Checkpoint
 
+Your agent will train each skill and then save the training progress to a "checkpoint." This allows MORE INFO MORE INFO. You will see a message like this, which means MORE INFO MORE INFO:
 
+![saved skill message](/2_learn/chemical_process_control/agents/2_hour_tutorial/img/saving-skill.png)
+
+Now we need to check the operation of the trained agent. This is done by starting another instance of the simulator locally and calling the agent_inference python file.
+
+In VS Code open a new terminal by clicking on the drop down icon on the top right of the terminal window. It is next to the + icon. Select zsh to open a new terminal.
+
+Type ```cd 2_learn/chemical_process_control/sim/src/``` to get to the correct location.
+
+Type ```python main.py```. To confirm that the sim has started a message saying ```listening on [::]:1337``` should be displayed.
+
+See screenshot for example:
+
+![sim message](/2_learn/chemical_process_control/agents/2_hour_tutorial/img/sim.png)
+
+Go back to the other terminal window. Check you are in the ```2_learn/chemical_process_control/2_hour_tutorial/strategy_pattern``` folder.
+
+To run the Operate function for the previously trained agent type ```python agent_inference.py```. Successful operations will result in a message that looks like this screenshot:
+
+![successful operation screenshot](/2_learn/chemical_process_control/agents/2_hour_tutorial/img/operation.png)
+
+In VSCode file explorer open the ```inference_figure.png``` file located in the benchmarks folder. This is the output from operation, and you can see the results of the agent's performance.
+
+To start training the agent from a saved checkpoint ensure that you are in the main directory where the agent is located.
+
+Change the agent.py file training iterations (around line 44) from 2 to 20. Save the agent file.
+
+Run ```python agent.py``` to start training again.
 
 #### Analyzing Agent Performance - Agent 3
+
+Look at the training results from your agent. How did it perform compared to Agents 1 and 2?
 
 The strategy-pattern agent had 93% conversion and 0% risk of thermal runaway. As you can see from the results, it has better performance in terms of productivity and temperature control that the single-skill DRL agent.
 
 ![strategy pattern results](./img/strategy-result.png)
-![strategy pattern results](./img/strategy-result.png)
 
 
+## Module 5: Design Patterns for Agents
 
-### Agent 4: Multi-Skill Agent - Plan-Execute Pattern
+You have already learned about the strategy pattern and how it addresses the needs of the use case. In this module, you will about an additional element that can be added to designs - a perception layer - and a different design pattern - the plan-execute pattern. We will compare results for five different designs that use the different patterns.
+
+### Agent 4: Strategy Pattern with Perception
+
+A "perception layer" is an optional design element that can be used to enhance agent performance. [Perceptors](## "definition") come between sensors and skills. They take information from the sensors and process it in some way to make it more useful.
+
+![perception agent](/2_learn/chemical_process_control/agents/2_hour_tutorial/img/perception%20agent.png)
+
+Perceptors commonly use [machine learning](## "definition") models, which are especially skilled at pattern recognition and perception. Using machine learning, perceptors can report not just sensor variable values but predictions about what is likely to happen.
+
+In this example, a preceptor  uses machine learning to predict thermal runaway. The perception layer in this design checks the sensor data for conditions that might indicate an elevated risk of thermal runaway, and then passes that information to the selector along with the rest of the sensor data. This helps the agent ensure that thermal runaway is never reached.
+
+### Agent 5: Multi-Skill Agent - Plan-Execute Pattern
 
 There are many ways to combine technologies to create an intelligent agent, and sometimes two technologies that don’t perform well individually can be very successful when paired together.
 
 This is a design for an agent that strategically leverages the unique capabilities of DRL and MPC to achieve better control than either technology can create alone. The agent does this by putting the two technologies together in skill group, a structure that directs the agent to use the skills in sequence in a two-part decision-making process.
 
+![plan-execute pattern agent](/2_learn/chemical_process_control/agents/2_hour_tutorial/img/plan-execute-agent.png)
+
 In this example, the DRL skill first determines the set point – that is, it uses its powers of learning and experimentation to ascertain the desired temperature at a given moment in the reaction. It then passes this information on to the MPC skill, which uses its powers of control and execution to direct the agent on what action to take to achieve the desired temperature.
 
 These two skills working together achieve results that are arguably as good or better as the multiple learned skills in a hierarchy. In a head-to-head comparison in the same simulation conditions, the agent with DRL and MPC in a skill group converted a lower percentage of the reagents, but also came less close to thermal runaway.
 
-The decision about which of the two high performing agents to use could be a business decision about whether it is more important to maximize conversion, in which case the multiple learned skills agent would be a better choice, or to prioritize safety, in which case the DRL and MPC agent might be preferable.
+### Comparing Agent Performance
+
+This table shows the performance of all five agents rated on MORE INFO.
+
+The decision about which of the two highest performing agents to use could be a business decision about whether it is more important to maximize conversion, in which case the multiple learned skills agent would be a better choice, or to prioritize safety, in which case the DRL and MPC agent might be preferable.
 
 While there may not be a clear winner between the two multi-skill agents, they both significantly outperform the single-skill agents. Multiple skills and technologies working together make the difference in creating a successful intelligent agent that can effectively control the process.
