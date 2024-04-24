@@ -2,7 +2,7 @@
 
 In the try onramp, you will first set up the composabl compute environment on GitHub Codespaces and train your first agent, then you will learn how to build that agent from scratch.
 
-The agent project for this onramp is for the agent to contorl a rocket and land it safely on its tail.
+The agent project for this onramp is for the agent to control a rocket and land it safely on its tail.
 
 Here is the structure of the project folder for this onramp. The agents folder contains the 2-minute trial, the 30-minute tutorial.
 
