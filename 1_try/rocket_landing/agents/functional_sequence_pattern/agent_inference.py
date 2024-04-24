@@ -69,6 +69,7 @@ def start():
         a += action[1]
         t = np.clip(t,0.4,1)
         a = np.clip(a, -3.15, 3.15)
+        #print('angle: ', a)
         thrust_history.append([t, a])
 
         if done:
@@ -112,6 +113,8 @@ def start():
 
     ax1.set_xlim(-400, 400)
     ax1.set_ylim(-50, 1000)
+    ax1.axvline(x=-10, color='black', linestyle='--')
+    ax1.axvline(x=10, color='black', linestyle='--')
     ax1.set_aspect(1)
 
     def update(i):
