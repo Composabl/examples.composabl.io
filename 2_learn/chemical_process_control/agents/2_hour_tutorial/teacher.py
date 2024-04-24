@@ -8,7 +8,7 @@ import pandas as pd
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
-#Skills are the building blocks of intelligent autonomous agents. 
+#Skills are the building blocks of intelligent autonomous agents.
 #Teaching allows you to define these AI building blocks so that your agent can succeed at complex tasks in dynamic conditions
 #This is an example of a base class to show the full structure of a teacher and all the associated elements.
 class BaseCSTR(Teacher):
@@ -152,7 +152,6 @@ class BaseCSTR(Teacher):
 #Copy this entire class 2 times and re-name them to reflect the second and third skills in the agent design.
 #Ensure that the self.title and self.history_path variables are also changed to reflect the names of the skills.
 class StartReactionTeacher(BaseCSTR):
-    
     def __init__(self):
         super().__init__()
         self.title = 'CSTR Live Control - StartReaction skill'
@@ -197,52 +196,8 @@ class StartReactionTeacher(BaseCSTR):
     def compute_termination(self, transformed_obs, action):
         return False
 
-    
-    def __init__(self):
-        super().__init__()
-        self.title = 'CSTR Live Control - NavigateReaction skill'
-        self.history_path = f"{PATH_HISTORY}/NavigateReaction_history.pkl"
 
-        # create metrics db
-        try:
-            self.df = pd.read_pickle(self.history_path)
-
-            if self.metrics == 'fast':
-                self.plot_metrics()
-        except Exception:
-            self.df = pd.DataFrame()
-
-    def compute_reward(self, transformed_obs, action, sim_reward):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-
-        error = (float(transformed_obs['Ca']) - float(transformed_obs['Cref']))**2
-        self.error_history.append(error)
-        rms = math.sqrt(np.mean(self.error_history))
-        self.rms_history.append(rms)
-
-        # minimize error
-        reward = 1 / rms
-        self.reward_history.append(reward)
-
-        self.count += 1
-
-        # history metrics
-        if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-            self.df = pd.concat([self.df, df_temp])
-            self.df.to_pickle(self.history_path)
-
-        return reward
-
-    def compute_termination(self, transformed_obs, action):
-        return False
-    
-#This is the teacher for the Selector Skill.    
+#This is the teacher for the Selector Skill.
 class CSTRTeacher(BaseCSTR):
     def __init__(self):
         self.obs_history = None
