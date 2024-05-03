@@ -1,5 +1,2 @@
-composabl-core-dev==0.7.3.dev10
+composabl-core-dev==0.8.0.dev60
 scipy
-casadi
-ipython
-ipywidgets
