@@ -41,8 +41,8 @@ class ServerImpl(ServerComposabl):
             "max_episode_steps": 400
         }
 
-    async def observation_space_info(self) -> gym.Space:
-        return self.env.observation_space
+    async def sensor_space_info(self) -> gym.Space:
+        return self.env.sensor_space
 
     async def action_space_info(self) -> gym.Space:
         return self.env.action_space
