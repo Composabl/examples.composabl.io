@@ -4,11 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from composabl import SkillTeacher
-from IPython.display import display
 from ipywidgets import IntProgress
 from matplotlib import pyplot as plt
-from matplotlib import rc
-from matplotlib.animation import FFMpegWriter, FuncAnimation, PillowWriter
+from matplotlib.animation import FuncAnimation
 
 
 class NavigationTeacher(SkillTeacher):
@@ -110,7 +108,7 @@ class NavigationTeacher(SkillTeacher):
     async def compute_termination(self, transformed_obs, action):
         return False
 
-    async def plot_metrics(self):
+    def plot_metrics(self):
         plt.clf()
         plt.subplot(3,1,1)
         plt.plot(self.reward_history, 'r.-')
@@ -136,7 +134,7 @@ class NavigationTeacher(SkillTeacher):
         plt.draw()
         plt.pause(0.001)
 
-    async def plot_obs(self, title='Starship'):
+    def plot_obs(self, title='Starship'):
         #x = [ x["x"] for x in self.obs_history[:]]
         x = np.array([ list(x.values()) for x in self.obs_history[:]])
         u = np.array(self.thrust_history[:])
