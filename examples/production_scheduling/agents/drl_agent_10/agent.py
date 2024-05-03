@@ -1,9 +1,9 @@
+import datetime
 import os
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
+from composabl import Agent, Runtime, Scenario, Sensor, Skill, SkillController
 from sensors import sensors
 from teacher import BaseTeacher
-import datetime
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -71,18 +71,18 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            #"docker": {
-            #    "image": "composabl/sim-whisky-local:latest"
-            #},
-            "local": {
-               "address": "localhost:1337"
-            }
+            "docker": {
+               "image": "composabl/sim-whisky-local:latest"
+            },
+            # "local": {
+            #    "address": "localhost:1337"
+            # }
         },
         "env": {
             "name": "sim-whisky",
         },
         "runtime": {
-            "workers": 1,
+            "workers": 8,
             "num_gpus": 0
         }
     }
@@ -92,7 +92,7 @@ def start():
     agent.add_sensors(sensors)
 
     agent.add_skill(produce_skill)
-    
+
     files = os.listdir(PATH_CHECKPOINTS)
 
     if '.DS_Store' in files:
@@ -105,7 +105,7 @@ def start():
 
 
     runtime.train(agent, train_iters=1)
-    
+
     agent.export(PATH_CHECKPOINTS)
     end_time = datetime.datetime.now()
     print(f"Training time: {end_time - start_time}")
