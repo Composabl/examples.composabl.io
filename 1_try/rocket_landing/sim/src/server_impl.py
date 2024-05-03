@@ -2,29 +2,19 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
 
-# from typing import Any, Dict, Optional, SupportsFloat, Tuple
-
-# import composabl_core.utils.logger as logger_util
-# import gymnasium as gym
-# from composabl_core.agent.scenario import Scenario
-# from composabl_core.grpc.server.server_composabl import ServerComposabl
-# from gymnasium.envs.registration import EnvSpec
-# from sim import Env
-
-
 from typing import Any, Dict, SupportsFloat, Tuple
 
 import gymnasium as gym
 from composabl_core.agent.scenario.scenario import Scenario
 from composabl_core.networking.server_composabl import ServerComposabl
-from sim import AerialAutonomyEnv
+from sim import Env
 
 
 class ServerImpl(ServerComposabl):
     """
     Define the way how Composabl (ServerComposabl) can interact with the simulation environment (SimEnv)
     """
-    env: AerialAutonomyEnv
+    env: Env
 
     def __init__(self, env_init: dict = {}) -> None:
         self.env_init = env_init
@@ -34,15 +24,15 @@ class ServerImpl(ServerComposabl):
         self.env_init = env_init if env_init else self.env_init
 
         print("Creating env_init: ", self.env_init)
-        self.env = AerialAutonomyEnv()
+        self.env = Env()
 
         return {
             "id": "starship",
-            "max_episode_steps": 400
+            "max_episode_steps": 401
         }
 
     async def sensor_space_info(self) -> gym.Space:
-        return self.env.sensor_space
+        return self.env.observation_space
 
     async def action_space_info(self) -> gym.Space:
         return self.env.action_space

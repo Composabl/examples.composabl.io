@@ -1,13 +1,13 @@
+from typing import Any, Dict, SupportsFloat, Tuple, Optional
 import math
 import random
-from typing import Any, Dict, Optional, SupportsFloat, Tuple
-
-import gymnasium as gym
 import numpy as np
+
 from composabl_core.agent.scenario import Scenario
+import gymnasium as gym
 
 
-class AerialAutonomyEnv(gym.Env):
+class Env(gym.Env):
     def __init__(self):
         self.obs_space_constraints = {
             "x": {'low': -400, 'high': 400},
@@ -26,7 +26,7 @@ class AerialAutonomyEnv(gym.Env):
         low_list = [x['low'] for x in self.obs_space_constraints.values()]
         high_list = [x['high'] for x in self.obs_space_constraints.values()]
 
-        self.sensor_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
+        self.observation_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
 
         low_act_list = [x['low'] for x in self.action_constraints.values()]
         high_act_list = [x['high'] for x in self.action_constraints.values()]
@@ -199,6 +199,9 @@ class AerialAutonomyEnv(gym.Env):
 
         # Increase time
         self.cnt += 1
+        if self.cnt >= 399:
+            self.cnt = 399
+
         #update values
         self.x_obs = self.x[self.cnt, 0]
         self.x_speed = self.x[self.cnt, 1]
@@ -228,8 +231,13 @@ class AerialAutonomyEnv(gym.Env):
         # end the simulation
         if self.y_obs < 0:
             terminated = True
+            #print('TERMINATED Y OBS ', self.y_obs)
         elif not self.obs_space_constraints['x']['low'] <= self.x_obs <= self.obs_space_constraints['x']['high']:
             terminated = True
+            #print('TERMINATED CONSTRAINTS ', self.x_obs)
+        elif self.cnt > 400:
+            terminated = True
+            #print('TERMINATED 400')
 
         self.obs = np.array(list(self.obs.values()))
         info = {}
