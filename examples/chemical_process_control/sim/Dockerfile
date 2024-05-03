@@ -4,7 +4,7 @@
 #
 # CHANGELOG
 # Version 2.0.0:
-#   - Update to Python 3.11
+#   - Update to Python 3.10
 #   - Dynamic composabl-version from Dockerfile args
 # Version 1.0.0:
 #   - Initial build file
