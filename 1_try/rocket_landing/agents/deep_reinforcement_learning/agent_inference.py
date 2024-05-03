@@ -81,7 +81,7 @@ async def run_agent():
     await sim.close()
 
     # save history data
-    #df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
+    df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
 
     # plot
     x = np.array(obs_history)
