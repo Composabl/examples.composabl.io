@@ -26,7 +26,7 @@ class AerialAutonomyEnv(gym.Env):
         low_list = [x['low'] for x in self.obs_space_constraints.values()]
         high_list = [x['high'] for x in self.obs_space_constraints.values()]
 
-        self.observation_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
+        self.sensor_space = gym.spaces.Box(low=np.array(low_list), high=np.array(high_list))
 
         low_act_list = [x['low'] for x in self.action_constraints.values()]
         high_act_list = [x['high'] for x in self.action_constraints.values()]
