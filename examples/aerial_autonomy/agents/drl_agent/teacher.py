@@ -1,14 +1,17 @@
-from composabl import Teacher
-import matplotlib.pyplot as plt
-from matplotlib import pyplot as plt, rc
-from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
-from ipywidgets import IntProgress
-from IPython.display import display
 import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from composabl import SkillTeacher
+from IPython.display import display
+from ipywidgets import IntProgress
+from matplotlib import pyplot as plt
+from matplotlib import rc
+from matplotlib.animation import FFMpegWriter, FuncAnimation, PillowWriter
 
-class NavigationTeacher(Teacher):
+
+class NavigationTeacher(SkillTeacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -38,16 +41,16 @@ class NavigationTeacher(Teacher):
             self.df = pd.DataFrame()
 
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -83,10 +86,10 @@ class NavigationTeacher(Teacher):
         #self.df.to_pickle("./starship/history.pkl")
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.plot:
             if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
                 self.plot_obs('Stabilization')
@@ -104,10 +107,10 @@ class NavigationTeacher(Teacher):
 
             return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.clf()
         plt.subplot(3,1,1)
         plt.plot(self.reward_history, 'r.-')
@@ -133,7 +136,7 @@ class NavigationTeacher(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self, title='Starship'):
+    async def plot_obs(self, title='Starship'):
         #x = [ x["x"] for x in self.obs_history[:]]
         x = np.array([ list(x.values()) for x in self.obs_history[:]])
         u = np.array(self.thrust_history[:])
