@@ -1,57 +1,44 @@
 import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Scenario, Skill, Trainer
+from config import config
+from scenarios import Navigation_scenarios
 from sensors import sensors
 from teacher import NavigationTeacher
 
-license_key = os.environ["COMPOSABL_LICENSE"]
+PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY: str = f"{PATH}/history"
+PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
-def start():
-
-    Navigation_scenarios = [
-        {
-            "x": 0,
-            "x_speed": 0,
-            "y": 1000,
-            "y_speed": -80,
-            "angle": -3.14 / 2,
-            "ang_speed": 0
-        }
-    ]
-
+def run_agent():
     Navigation_skill = Skill("Navigation", NavigationTeacher)
 
     for scenario_dict in Navigation_scenarios:
         scenario = Scenario(scenario_dict)
         Navigation_skill.add_scenario(scenario)
 
-    config = {
-        "license": license_key,
-        "target": {
-            # "docker": {
-            #     "image": "composabl/sim-starship-local"
-            # },
-            "local": {
-              "address": "localhost:1337"
-            }
-        },
-        "env": {
-            "name": "starship",
-        },
-        "training": {},
-        "runtime": {
-            "workers": 1
-        }
-    }
     trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
 
+    # Load a pre-trained agent
+    try:
+        if len(os.listdir(PATH_CHECKPOINTS)) > 0:
+            agent.load(PATH_CHECKPOINTS)
+    except Exception:
+        print("|-- No checkpoints found. Training from scratch...")
+
     # Start training the agent
     trainer.train(agent, train_cycles=20)
 
+    # Save the trained agent
+    agent.export(PATH_CHECKPOINTS)
+
 
 if __name__ == "__main__":
-    start()
+    run_agent()
