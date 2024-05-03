@@ -1,8 +1,8 @@
 import os
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from teacher import NavigationTeacher
+from composabl import Agent, Scenario, Skill, Trainer
 from sensors import sensors
+from teacher import NavigationTeacher
 
 license_key = os.environ["COMPOSABL_LICENSE"]
 
@@ -28,12 +28,12 @@ def start():
     config = {
         "license": license_key,
         "target": {
-            "docker": {
-                "image": "composabl/sim-starship-local"
-            },
-            #"local": {
-            #   "address": "localhost:1337"
-            #}
+            # "docker": {
+            #     "image": "composabl/sim-starship-local"
+            # },
+            "local": {
+              "address": "localhost:1337"
+            }
         },
         "env": {
             "name": "starship",
@@ -43,14 +43,14 @@ def start():
             "workers": 1
         }
     }
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(Navigation_skill)
 
     # Start training the agent
-    runtime.train(agent, train_iters=20)
+    trainer.train(agent, train_cycles=20)
 
 
 if __name__ == "__main__":
