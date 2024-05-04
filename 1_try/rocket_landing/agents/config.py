@@ -5,18 +5,18 @@ license_key = os.environ["COMPOSABL_LICENSE"]
 config = {
         "license": license_key,
         "target": {
-            "docker": {
-                "image": "composabl/sim-starship"
-            },
+             "docker": {
+                 "image": "composabl/sim-starship-local"
+             },
             #"local": {
-            #   "address": "localhost:1337"
+            #  "address": "localhost:1337"
             #}
         },
         "env": {
-            "name": "starship",
+            "name": "rocket-landing",
         },
         "training": {},
-        "runtime": {
-            "workers": 1
+        "trainer": {
+            "workers": 8
         }
     }

@@ -245,4 +245,3 @@ class Env(gym.Env):
 
     def render(self, mode='auto'):
         pass
-

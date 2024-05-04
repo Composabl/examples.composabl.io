@@ -1,13 +1,16 @@
+from asyncore import loop
 import os
 import sys
+import asyncio
+from typing import Protocol
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from config import config
+from composabl import Agent, Trainer, Scenario
+from composabl_core.networking.client import make
 from sensors import sensors
+from config import config
 from scenarios import Navigation_scenarios
-from composabl_core.grpc.client.client import make
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,52 +18,52 @@ from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
 from ipywidgets import IntProgress
 import math
 
+
 PATH = os.path.dirname(os.path.realpath(__file__))
-PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
+PATH_HISTORY = f"{PATH}/history"
 
-DELETE_OLD_HISTORY_FILES: bool = True
-
-def start():
+async def run_agent():
     # Start Runtime
-    runtime = Runtime(config)
+    trainer = Trainer(config)
 
     # Load the pre trained agent
     agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
-    trained_agent = runtime.package(agent)
+    #trained_agent = runtime.package(agent)
+    trained_agent = await trainer._package(agent)
 
     # Inference
-    #"Creating Environment"
+    print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
 
-    #"Initializing Environment"
-    sim.init()
-    #"Initialized"
+    print("Initializing Environment")
+    await sim.init()
+    print("Initialized")
 
-    noise = 0.0
-    sim.set_scenario(Navigation_scenarios)
-    df = pd.DataFrame()
+    # Set scenario
+    await sim.set_scenario(Navigation_scenarios)
     obs_history = []
     thrust_history = []
     t = 0
     a = 0
-    #"Resetting Environment"
-    obs, info= sim.reset()
+    df = pd.DataFrame()
+    print("Resetting Environment")
+    obs, info = await sim.reset()
     obs_history.append(obs)
     for i in range(400):
-        action = trained_agent.execute(obs)
-        obs, reward, done, truncated, info = sim.step(action)
+        action = await trained_agent._execute(obs)
+        obs, reward, done, truncated, info = await sim.step(action)
         df_temp = pd.DataFrame(columns=[s.name for s in sensors] + ['time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
 
@@ -74,7 +77,8 @@ def start():
         if done:
             break
 
-    sim.close()
+    print("Closing")
+    await sim.close()
 
     # save history data
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
@@ -147,4 +151,5 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_agent())

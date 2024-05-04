@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl import Agent, Trainer, Scenario, Skill
 from teacher import NavigationTeacher
 from sensors import sensors
 from config import config
@@ -20,7 +20,7 @@ def run_agent():
         scenario = Scenario(scenario_dict)
         Navigation_skill.add_scenario(scenario)
 
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -34,7 +34,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    trainer.train(agent, train_cycles=10)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
