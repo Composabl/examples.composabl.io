@@ -61,7 +61,7 @@ async def run_agent():
     print("Resetting Environment")
     obs, info = await sim.reset()
     obs_history.append(obs)
-    for i in range(90):
+    for i in range(400):
         action = await trained_agent._execute(obs)
         obs, reward, done, truncated, info = await sim.step(action)
         df_temp = pd.DataFrame(columns=[s.name for s in sensors] + ['time'],data=[list(obs) + [i]])
