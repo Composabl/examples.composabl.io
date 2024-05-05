@@ -1,3 +1,8 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from composabl import Teacher
 import math
 import matplotlib.pyplot as plt
@@ -8,6 +13,10 @@ from IPython.display import display
 import numpy as np
 import pandas as pd
 import pickle
+
+PATH: str = os.path.dirname(os.path.realpath(__file__))
+PATH_HISTORY: str = f"{PATH}/history"
+PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 class BaseTeacher(Teacher):
     def __init__(self):
@@ -25,22 +34,22 @@ class BaseTeacher(Teacher):
 
         # create metrics db
         try:
-            self.df = pd.read_pickle('./history/history.pkl')
+            self.df = pd.read_pickle(f"{PATH_HISTORY}/history.pkl")
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -58,8 +67,10 @@ class BaseTeacher(Teacher):
             + 1 * (error_3) + 1 * (error_4) \
             + 1 * (error_5) + 1 * (error_6))
 
-        self.t += action[0]
-        self.a += action[1]
+        #self.t += action[0]
+        #self.a += action[1]
+        self.a = action[0]
+        self.t = action[1]
 
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)
@@ -75,14 +86,14 @@ class BaseTeacher(Teacher):
                                data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
                                       transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./starship/history.pkl")
+        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.plot:
             if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
                 self.plot_obs('Stabilization')
@@ -100,13 +111,13 @@ class BaseTeacher(Teacher):
 
             return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         if abs(float(transformed_obs['angle'])) > 4:
             return True
         else:
             return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.clf()
         plt.subplot(3,1,1)
         plt.plot(self.reward_history, 'r.-')
@@ -132,7 +143,7 @@ class BaseTeacher(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self, title='Rocket Landing'):
+    async def plot_obs(self, title='Rocket Landing'):
         #x = [ x["x"] for x in self.obs_history[:]]
         x = np.array([ list(x.values()) for x in self.obs_history[:]])
         u = np.array(self.thrust_history[:])
@@ -202,7 +213,7 @@ class BaseTeacher(Teacher):
 
 
 class SelectorTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -220,32 +231,15 @@ class SelectorTeacher(BaseTeacher):
 
         reward = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
 
-
-        #TODO: selector teacher is returning the action as discrete and not the sub action
-        #self.t += action[0]
-        #self.a += action[1]
-
-        #self.t = np.clip(self.t,0.4,1)
-        #self.a = np.clip(self.a, -3.15, 3.15)
-
-        #self.action_history.append(action)
-        #self.thrust_history.append([self.t, self.a])
-
         self.reward_history.append(reward)
         self.angle_history.append(transformed_obs['angle'])
         self.count += 1
-        # history metrics
-        #df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
-        #                       data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
-        #                              transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
-        #self.df = pd.concat([self.df, df_temp])
-        #self.df.to_pickle("./history/history.pkl")
 
         return reward
 
 
 class SpeedControlTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -280,13 +274,13 @@ class SpeedControlTeacher(BaseTeacher):
                                data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
                                       transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./history/history.pkl")
+        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
 
         return reward
 
 
 class StabilizationTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -321,12 +315,12 @@ class StabilizationTeacher(BaseTeacher):
                                data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
                                       transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./history/history.pkl")
+        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
 
         return reward
 
 class NavigationTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -359,6 +353,6 @@ class NavigationTeacher(BaseTeacher):
                                data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
                                       transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
         self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle("./history/history.pkl")
+        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
 
         return reward

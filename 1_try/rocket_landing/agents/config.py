@@ -17,6 +17,6 @@ config = {
         },
         "training": {},
         "trainer": {
-            "workers": 8
+            "workers": 4
         }
     }

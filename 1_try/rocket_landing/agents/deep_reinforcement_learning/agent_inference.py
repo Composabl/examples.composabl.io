@@ -32,7 +32,6 @@ async def run_agent():
     agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
-    #trained_agent = runtime.package(agent)
     trained_agent = await trainer._package(agent)
 
     # Inference
@@ -68,8 +67,11 @@ async def run_agent():
         df = pd.concat([df, df_temp])
 
         obs_history.append(obs)
-        t += action[0]
-        a += action[1]
+        #t += action[0]
+        #a += action[1]
+        a = action[0]
+        t = action[1]
+
         t = np.clip(t,0.4,1)
         a = np.clip(a, -3.15, 3.15)
         thrust_history.append([t, a])
@@ -95,7 +97,7 @@ async def run_agent():
     final_time_step = t_step
     duration = t_step * steps
 
-    #print("Generating Animation")
+    print("Generating Animation")
     f = IntProgress(min = 0, max = steps)
     #display(f)
 
@@ -111,7 +113,6 @@ async def run_agent():
     ln2, = ax1.plot([], [], linewidth = 2, color = 'tomato')
     ln1, = ax1.plot([], [], linewidth = 5, color = 'lightblue')
 
-    #plt.axis('off')
     plt.tight_layout()
 
     ax1.set_xlim(-400, 400)
