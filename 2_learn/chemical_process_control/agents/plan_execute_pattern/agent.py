@@ -3,11 +3,11 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Skill, Sensor, Scenario, Controller, Runtime
-from teacher import CSTRTeacher
-from sensors import sensors
+from composabl import Agent, Scenario, Skill, Trainer
 from config import config
 from scenarios import reaction_scenarios
+from sensors import sensors
+from teacher import CSTRTeacher
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -18,7 +18,7 @@ def run_agent():
     for scenario_dict in reaction_scenarios:
         control_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -33,7 +33,7 @@ def run_agent():
     if len(files) > 0:
         agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=1)
+    trainer.train(agent, train_iters=1)
 
     #save agent
     agent.export(PATH_CHECKPOINTS)

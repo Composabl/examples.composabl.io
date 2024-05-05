@@ -1,19 +1,17 @@
+import math
 import os
 
-import math
-import numpy as np
-
-from composabl import Teacher
-from mpc_model import mpc
-
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+from composabl import SkillTeacher
+from mpc_model import mpc
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
 PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
-class CSTRTeacher(Teacher):
+class CSTRTeacher(SkillTeacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -31,10 +29,10 @@ class CSTRTeacher(Teacher):
             self.df = pd.DataFrame()
 
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         if type(transformed_obs) == dict:
             if 'observation' in list(transformed_obs.keys()):
                 transformed_obs = transformed_obs['observation']
@@ -61,10 +59,10 @@ class CSTRTeacher(Teacher):
 
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -85,10 +83,10 @@ class CSTRTeacher(Teacher):
         self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             return False
         else:
@@ -101,7 +99,7 @@ class CSTRTeacher(Teacher):
 
             return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
     def plot_metrics(self):
