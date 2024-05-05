@@ -1,14 +1,18 @@
+from asyncore import loop
 import os
 import sys
+import asyncio
+from typing import Protocol
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from composabl_core.grpc.client.client import make
+from composabl import Agent, Trainer, Scenario
+from composabl_core.networking.client import make
+from sensors import sensors
 from config import config
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -16,13 +20,13 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
 # Start Runtime
-runtime = Runtime(config)
+trainer = Trainer(config)
 
 # Load the pre trained agent
 agent = Agent.load(PATH_CHECKPOINTS)
 
 # Prepare the loaded agent for inference
-trained_agent = runtime.package(agent)
+trained_agent = trainer.package(agent)
 
 # Inference
 sim = make(

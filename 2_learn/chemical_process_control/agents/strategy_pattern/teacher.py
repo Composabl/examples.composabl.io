@@ -41,7 +41,7 @@ class BaseCSTR(SkillTeacher):
     async def transform_action(self, transformed_obs, action):
         return action
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
     async def compute_reward(self, transformed_obs, action, sim_reward):
@@ -94,7 +94,7 @@ class BaseCSTR(SkillTeacher):
     async def compute_termination(self, transformed_obs, action):
         return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
         plt.clf()
         plt.subplot(3,1,1)
@@ -120,7 +120,7 @@ class BaseCSTR(SkillTeacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self):
+    async def plot_obs(self):
         plt.figure(2,figsize=(7,5))
         plt.clf()
         plt.subplot(3,1,1)

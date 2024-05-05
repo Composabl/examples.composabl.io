@@ -16,7 +16,7 @@ config = {
         "name": "sim-cstr",
     },
     "trainer": {
-        "workers": 2,
+        "workers": 4,
         "num_gpus": 0
     }
 }

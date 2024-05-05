@@ -18,8 +18,6 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
-DELETE_OLD_HISTORY_FILES: bool = True
-
 class ProgrammedSelector(SkillController):
     def __init__(self):
         self.counter = 0
@@ -37,7 +35,7 @@ class ProgrammedSelector(SkillController):
     async def transform_obs(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
     async def compute_success_criteria(self, transformed_obs, action):
@@ -81,7 +79,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    trainer.train(agent, train_iters=2)
+    trainer.train(agent, train_cycles=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

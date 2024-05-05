@@ -1,21 +1,24 @@
-import asyncio
+from asyncore import loop
 import os
 import sys
+import asyncio
+from typing import Protocol
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-import matplotlib.pyplot as plt
-import pandas as pd
-from composabl import Agent, Scenario, Trainer
-from composabl_core.grpc.client.client import make
+from composabl import Agent, Trainer, Scenario
+from composabl_core.networking.client import make
+from sensors import sensors
 from config import config
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
-
-DELETE_OLD_HISTORY_FILES: bool = True
 
 async def run_agent():
     # Start Runtime
@@ -25,10 +28,10 @@ async def run_agent():
     agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
-    trained_agent = trainer._package(agent)
+    trained_agent = await trainer._package(agent)
 
     # Inference
-    #"Creating Environment"
+    print("Creating Environment")
     sim = make(
         run_id="run-benchmark",
         sim_id="sim-benchmark",
@@ -39,27 +42,34 @@ async def run_agent():
         #protocol = Protocol
     )
 
-    #"Initializing Environment"
+    print("Initializing Environment")
     await sim.init()
-    #"Initialized"
+    print("Initialized")
 
+    # Set scenario
     noise = 0.0
     await sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
         }))
+
+    obs_history = []
     df = pd.DataFrame()
-    #"Resetting Environment"
-    obs, info = sim.reset()
+    print("Resetting Environment")
+    obs, info = await sim.reset()
+    obs_history.append(obs)
     for i in range(90):
-        action = trained_agent.execute(obs)
-        obs, reward, done, truncated, info = sim.step(action)
-        df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
+        action = await trained_agent._execute(obs)
+        obs, reward, done, truncated, info = await sim.step(action)
+        df_temp = pd.DataFrame(columns=[s.name for s in sensors] + ['time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
+
+        obs_history.append(obs)
 
         if done:
             break
 
+    print("Closing")
     await sim.close()
 
     # save history data

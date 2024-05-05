@@ -41,7 +41,7 @@ class BaseCSTR(SkillTeacher):
     async def transform_action(self, transformed_obs, action):
         return action
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
     async def compute_reward(self, transformed_obs, action, sim_reward):
@@ -94,7 +94,7 @@ class BaseCSTR(SkillTeacher):
     async def compute_termination(self, transformed_obs, action):
         return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.figure(1,figsize=(7,5))
         plt.clf()
         plt.subplot(3,1,1)
@@ -120,7 +120,7 @@ class BaseCSTR(SkillTeacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self):
+    async def plot_obs(self):
         plt.figure(2,figsize=(7,5))
         plt.clf()
         plt.subplot(3,1,1)
@@ -162,33 +162,6 @@ class SS1Teacher(BaseCSTR):
         except Exception:
             self.df = pd.DataFrame()
 
-    async def compute_reward(self, transformed_obs, action, sim_reward):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-
-        error = (float(transformed_obs['Ca']) - float(transformed_obs['Cref']))**2
-        self.error_history.append(error)
-        rms = math.sqrt(np.mean(self.error_history))
-        self.rms_history.append(rms)
-
-        # minimize error
-        reward = 1 / rms
-        self.reward_history.append(reward)
-
-        self.count += 1
-
-        # history metrics
-        if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-            self.df = pd.concat([self.df, df_temp])
-            self.df.to_pickle(self.history_path)
-
-        return reward
-
     async def compute_termination(self, transformed_obs, action):
         return False
 
@@ -207,32 +180,6 @@ class SS2Teacher(BaseCSTR):
                 self.plot_metrics()
         except Exception:
             self.df = pd.DataFrame()
-
-    async def compute_reward(self, transformed_obs, action, sim_reward):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-
-        error = (float(transformed_obs['Ca']) - float(transformed_obs['Cref']))**2
-        self.error_history.append(error)
-        rms = math.sqrt(np.mean(self.error_history))
-        self.rms_history.append(rms)
-        # minimize error
-        reward = 1 / rms
-        self.reward_history.append(reward)
-
-        self.count += 1
-
-        # history metrics
-        if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-            self.df = pd.concat([self.df, df_temp])
-            self.df.to_pickle(self.history_path)
-
-        return reward
 
     async def compute_termination(self, transformed_obs, action):
         return False
