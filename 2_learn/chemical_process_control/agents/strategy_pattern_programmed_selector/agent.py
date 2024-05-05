@@ -3,12 +3,16 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
+from composabl import Agent, Scenario, Skill, SkillController, Trainer
 from config import config
-from scenarios import ss1_scenarios, ss2_scenarios, transition_scenarios, selector_scenarios
+from scenarios import (
+    selector_scenarios,
+    ss1_scenarios,
+    ss2_scenarios,
+    transition_scenarios,
+)
+from sensors import sensors
 from teacher import SS1Teacher, SS2Teacher, TransitionTeacher
-from composabl import Controller
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -16,11 +20,11 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 DELETE_OLD_HISTORY_FILES: bool = True
 
-class ProgrammedSelector(Controller):
+class ProgrammedSelector(SkillController):
     def __init__(self):
         self.counter = 0
 
-    def compute_action(self, obs):
+    async def compute_action(self, obs):
         if self.counter >= 0 and self.counter <= 22:
             action = [0]
         elif self.counter >= 76 :
@@ -30,16 +34,16 @@ class ProgrammedSelector(Controller):
 
         return action
 
-    def transform_obs(self, obs):
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 
@@ -61,7 +65,7 @@ def run_agent():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -77,7 +81,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    trainer.train(agent, train_iters=2)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

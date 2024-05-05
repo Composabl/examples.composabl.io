@@ -1,13 +1,14 @@
+import asyncio
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from config import config
-from composabl_core.grpc.client.client import make
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
+from composabl import Agent, Scenario, Trainer
+from composabl_core.grpc.client.client import make
+from config import config
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -16,40 +17,40 @@ PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
 DELETE_OLD_HISTORY_FILES: bool = True
 
-def start():
+async def run_agent():
     # Start Runtime
-    runtime = Runtime(config)
+    trainer = Trainer(config)
 
     # Load the pre trained agent
     agent = Agent.load(PATH_CHECKPOINTS)
 
     # Prepare the loaded agent for inference
-    trained_agent = runtime.package(agent)
+    trained_agent = trainer._package(agent)
 
     # Inference
     #"Creating Environment"
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
 
     #"Initializing Environment"
-    sim.init()
+    await sim.init()
     #"Initialized"
 
     noise = 0.0
-    sim.set_scenario(Scenario({
+    await sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
         }))
     df = pd.DataFrame()
     #"Resetting Environment"
-    obs, info= sim.reset()
+    obs, info = sim.reset()
     for i in range(90):
         action = trained_agent.execute(obs)
         obs, reward, done, truncated, info = sim.step(action)
@@ -59,7 +60,7 @@ def start():
         if done:
             break
 
-    sim.close()
+    await sim.close()
 
     # save history data
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
@@ -89,4 +90,5 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_agent())

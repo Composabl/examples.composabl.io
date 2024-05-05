@@ -3,12 +3,12 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from composabl import Agent, Scenario, Trainer
 from composabl_core.grpc.client.client import make
 from config import config
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -16,23 +16,23 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
 # Start Runtime
-runtime = Runtime(config)
+trainer = Trainer(config)
 
 # Load the pre trained agent
 agent = Agent.load(PATH_CHECKPOINTS)
 
 # Prepare the loaded agent for inference
-trained_agent = runtime.package(agent)
+trained_agent = trainer._package(agent)
 
 # Inference
 sim = make(
-    "run-benchmark",
-    "sim-benchmark",
-    "",
-    "localhost:1337",
-    {
-        "render_mode": "rgb_array"
-    },
+    run_id="run-benchmark",
+    sim_id="sim-benchmark",
+    env_id="sim",
+    address="localhost:1337",
+    env_init={},
+    init_client=False,
+    #protocol = Protocol
 )
 
 sim.init()
