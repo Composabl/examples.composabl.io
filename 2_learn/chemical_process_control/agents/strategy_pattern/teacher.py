@@ -1,14 +1,15 @@
-import os
-from composabl import Teacher
-import numpy as np
 import math
+import os
+
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+from composabl import SkillTeacher
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
-class BaseCSTR(Teacher):
+class BaseCSTR(SkillTeacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -34,16 +35,16 @@ class BaseCSTR(Teacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -73,10 +74,10 @@ class BaseCSTR(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         success = False
         if self.obs_history is None:
             success = False
@@ -90,7 +91,7 @@ class BaseCSTR(Teacher):
 
         return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
     def plot_metrics(self):
@@ -161,7 +162,7 @@ class SS1Teacher(BaseCSTR):
         except Exception:
             self.df = pd.DataFrame()
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -188,7 +189,7 @@ class SS1Teacher(BaseCSTR):
 
         return reward
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 
@@ -207,7 +208,7 @@ class SS2Teacher(BaseCSTR):
         except Exception:
             self.df = pd.DataFrame()
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -233,7 +234,7 @@ class SS2Teacher(BaseCSTR):
 
         return reward
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 class TransitionTeacher(BaseCSTR):

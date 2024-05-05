@@ -3,11 +3,16 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
+from composabl import Agent, Scenario, Skill, Trainer
+from config import config
+from scenarios import (
+    selector_scenarios,
+    ss1_scenarios,
+    ss2_scenarios,
+    transition_scenarios,
+)
 from sensors import sensors
 from teacher import CSTRTeacher, SS1Teacher, SS2Teacher, TransitionTeacher
-from scenarios import ss1_scenarios, ss2_scenarios, transition_scenarios, selector_scenarios
-from config import config
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -34,7 +39,7 @@ def run_agent():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -51,7 +56,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=2)
+    trainer.train(agent, train_iters=2)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
@@ -59,4 +64,3 @@ def run_agent():
 
 if __name__ == "__main__":
     run_agent()
-
