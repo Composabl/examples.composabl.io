@@ -1,2 +1,2 @@
-composabl-core==0.6.3
+composabl-core-dev==0.8.0.dev60
 scipy

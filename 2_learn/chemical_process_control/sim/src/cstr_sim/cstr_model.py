@@ -1,6 +1,7 @@
-from dataclasses import dataclass
 import math
+from dataclasses import dataclass
 from math import exp
+
 import numpy as np
 from scipy.integrate import odeint
 
@@ -15,8 +16,6 @@ class CSTRModel:
     ΔTc: float
     ΔT: float = 0  # Kelvin
     ΔCa: float = 0 #kmol/m3
-    
-    
 
     #constants
     F: float = 1 #Volumetric flow rate (m3/h)
@@ -69,7 +68,7 @@ class CSTRModel:
             x[i] = z[1][0]
             y[i] = z[1][1]
             z0 = z[1]
-            
+
         self.Ca = x[1]
         self.T = y[1]
         self.Tc += self.ΔTc
@@ -108,15 +107,7 @@ class CSTRModel:
             x[i] = z[1][0]
             y[i] = z[1][1]
             z0 = z[1]
-            
+
         self.Ca = x[1]
         self.T = y[1]
         self.Tc += self.ΔTc
-        
-        
-            
-            
-
-        
-        
-
