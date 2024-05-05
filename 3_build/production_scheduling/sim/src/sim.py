@@ -1,15 +1,12 @@
-import math
 import random
-import numpy as np
 
-from composabl_core.agent.scenario import Scenario
 import gymnasium as gym
-
+import numpy as np
+from composabl_core.agent.scenario import Scenario
 from rllib.whisky_business_env import WhiskeyBusinessEnv
-from simulation.sim_controller import SimController
-import simpy
 
-class Env(gym.Env):
+
+class ProductionSchedulingEnv(gym.Env):
     def __init__(self):
         '''
         actions =
@@ -28,7 +25,7 @@ class Env(gym.Env):
         '''self.action_space = gym.spaces.Dict({'mix_bake_decorate': gym.spaces.Discrete(3),
                                              'chip_coco_eclair_wait': gym.spaces.Discrete(3),
                                              'product_equip': gym.spaces.Discrete(3)
-                             
+
                              })'''
 
         obs_space_constraints = {
@@ -118,7 +115,7 @@ class Env(gym.Env):
         self.cookies_demand_real = self.cookies_demand * (1 + random.uniform(-0.3, 1))
         self.cupcakes_demand_real = self.cupcake_demand * (1 + random.uniform(-0.3, 1))
         self.cakes_demand_real = self.cake_demand * (1 + random.uniform(-0.3, 1))
-        
+
         self.profit = 0
 
         obs, info = self.business_env.reset()
@@ -148,11 +145,11 @@ class Env(gym.Env):
                 '21' :8, #"Eclair_mix_cupcakes",
                 '22' :9, #"Eclair_mix_cakes"
             },
-        
+
             1: {
                 '00':10,#"Chip_bake_from_Mixer_1",
                 '01':11,#"Chip_bake_from_Mixer_2",
-                '02':0, 
+                '02':0,
                 '10':12,#"Coco_bake_from_Mixer_1",
                 '11':13,#"Coco_bake_from_Mixer_2",
                 '12':0,
@@ -209,7 +206,7 @@ class Env(gym.Env):
 
         if completed_cupcakes <= self.cupcakes_demand_real:
             cost_of_opportunity = (self.cupcakes_demand_real - completed_cupcakes) * (self.cupcake_price - self.cupcake_cost)
-            cupcakes_revenue = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) 
+            cupcakes_revenue = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost))
             cupcakes_profit = cupcakes_revenue - cost_of_opportunity
         else:
             waste  = -(self.cupcakes_demand_real - completed_cupcakes) * self.cupcake_cost
@@ -224,10 +221,10 @@ class Env(gym.Env):
             waste  = -(self.cakes_demand_real - completed_cakes) * self.cake_cost
             cakes_revenue = (self.cakes_demand_real * (self.cake_price - self.cake_cost))
             cakes_profit = cakes_revenue - waste
-        
+
         self.profit = cookies_profit + cupcakes_profit + cakes_profit
         reward = self.profit
-        
+
         debug = False
         if debug:
             # Debug
