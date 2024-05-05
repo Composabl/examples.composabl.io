@@ -1,7 +1,7 @@
 import os
-
-from composabl import Perceptor, Scenario
 import pickle
+
+from composabl import Perceptor
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 

@@ -1,19 +1,16 @@
+import math
 import os
 
-from composabl import Teacher, Scenario
-import numpy as np
-import math
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import pickle
-import logging
-import copy
+from composabl import SkillTeacher
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
-class BaseCSTR(Teacher):
+class BaseCSTR(SkillTeacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -44,10 +41,10 @@ class BaseCSTR(Teacher):
         except:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         self.ΔTc = action[0]
 
         if type(transformed_obs) == dict:
@@ -67,10 +64,10 @@ class BaseCSTR(Teacher):
         action = np.array([self.ΔTc])
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref','thermal_runaway_predict']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -95,10 +92,10 @@ class BaseCSTR(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         success = False
         if self.obs_history is None:
             success = False
@@ -113,7 +110,7 @@ class BaseCSTR(Teacher):
 
         return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
     def plot_metrics(self):
@@ -201,8 +198,6 @@ class SS1Teacher(BaseCSTR):
             self.df = pd.DataFrame()
 
 
-
-
 class SS2Teacher(BaseCSTR):
     def __init__(self):
         super().__init__()
@@ -232,7 +227,7 @@ class SS2Teacher(BaseCSTR):
         except:
             self.df = pd.DataFrame()
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
 class TransitionTeacher(BaseCSTR):
@@ -293,9 +288,5 @@ class CSTRTeacher(BaseCSTR):
         except:
             self.df = pd.DataFrame()
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
-
-
-
-
