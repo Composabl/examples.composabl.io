@@ -1,29 +1,29 @@
+import asyncio
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from composabl_core.grpc.client.client import make
-from controller import MPCController
-from sensors import sensors
-from config import config
-from scenarios import reaction_scenarios
-
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
+from composabl import Agent, Scenario, Skill, Trainer
+from composabl_core.grpc.client.client import make
+from config import config
+from controller import MPCController
+from scenarios import reaction_scenarios
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
-def start():
+async def run_agent():
     reaction_skill = Skill("reaction", MPCController)
     for scenario_dict in reaction_scenarios:
         reaction_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -47,7 +47,7 @@ def start():
             "noise_percentage": noise
         }))
     df = pd.DataFrame()
-    obs, info= sim.reset()
+    obs, info = sim.reset()
 
     for i in range(90-1):
         action = cont.compute_action(obs)
@@ -87,4 +87,5 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_agent())
