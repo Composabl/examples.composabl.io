@@ -163,7 +163,10 @@ class SS1Teacher(BaseCSTR):
             self.df = pd.DataFrame()
 
     async def compute_termination(self, transformed_obs, action):
-        return False
+        if self.count > 25:
+            return True
+        else:
+            return False
 
 
 class SS2Teacher(BaseCSTR):
@@ -182,7 +185,10 @@ class SS2Teacher(BaseCSTR):
             self.df = pd.DataFrame()
 
     async def compute_termination(self, transformed_obs, action):
-        return False
+        if self.count > 25:
+            return True
+        else:
+            return False
 
 class TransitionTeacher(BaseCSTR):
     def __init__(self):
