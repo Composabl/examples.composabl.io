@@ -3,10 +3,10 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Skill
-from sensors import sensors
+from composabl import Agent, Scenario, Skill, Trainer
 from config import config
 from scenarios import bake_scenarios
+from sensors import sensors
 from teacher import BaseTeacher
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -30,7 +30,7 @@ def run_agent():
     for scenario_dict in bake_scenarios:
         produce_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -42,15 +42,13 @@ def run_agent():
         files.remove('.DS_Store')
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-
     if len(files) > 0:
         agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=2)
+    trainer.train(agent, train_iters=2)
 
     agent.export(PATH_CHECKPOINTS)
 
 
 if __name__ == "__main__":
     run_agent()
-

@@ -2,18 +2,17 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from composabl import Teacher
-import numpy as np
-import math
+
 import matplotlib.pyplot as plt
 import pandas as pd
+from composabl import SkillTeacher
 from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
 
-class BaseTeacher(Teacher):
+class BaseTeacher(SkillTeacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -34,16 +33,16 @@ class BaseTeacher(Teacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -79,10 +78,10 @@ class BaseTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             success = False
         else:
@@ -96,7 +95,7 @@ class BaseTeacher(Teacher):
 
         return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
     def plot_metrics(self):
