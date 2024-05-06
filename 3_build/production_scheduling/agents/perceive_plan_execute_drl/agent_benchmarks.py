@@ -3,23 +3,21 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
-
-from composabl_core.grpc.client.client import make
-import numpy as np
-import math
-from gymnasium import spaces
-import matplotlib.pyplot as plt
 import pickle
+
+import matplotlib.pyplot as plt
+import numpy as np
+from composabl import Agent, Scenario, Trainer
+from composabl_core.grpc.client.client import make
 from config import config
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
-def start():
+def run_agent():
     # Remove unused files from path (mac only)
     files = os.listdir(PATH_CHECKPOINTS)
 
@@ -28,27 +26,25 @@ def start():
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
     # Start Runtime
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     directory = PATH_CHECKPOINTS
 
     # Load the pre trained agent
     agent = Agent.load(directory)
 
     # Prepare the loaded agent for inference
-    trained_agent = runtime.package(agent)
+    trained_agent = trainer.package(agent)
 
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-            #"observation_space": _create_observation_space(),
-            #"action_space": _create_action_space()
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
 
     scenarios_list = [
@@ -243,5 +239,5 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    run_agent()
 

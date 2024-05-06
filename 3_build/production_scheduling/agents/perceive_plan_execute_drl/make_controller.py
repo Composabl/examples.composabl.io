@@ -1,23 +1,19 @@
-from composabl import Controller
-
-import numpy as np
-import matplotlib.pyplot as plt
-from gekko import GEKKO
+from composabl import SkillController
 from sensors import sensors
 
 
-class MakeCookieController(Controller):
+class MakeCookieController(SkillController):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
-    def compute_action(self, obs):
+
+    async def compute_action(self, obs):
         if type(obs) != dict:
             old_obs = obs.copy()
             sensors_name = [s.name for s in sensors]
@@ -30,8 +26,8 @@ class MakeCookieController(Controller):
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
+
+        action = 0
 
         ## COOKIES
         # MIX
@@ -54,7 +50,7 @@ class MakeCookieController(Controller):
                 action = 12
             elif obs['mixer_2_recipe'] == 1:
                 action = 13
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['mixer_1_recipe'] == 1:
                 action = 14
@@ -69,7 +65,7 @@ class MakeCookieController(Controller):
                 action = 17
             elif obs['oven_3_recipe'] == 1:
                 action = 18
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['oven_1_recipe'] == 1:
                 action = 19
@@ -85,28 +81,28 @@ class MakeCookieController(Controller):
                 action = 23
             elif obs['oven_3_recipe'] == 1:
                 action = 24
-        
+
         return action
-    
-    def compute_success_criteria(self, transformed_obs, action):
+
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 
-class MakeCupcakeController(Controller):
+class MakeCupcakeController(SkillController):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
-    def compute_action(self, obs):
+
+    async def compute_action(self, obs):
         if type(obs) != dict:
             old_obs = obs.copy()
             sensors_name = [s.name for s in sensors]
@@ -119,8 +115,8 @@ class MakeCupcakeController(Controller):
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
+
+        action = 0
 
         ## CUPCAKES
         # MIX
@@ -143,7 +139,7 @@ class MakeCupcakeController(Controller):
                 action = 12
             elif obs['mixer_2_recipe'] == 2:
                 action = 13
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['mixer_1_recipe'] == 2:
                 action = 14
@@ -158,7 +154,7 @@ class MakeCupcakeController(Controller):
                 action = 17
             elif obs['oven_3_recipe'] == 2:
                 action = 18
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['oven_1_recipe'] == 2:
                 action = 19
@@ -174,28 +170,28 @@ class MakeCupcakeController(Controller):
                 action = 23
             elif obs['oven_3_recipe'] == 2:
                 action = 24
-        
+
         return action
-    
-    def compute_success_criteria(self, transformed_obs, action):
+
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
-    
 
-class MakeCakeController(Controller):
+
+class MakeCakeController(SkillController):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
-    def compute_action(self, obs):
+
+    async def compute_action(self, obs):
         if type(obs) != dict:
             old_obs = obs.copy()
             sensors_name = [s.name for s in sensors]
@@ -208,8 +204,8 @@ class MakeCakeController(Controller):
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
+
+        action = 0
 
         ## CAKES
         # MIX
@@ -233,7 +229,7 @@ class MakeCakeController(Controller):
                 action = 12
             elif obs['mixer_2_recipe'] == 3:
                 action = 13
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['mixer_1_recipe'] == 3:
                 action = 14
@@ -248,7 +244,7 @@ class MakeCakeController(Controller):
                 action = 17
             elif obs['oven_3_recipe'] == 3:
                 action = 18
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['oven_1_recipe'] == 3:
                 action = 19
@@ -265,27 +261,27 @@ class MakeCakeController(Controller):
             elif obs['oven_3_recipe'] == 3:
                 action = 24
 
-        
+
         return action
-    
-    def compute_success_criteria(self, transformed_obs, action):
+
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
-    
-class WaitController(Controller):
+
+class WaitController(SkillController):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
-    def compute_action(self, obs):
+
+    async def compute_action(self, obs):
         if type(obs) != dict:
             old_obs = obs.copy()
             sensors_name = [s.name for s in sensors]
@@ -298,13 +294,13 @@ class WaitController(Controller):
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
-        
+
+        action = 0
+
         return action
-    
-    def compute_success_criteria(self, transformed_obs, action):
+
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False

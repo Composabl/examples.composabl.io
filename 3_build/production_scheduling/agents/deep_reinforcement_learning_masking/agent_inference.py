@@ -81,7 +81,7 @@ async def run_agent():
 
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
-        action = await trained_agent.execute(obs)
+        action = await trained_agent._execute(obs)
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
