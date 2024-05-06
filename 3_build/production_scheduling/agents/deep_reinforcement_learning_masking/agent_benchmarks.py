@@ -17,7 +17,7 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
-def start():
+def run_agent():
     # Remove unused files from path (mac only)
     files = os.listdir(PATH_CHECKPOINTS)
 
@@ -239,4 +239,4 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    run_agent()
