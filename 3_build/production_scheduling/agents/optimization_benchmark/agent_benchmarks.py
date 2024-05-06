@@ -20,13 +20,13 @@ def run_agent():
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
     scenarios_list = [
         {'co_dm' : 100,

@@ -1,18 +1,16 @@
+import asyncio
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
-
-from composabl_core.grpc.client.client import make
-import numpy as np
-import math
-from gymnasium import spaces
-import matplotlib.pyplot as plt
 import pickle
+
+import matplotlib.pyplot as plt
+from composabl import Scenario
+from composabl_core.grpc.client.client import make
 from heuristic_controller import OrderController
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -20,21 +18,23 @@ PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 ## INFERENCE FOR HEURISTIC CONTROLLER
 
-def run_agent():
+async def run_agent():
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
 
     print("Initializing Environment")
-    sim.init()
+    await sim.init()
+    print("Initialized")
+
     co_dm = 100
     cp_dm = 18
     ck_dm = 5
@@ -44,14 +44,16 @@ def run_agent():
         'Ck_demand':ck_dm
     }
 
-    sim.set_scenario(Scenario({
+    await sim.set_scenario(Scenario({
             "cookies_demand": co_dm,
             "cupcake_demand": cp_dm,
             "cake_demand": ck_dm,
         }))
+
     print("Resetting Environment")
-    obs, info = sim.reset()
+    obs, info = await sim.reset()
     print("Initialized")
+
     # Get a sim action sample if needed (debug)
     obs_history = []
     action_history = []
@@ -100,7 +102,7 @@ def run_agent():
             #21:'completed_cake',
         }
 
-        obs, sim_reward, done, terminated, info =  sim.step(action)
+        obs, sim_reward, done, terminated, info = await sim.step(action)
         reward_history.append(sim_reward)
 
         if done:
@@ -115,7 +117,7 @@ def run_agent():
 
     print("Done", ccok, ccup, ccak)
     print("Closing")
-    sim.close()
+    await sim.close()
 
     plt.figure(2,figsize=(7,5))
     plt.subplot(4,1,1)
@@ -155,5 +157,5 @@ def run_agent():
 
 
 if __name__ == "__main__":
-    run_agent()
-
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_agent())
