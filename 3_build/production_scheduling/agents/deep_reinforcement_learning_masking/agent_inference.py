@@ -1,25 +1,23 @@
+import asyncio
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
-from config import config
-
-from composabl_core.grpc.client.client import make
-import numpy as np
-import math
-from gymnasium import spaces
-import matplotlib.pyplot as plt
 import pickle
+
+import matplotlib.pyplot as plt
+from composabl import Agent, Scenario, Trainer
+from composabl_core.grpc.client.client import make
+from config import config
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
-def start():
+async def run_agent():
     # Remove unused files from path (mac only)
     files = os.listdir(PATH_CHECKPOINTS)
 
@@ -28,27 +26,31 @@ def start():
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
     # Start Runtime
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     directory = PATH_CHECKPOINTS
 
     # Load the pre trained agent
     agent = Agent.load(directory)
 
     # Prepare the loaded agent for inference
-    trained_agent = runtime.package(agent)
+    trained_agent = await trainer._package(agent)
 
     # Create a new Simulation Environment
+    print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
 
-    sim.init()
+    print("Initializing Environment")
+    await sim.init()
+    print("Initialized")
+
     co_dm = 100
     cp_dm = 18
     ck_dm = 5
@@ -58,13 +60,13 @@ def start():
         'Ck_demand':ck_dm
     }
 
-    sim.set_scenario(Scenario({
+    await sim.set_scenario(Scenario({
             "cookies_demand": co_dm,
             "cupcake_demand": cp_dm,
             "cake_demand": ck_dm,
         }))
 
-    obs, info = sim.reset()
+    obs, info = await sim.reset()
 
     # Get a sim action sample if needed (debug)
 
@@ -79,7 +81,7 @@ def start():
 
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
-        action = trained_agent.execute(obs)
+        action = await trained_agent.execute(obs)
 
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         obs_history.append(obs)
@@ -114,7 +116,7 @@ def start():
             #21:'completed_cake',
         }
 
-        obs, sim_reward, done, terminated, info =  sim.step(action)
+        obs, sim_reward, done, terminated, info = await sim.step(action)
         reward_history.append(sim_reward)
 
         if done:
@@ -129,7 +131,7 @@ def start():
 
     print(metrics)
     print("Closing")
-    sim.close()
+    await sim.close()
 
     plt.figure(2,figsize=(7,5))
     plt.subplot(4,1,1)
@@ -177,5 +179,5 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
-
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_agent())
