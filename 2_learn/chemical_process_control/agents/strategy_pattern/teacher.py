@@ -162,35 +162,11 @@ class SS1Teacher(BaseCSTR):
         except Exception:
             self.df = pd.DataFrame()
 
-    async def compute_reward(self, transformed_obs, action, sim_reward):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-
-        error = (float(transformed_obs['Ca']) - float(transformed_obs['Cref']))**2
-        self.error_history.append(error)
-        rms = math.sqrt(np.mean(self.error_history))
-        self.rms_history.append(rms)
-
-        # minimize error
-        reward = 1 / rms
-        self.reward_history.append(reward)
-
-        self.count += 1
-
-        # history metrics
-        if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-            self.df = pd.concat([self.df, df_temp])
-            self.df.to_pickle(self.history_path)
-
-        return reward
-
     async def compute_termination(self, transformed_obs, action):
-        return False
+        if self.count > 25:
+            return True
+        else:
+            return False
 
 
 class SS2Teacher(BaseCSTR):
@@ -208,34 +184,11 @@ class SS2Teacher(BaseCSTR):
         except Exception:
             self.df = pd.DataFrame()
 
-    async def compute_reward(self, transformed_obs, action, sim_reward):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-
-        error = (float(transformed_obs['Ca']) - float(transformed_obs['Cref']))**2
-        self.error_history.append(error)
-        rms = math.sqrt(np.mean(self.error_history))
-        self.rms_history.append(rms)
-        # minimize error
-        reward = 1 / rms
-        self.reward_history.append(reward)
-
-        self.count += 1
-
-        # history metrics
-        if self.metrics != 'none':
-            df_temp = pd.DataFrame(columns=['time','Ca','Cref','reward','rms'],data=[[self.count,transformed_obs['Ca'], transformed_obs['Cref'], reward, rms]])
-            self.df = pd.concat([self.df, df_temp])
-            self.df.to_pickle(self.history_path)
-
-        return reward
-
     async def compute_termination(self, transformed_obs, action):
-        return False
+        if self.count > 25:
+            return True
+        else:
+            return False
 
 class TransitionTeacher(BaseCSTR):
     def __init__(self):
