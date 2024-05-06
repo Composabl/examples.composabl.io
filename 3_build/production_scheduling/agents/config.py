@@ -15,7 +15,7 @@ config = {
         "env": {
             "name": "sim-whisky",
         },
-        "runtime": {
+        "trainer": {
             "workers": 1,
             "num_gpus": 0
         }

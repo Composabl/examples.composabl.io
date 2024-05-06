@@ -1,5 +1,3 @@
-from composabl import Scenario
-
 bake_scenarios = [
         {   # High Demand
             "cookies_demand": 100,
