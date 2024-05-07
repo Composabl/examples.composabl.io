@@ -3,13 +3,14 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Scenario
-from sensors import sensors
-from composabl_core.grpc.client.client import make
-import numpy as np
-import matplotlib.pyplot as plt
 import pickle
+
+import matplotlib.pyplot as plt
+import numpy as np
+from composabl import Scenario
+from composabl_core.grpc.client.client import make
 from order_controller import OrderController
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -19,13 +20,13 @@ def run_agent():
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array",
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
     scenarios_list = [
         {'co_dm' : 100,
@@ -215,4 +216,3 @@ def run_agent():
 
 if __name__ == "__main__":
     run_agent()
-

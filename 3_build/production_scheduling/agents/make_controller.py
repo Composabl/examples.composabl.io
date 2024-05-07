@@ -1,28 +1,24 @@
-from composabl import Controller
-
-import numpy as np
-import matplotlib.pyplot as plt
-from gekko import GEKKO
+from composabl import SkillController
 from sensors import sensors
 
 
-class MakeController(Controller):
+class MakeController(SkillController):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
-    def compute_action(self, obs):
+
+    async def compute_action(self, obs):
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
+
         # input: [0,1,2,3]
         step_action_dict = {
             0:"wait",
@@ -51,11 +47,11 @@ class MakeController(Controller):
             23:"Reese_decorate_from_Oven_2",
             24:"Reese_decorate_from_Oven_3"
         }
-        action = 0 
+        action = 0
         # WAIT
         if obs['order_skill'] == 0:
             action = 0
-        
+
         ## COOKIES
         elif obs['order_skill'] == 1:  #cookies
             # MIX
@@ -78,7 +74,7 @@ class MakeController(Controller):
                     action = 12
                 elif obs['mixer_2_recipe'] == 1:
                     action = 13
-                    
+
             elif obs['baker_3_time_remaining'] == 0: #eclair
                 if obs['mixer_1_recipe'] == 1:
                     action = 14
@@ -93,7 +89,7 @@ class MakeController(Controller):
                     action = 17
                 elif obs['oven_3_recipe'] == 1:
                     action = 18
-                    
+
             elif obs['baker_3_time_remaining'] == 0: #eclair
                 if obs['oven_1_recipe'] == 1:
                     action = 19
@@ -132,7 +128,7 @@ class MakeController(Controller):
                     action = 12
                 elif obs['mixer_2_recipe'] == 2:
                     action = 13
-                    
+
             elif obs['baker_3_time_remaining'] == 0: #eclair
                 if obs['mixer_1_recipe'] == 2:
                     action = 14
@@ -147,7 +143,7 @@ class MakeController(Controller):
                     action = 17
                 elif obs['oven_3_recipe'] == 2:
                     action = 18
-                    
+
             elif obs['baker_3_time_remaining'] == 0: #eclair
                 if obs['oven_1_recipe'] == 2:
                     action = 19
@@ -186,7 +182,7 @@ class MakeController(Controller):
                     action = 12
                 elif obs['mixer_2_recipe'] == 3:
                     action = 13
-                    
+
             elif obs['baker_3_time_remaining'] == 0: #eclair
                 if obs['mixer_1_recipe'] == 3:
                     action = 14
@@ -201,7 +197,7 @@ class MakeController(Controller):
                     action = 17
                 elif obs['oven_3_recipe'] == 3:
                     action = 18
-                    
+
             elif obs['baker_3_time_remaining'] == 0: #eclair
                 if obs['oven_1_recipe'] == 3:
                     action = 19
@@ -218,12 +214,11 @@ class MakeController(Controller):
                 elif obs['oven_3_recipe'] == 3:
                     action = 24
 
-        
+
         return action
-    
-    def compute_success_criteria(self, transformed_obs, action):
+
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
-    

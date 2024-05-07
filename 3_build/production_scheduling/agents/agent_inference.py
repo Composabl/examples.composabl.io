@@ -1,13 +1,9 @@
 import os
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
-
-from composabl_core.grpc.client.client import make
-import numpy as np
-import math
-from gymnasium import spaces
 import matplotlib.pyplot as plt
+from composabl import Agent, Trainer
+from composabl_core.grpc.client.client import make
+from sensors import sensors
 
 license_key = os.environ["COMPOSABL_KEY"]
 
@@ -44,15 +40,15 @@ def start():
         os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
     # Start Runtime
-    runtime = Runtime(config)
+    trainer = Trainer(config)
     directory = PATH_CHECKPOINTS
 
     # Load the pre trained agent
     agent = Agent.load(directory)
 
     # Prepare the loaded agent for inference
-    trained_agent = runtime.package(agent)
-    
+    trained_agent = trainer._package(agent)
+
     # Create a new Simulation Environment
     print("Creating Environment")
     sim = make(
@@ -79,10 +75,10 @@ def start():
     reward_history = []
     sensors_name = [s.name for s in sensors]
     obs_base = {}
-    
+
     for s in sensors_name:
         obs_base[s] = None
-    
+
     for i in range(480):
         # Extract agent actions - Here you can pass the obs (observation state), call the agent.execute() and get the action back
         action = trained_agent.execute(obs)
@@ -131,9 +127,9 @@ def start():
 
         obs, sim_reward, done, terminated, info =  sim.step(action)
         reward_history.append(sim_reward)
-        
+
         #print(ccok, ccup, ccak)
-        
+
 
         #if done:
         #    break
@@ -151,9 +147,9 @@ def start():
     plt.title('Live Control')
 
     plt.subplot(4,1,2)
-    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]), 
-                                                float(obs_history[-1]["completed_cupcakes"]), 
-                                                float(obs_history[-1]["completed_cake"]) 
+    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]),
+                                                float(obs_history[-1]["completed_cupcakes"]),
+                                                float(obs_history[-1]["completed_cake"])
                                                 ])'''
     plt.plot([ x[observation_dict[5]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[6]] for x in obs_history],'k.-',lw=2)
@@ -165,9 +161,9 @@ def start():
     plt.legend(['cookies','cupcakes','cake', 'completed'],loc='best')
 
     plt.subplot(4,1,3)
-    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]) * float(obs_history[-1]["cookies_price"]), 
-                                                float(obs_history[-1]["completed_cupcakes"])  * float(obs_history[-1]["cupcake_price"]), 
-                                                float(obs_history[-1]["completed_cake"])  * float(obs_history[-1]["cake_price"]) 
+    '''plt.bar(['cookies','cupcakes', 'cakes'], [float(obs_history[-1]["completed_cookies"]) * float(obs_history[-1]["cookies_price"]),
+                                                float(obs_history[-1]["completed_cupcakes"])  * float(obs_history[-1]["cupcake_price"]),
+                                                float(obs_history[-1]["completed_cake"])  * float(obs_history[-1]["cake_price"])
                                                 ])'''
     '''plt.plot([ x[observation_dict[7]] for x in obs_history],'k.-',lw=2)
     plt.plot([ x[observation_dict[8]] for x in obs_history],'k.-',lw=2)
@@ -188,8 +184,7 @@ def start():
     plt.legend(['Reward'],loc='best')
 
     plt.show()
-    
+
 
 if __name__ == "__main__":
     start()
-

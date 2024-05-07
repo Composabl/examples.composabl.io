@@ -3,26 +3,22 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Controller
-
-import numpy as np
-import matplotlib.pyplot as plt
-from gekko import GEKKO
+from composabl import SkillController
 from sensors import sensors
 
 
-class MakeCookieController(Controller):
+class MakeCookieController(SkillController):
     def __init__(self):
         self.total_time = 0
         self.obs_history = []
 
-    def transform_obs(self, obs):
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
 
-    def compute_action(self, obs):
+    async def compute_action(self, obs):
         sensors_name = [s.name for s in sensors]
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
@@ -87,25 +83,25 @@ class MakeCookieController(Controller):
 
         return action
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 
-class MakeCupcakeController(Controller):
+class MakeCupcakeController(SkillController):
     def __init__(self):
         self.total_time = 0
         self.obs_history = []
 
-    def transform_obs(self, obs):
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
 
-    def compute_action(self, obs):
+    async def compute_action(self, obs):
         sensors_name = [s.name for s in sensors]
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
@@ -170,25 +166,25 @@ class MakeCupcakeController(Controller):
 
         return action
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
 
-class MakeCakeController(Controller):
+class MakeCakeController(SkillController):
     def __init__(self):
         self.total_time = 0
         self.obs_history = []
 
-    def transform_obs(self, obs):
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
 
-    def compute_action(self, obs):
+    async def compute_action(self, obs):
         sensors_name = [s.name for s in sensors]
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
@@ -254,24 +250,24 @@ class MakeCakeController(Controller):
 
         return action
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
-class WaitController(Controller):
+class WaitController(SkillController):
     def __init__(self):
         self.total_time = 0
         self.obs_history = []
 
-    def transform_obs(self, obs):
+    async def transform_obs(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors]
 
-    def compute_action(self, obs):
+    async def compute_action(self, obs):
         sensors_name = [s.name for s in sensors]
         obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.total_time += 1
@@ -283,8 +279,8 @@ class WaitController(Controller):
 
         return action
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False

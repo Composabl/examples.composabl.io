@@ -3,8 +3,12 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from make_controller import MakeCookieController, MakeCupcakeController, MakeCakeController
 from gekko import GEKKO
+from make_controller import (
+    MakeCakeController,
+    MakeCookieController,
+    MakeCupcakeController,
+)
 
 
 class OrderController():
