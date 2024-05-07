@@ -20,22 +20,6 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 def run_agent():
-    #ss1_skill = Skill("ss1", SS1Teacher)
-    #for scenario_dict in ss1_scenarios:
-    #    ss1_skill.add_scenario(Scenario(scenario_dict))
-
-    #ss2_skill = Skill("ss2", SS2Teacher)
-    #for scenario_dict in ss2_scenarios:
-    #    ss2_skill.add_scenario(Scenario(scenario_dict))
-
-    #transition_skill = Skill("transition", TransitionTeacher)
-    #for scenario_dict in transition_scenarios:
-    #    transition_skill.add_scenario(Scenario(scenario_dict))
-
-    #selector_skill = Skill("selector", ProgrammedSelector)
-    #for scenario_dict in selector_scenarios:
-    #    selector_skill.add_scenario(Scenario(scenario_dict))
-
     trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
@@ -69,7 +53,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    trainer.train(agent, train_cycles=50)
+    trainer.train(agent, train_cycles=200)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)
