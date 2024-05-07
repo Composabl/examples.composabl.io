@@ -64,7 +64,7 @@ class BaseCSTR(SkillTeacher):
         action = np.array([self.ΔTc])
         return action
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref','thermal_runaway_predict']
 
     async def compute_reward(self, transformed_obs, action, sim_reward):
