@@ -59,7 +59,7 @@ class BaseCSTR(SkillTeacher):
         # Smart Constraints - ML
         if y == 1 :
             ###self.ML_list.append(self.count)
-            self.ΔTc -= 0.1 * abs(self.ΔTc) * np.sign(self.ΔTc)
+            self.ΔTc -= 0.05 * abs(self.ΔTc) * np.sign(self.ΔTc)
 
         action = np.array([self.ΔTc])
         return action

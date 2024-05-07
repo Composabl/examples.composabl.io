@@ -1,7 +1,11 @@
 import os
+import sys
 import pickle
 
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from composabl import Perceptor, PerceptorImpl
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -14,6 +18,11 @@ class ThermalRunawayPredict(PerceptorImpl):
         self.last_Tc = 0
 
     async def compute(self, obs_spec, obs):
+        # change obs to dictionary using sensors
+        if type(obs) != dict:
+            obs_keys = [s.name for s in sensors]
+            obs = dict(zip(obs_keys, obs))
+
         #get the action - add action to perception
         #self.ΔTc = action[0]
         if self.last_Tc == 0:
