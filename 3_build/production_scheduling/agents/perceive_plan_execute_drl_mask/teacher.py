@@ -3,20 +3,18 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Teacher
-import numpy as np
-import math
 import matplotlib.pyplot as plt
 import pandas as pd
-from sensors import sensors
+from composabl import SkillTeacher
 from heuristic_controller import OrderController
 from perceptors import perceptors
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
 
-class BaseTeacher(Teacher):
+class BaseTeacher(SkillTeacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -29,8 +27,6 @@ class BaseTeacher(Teacher):
         self.metrics = 'none' # standard, fast, none
         self.cont = OrderController()
 
-
-
         # Read metrics db
         try:
             self.df = pd.read_pickle(f"{PATH_HISTORY}/db.pkl")
@@ -40,11 +36,11 @@ class BaseTeacher(Teacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_obs(self, obs, action):
         self.obs = obs
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         sensors_name = [s.name for s in sensors]
         transformed_obs = self.obs
 
@@ -62,10 +58,10 @@ class BaseTeacher(Teacher):
         action = self.cont.compute_action(transformed_obs)
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_observation_space(self):
         return [s.name for s in sensors] + [p.name for p in perceptors]
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -101,13 +97,13 @@ class BaseTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         if float(transformed_obs['completed_cupcakes']) >= float(transformed_obs['demand_predict']['cookies_demand_predict']):
             return [1] + ([0] * 24)
         else:
             return [1] * 25
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             success = False
         else:
@@ -121,7 +117,7 @@ class BaseTeacher(Teacher):
 
         return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
     def plot_metrics(self):
@@ -198,5 +194,3 @@ class BaseTeacher(Teacher):
 
         plt.draw()
         plt.pause(0.001)
-
-
