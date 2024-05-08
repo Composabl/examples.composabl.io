@@ -58,7 +58,7 @@ def run_agent():
        agent.load(PATH_CHECKPOINTS)
 
 
-    runtime.train(agent, train_iters=1)
+    runtime.train(agent, train_cycles=1)
 
     agent.export(PATH_CHECKPOINTS)
     end_time = datetime.datetime.now()

@@ -66,7 +66,7 @@ def run_agent():
     if len(files) > 0:
         agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=3)
+    runtime.train(agent, train_cycles=3)
 
     agent.export(PATH_CHECKPOINTS)
     end_time = datetime.datetime.now()

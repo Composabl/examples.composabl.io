@@ -48,7 +48,7 @@ def run_agent():
     if len(files) > 0:
        agent.load(PATH_CHECKPOINTS)
 
-    trainer.train(agent, train_iters=100)
+    trainer.train(agent, train_cycles=100)
 
     agent.export(PATH_CHECKPOINTS)
 

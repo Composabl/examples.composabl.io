@@ -62,7 +62,7 @@ def run_agent():
     except Exception:
         os.mkdir(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=10)
+    runtime.train(agent, train_cycles=10)
 
     agent.export(PATH_CHECKPOINTS)
 
