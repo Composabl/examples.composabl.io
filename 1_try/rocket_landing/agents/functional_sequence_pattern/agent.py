@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Trainer, Scenario, Skill
+from composabl import Agent, Trainer, Scenario, Skill, SkillSelector
 from config import config
 from sensors import sensors
 from scenarios import Navigation_scenarios
@@ -17,26 +17,29 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 
 def run_agent():
-    # Define Skills
-    Navigation_skill = Skill("Navigation", NavigationTeacher)
-    SpeedControl_skill = Skill("SpeedControl", SpeedControlTeacher)
-    Stabilization_skill = Skill("Stabilization", StabilizationTeacher)
-    selector_skill = Skill("selector", ProgrammedSelector)
-
-    for scenario_dict in Navigation_scenarios:
-        scenario = Scenario(scenario_dict)
-        Navigation_skill.add_scenario(scenario)
-        SpeedControl_skill.add_scenario(scenario)
-        Stabilization_skill.add_scenario(scenario)
-        selector_skill.add_scenario(scenario)
-
     trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
-    agent.add_skill(Navigation_skill)
-    agent.add_skill(SpeedControl_skill)
-    agent.add_skill(Stabilization_skill)
+    with SkillSelector("selector", ProgrammedSelector) as selector_skill:
+        for selector_scenario in Navigation_scenarios:
+            selector_skill.add_scenario(Scenario(selector_scenario))
+
+        with Skill("Navigation", NavigationTeacher) as Navigation_skill:
+            for scenario_dict in Navigation_scenarios:
+                Navigation_skill.add_scenario(Scenario(scenario_dict))
+            selector_skill.add_skill(Navigation_skill)
+
+        with Skill("Stabilization", StabilizationTeacher) as Stabilization_skill:
+            for scenario_dict in Navigation_scenarios:
+                Stabilization_skill.add_scenario(Scenario(scenario_dict))
+            selector_skill.add_skill(Stabilization_skill)
+
+        with Skill("SpeedControl", SpeedControlTeacher) as SpeedControl_skill:
+            for scenario_dict in Navigation_scenarios:
+                SpeedControl_skill.add_scenario(Scenario(scenario_dict))
+            selector_skill.add_skill(SpeedControl_skill)
+
     agent.add_selector_skill(selector_skill, [Navigation_skill, Stabilization_skill, SpeedControl_skill], fixed_order=False)
 
     # Load a pre-trained agent
@@ -47,7 +50,7 @@ def run_agent():
         print("|-- No valid checkpoints found. Training from scratch...")
 
     # Start training the agent
-    trainer.train(agent, train_cycles=100)
+    trainer.train(agent, train_cycles=20)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

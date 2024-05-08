@@ -4,7 +4,7 @@ class ProgrammedSelector(SkillController):
     def __init__(self, *args, **kwargs):
         self.counter = 0
 
-    async def compute_action(self, obs_spec, obs):
+    async def compute_action(self, obs, action):
         self.counter += 1
         if self.counter >= 0 and self.counter <= 22:
             action = 0
