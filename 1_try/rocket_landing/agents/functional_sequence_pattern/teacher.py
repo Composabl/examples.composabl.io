@@ -253,9 +253,9 @@ class SpeedControlTeacher(BaseTeacher):
         error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 1/(1 * (error_1) + 5 * (error_2)\
+        reward = 1/(1 * (error_1) + 10 * (error_2)\
             + 1 * (error_3) + 10 * (error_4) \
-            + 1 * (error_5) + 1 * (error_6))
+            + 5 * (error_5) + 5 * (error_6))
 
         self.t += action[0]
         self.a += action[1]
@@ -334,7 +334,7 @@ class NavigationTeacher(BaseTeacher):
         error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 1/(10 * (error_1) + 1 * (error_2) + 3 * (error_3) + 1 * (error_4) + 1 * (error_5) + 1 * (error_6))
+        reward = 1/(20 * (error_1) + 1 * (error_2) + 1 * (error_3) + 2 * (error_4) + 1 * (error_5) + 1 * (error_6))
 
         self.t += action[0]
         self.a += action[1]

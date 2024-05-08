@@ -11,7 +11,7 @@ class ProgrammedSelector(SkillController):
         self.counter = 0
 
     async def compute_action(self, obs, action):
-        if abs(float(obs['angle'])) > 0.5:
+        if abs(float(obs['angle'])) > 0.9:
             return 1 #"Stabilization_skill"
 
         elif abs(float(obs['x'])) > 10:
