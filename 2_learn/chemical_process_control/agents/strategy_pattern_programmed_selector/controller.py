@@ -1,17 +1,17 @@
 from composabl import SkillController
 
 class ProgrammedSelector(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.counter = 0
 
-    async def compute_action(self, obs):
+    async def compute_action(self, obs_spec, obs):
         self.counter += 1
         if self.counter >= 0 and self.counter <= 22:
-            action = [0]
+            action = 0
         elif self.counter >= 76 :
-            action = [2]
+            action = 2
         else:
-            action = [1]
+            action = 1
 
         return action
 
