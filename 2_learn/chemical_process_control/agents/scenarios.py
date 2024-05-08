@@ -2,7 +2,7 @@
 # and temperature set points.
 reaction_scenarios = [{
     "Cref_signal": "complete",
-    "noise_percentage": 0.01
+    "noise_percentage": 0.00
     }]
 
 # Scenarios

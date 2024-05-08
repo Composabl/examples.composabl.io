@@ -160,7 +160,7 @@ class MPCController(SkillController):
     async def transform_obs(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
     async def compute_success_criteria(self, transformed_obs, action):
