@@ -17,7 +17,7 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 # Change here to define how the agent will orchestrate each skill
 # Define the Programmed Selector and how it selects the each skill
 class ProgrammedSelector(Controller):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.counter = 0
 
     def compute_action(self, obs):

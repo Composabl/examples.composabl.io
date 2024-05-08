@@ -8,7 +8,7 @@ import gymnasium as gym
 
 
 class Env(gym.Env):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_space_constraints = {
             "x": {'low': -400, 'high': 400},
             "x_speed": {'low': -100, 'high': 100},

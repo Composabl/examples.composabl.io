@@ -7,7 +7,7 @@ from sensors import sensors
 from composabl import SkillController
 
 class ProgrammedSelector(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.counter = 0
 
     async def compute_action(self, obs):

@@ -10,7 +10,7 @@ import pandas as pd
 import pickle
 
 class BaseTeacher(Teacher):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0

@@ -7,7 +7,7 @@ from rllib.whisky_business_env import WhiskeyBusinessEnv
 
 
 class ProductionSchedulingEnv(gym.Env):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         '''
         actions =
         observation_variables =

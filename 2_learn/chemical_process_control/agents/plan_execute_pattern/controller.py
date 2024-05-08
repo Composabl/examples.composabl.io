@@ -21,7 +21,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
 class MPCController(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.count = 0
 
     async def compute_action(self, obs, action):

@@ -12,7 +12,7 @@ PATH_HISTORY = f"{PATH}/history"
 #Teaching allows you to define these AI building blocks so that your agent can succeed at complex tasks in dynamic conditions
 #This is an example of a base class to show the full structure of a teacher and all the associated elements.
 class BaseCSTR(Teacher):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
@@ -152,7 +152,7 @@ class BaseCSTR(Teacher):
 #Copy this entire class 2 times and re-name them to reflect the second and third skills in the agent design.
 #Ensure that the self.title and self.history_path variables are also changed to reflect the names of the skills.
 class StartReactionTeacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.title = 'CSTR Live Control - StartReaction skill'
         self.history_path = f"{PATH_HISTORY}/StartReaction_history.pkl"
@@ -199,7 +199,7 @@ class StartReactionTeacher(BaseCSTR):
 
 #This is the teacher for the Selector Skill.
 class CSTRTeacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0

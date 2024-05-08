@@ -10,7 +10,7 @@ from sensors import sensors
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 class ThermalRunawayPredict(PerceptorImpl):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.y = 0
         self.thermal_run = 0
         self.ml_model = pickle.load(open(f"{PATH}/ml_models/ml_predict_temperature.pkl", 'rb'))

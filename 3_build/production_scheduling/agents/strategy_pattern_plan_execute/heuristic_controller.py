@@ -42,14 +42,14 @@ bake_scenarios = [
     ]
 
 class OrderController():
-    def __init__(self):
-        self.count = 0 
+    def __init__(self, *args, **kwargs):
+        self.count = 0
         self.action_count = 1
 
         self.make_cake = True
         self.make_cupcake = True
         self.make_cookie = True
-    
+
     def compute_action(self, obs):
         #print('COMPUTE')
         if type(obs) != dict:
@@ -66,7 +66,7 @@ class OrderController():
         x1 = 0
         x2 = 0
         x3 = 0
-        
+
         dem_cake = obs['cake_demand']
         dem_cupcake = obs['cupcake_demand']
         dem_cookie = obs['cookies_demand']
@@ -80,11 +80,11 @@ class OrderController():
 
         if obs['completed_cupcakes'] < dem_cupcake:
             x2 = 1
-       
+
         if (obs['completed_cookies'] < dem_cookie) and (x3 + x2 < 2):
             self.make_cookie = True
             x1 = 1
-            
+
         if self.make_cake:
             if x3 == 1:
                 #print('Produce Cake')
@@ -114,10 +114,9 @@ class OrderController():
                 self.make_cupcake = True
                 self.make_cookie = False
                 return action
-            
+
         return action
-        
-    
+
+
     def compute_termination(self, transformed_obs, action):
         return False
-    

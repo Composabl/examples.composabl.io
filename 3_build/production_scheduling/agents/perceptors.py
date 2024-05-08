@@ -3,7 +3,7 @@ from sensors import sensors
 
 
 class DemandPredict():
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         pass
 
     def compute(self, obs):

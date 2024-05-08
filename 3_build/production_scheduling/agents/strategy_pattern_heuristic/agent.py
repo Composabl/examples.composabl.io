@@ -16,7 +16,7 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 class ProgrammedSelector(Controller):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.counter = 0
 
     def compute_action(self, obs):

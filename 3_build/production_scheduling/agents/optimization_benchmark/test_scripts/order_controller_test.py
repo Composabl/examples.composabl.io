@@ -7,7 +7,7 @@ from sensors import sensors
 
 
 class OrderController(Controller):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.total_time = 0
 
         # Two products at a time

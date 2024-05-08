@@ -11,7 +11,7 @@ PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 
 class BaseCSTR(SkillTeacher):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
@@ -169,7 +169,7 @@ class BaseCSTR(SkillTeacher):
 
 
 class SS1Teacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         #super().__init__()
         self.obs_history = None
         self.reward_history = []
@@ -199,7 +199,7 @@ class SS1Teacher(BaseCSTR):
 
 
 class SS2Teacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.obs_history = None
         self.reward_history = []
@@ -231,7 +231,7 @@ class SS2Teacher(BaseCSTR):
         return action
 
 class TransitionTeacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.obs_history = None
         self.reward_history = []
@@ -261,7 +261,7 @@ class TransitionTeacher(BaseCSTR):
 
 
 class CSTRTeacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0

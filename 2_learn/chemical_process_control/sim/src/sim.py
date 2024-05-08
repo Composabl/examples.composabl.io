@@ -10,7 +10,7 @@ from cstr_sim import cstr_model as cstr
 
 
 class CSTREnv(gym.Env):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         '''
         actions = 1 : dTc (delta coolant temperature)
         observation_variables = 5 :

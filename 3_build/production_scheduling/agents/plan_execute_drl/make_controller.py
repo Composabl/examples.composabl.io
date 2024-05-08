@@ -3,7 +3,7 @@ from sensors import sensors
 
 
 class MakeCookieController(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.total_time = 0
         self.obs_history = []
 
@@ -92,7 +92,7 @@ class MakeCookieController(SkillController):
 
 
 class MakeCupcakeController(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.total_time = 0
         self.obs_history = []
 
@@ -181,7 +181,7 @@ class MakeCupcakeController(SkillController):
 
 
 class MakeCakeController(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.total_time = 0
         self.obs_history = []
 
@@ -271,7 +271,7 @@ class MakeCakeController(SkillController):
         return False
 
 class WaitController(SkillController):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.total_time = 0
         self.obs_history = []
 
