@@ -12,13 +12,13 @@ class ProgrammedSelector(SkillController):
 
     async def compute_action(self, obs):
         if abs(float(obs['angle'])) > 0.5:
-            return [1] #"Stabilization_skill"
+            return 1 #"Stabilization_skill"
 
         elif abs(float(obs['x'])) > 10:
-            return [0] #"Navigation_skill"
+            return 0 #"Navigation_skill"
 
         else:
-            return [2] #"SpeedControl_skill"
+            return 2 #"SpeedControl_skill"
 
     async def transform_sensors(self, obs):
         return obs

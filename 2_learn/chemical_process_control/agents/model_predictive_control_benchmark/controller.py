@@ -100,15 +100,8 @@ class MPCController(SkillController):
         T_ = interpolate.interp1d([0,p1,p2,time,time+1], [311.2612,311.2612,373.1311,373.1311,373.1311])
         C = interpolate.interp1d([0,p1,p2,time, time+1], [8.57,8.57,2,2,2])
 
-    async def compute_action(self, obs):
-        #print(obs) #self.T, self.Tc, self.Ca, self.Cref, self.Tref
-        obs = {
-            'T': obs[0],
-            'Tc': obs[1],
-            'Ca': obs[2],
-            'Cref': obs[3],
-            'Tref': obs[4]
-        }
+    async def compute_action(self, obs, action):
+        #self.T, self.Tc, self.Ca, self.Cref, self.Tref
 
         df = pd.DataFrame()
         t = self.t

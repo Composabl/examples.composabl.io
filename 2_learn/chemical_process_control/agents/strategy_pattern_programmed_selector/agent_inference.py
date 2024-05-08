@@ -61,7 +61,6 @@ async def run_agent():
     for i in range(90):
         action = await trained_agent._execute(obs)
         obs, reward, done, truncated, info = await sim.step(action)
-
         df_temp = pd.DataFrame(columns=[s.name for s in sensors] + ['time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
 
