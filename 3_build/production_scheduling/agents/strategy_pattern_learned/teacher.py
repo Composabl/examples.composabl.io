@@ -35,7 +35,7 @@ class BaseTeacher(Teacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    def transform_sensors(self, obs, action):
         return obs
 
     def transform_action(self, transformed_obs, action):

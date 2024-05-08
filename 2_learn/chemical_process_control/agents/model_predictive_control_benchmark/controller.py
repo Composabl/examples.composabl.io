@@ -157,7 +157,7 @@ class MPCController(SkillController):
         dTc = float(newTc) - float(obs['Tc'])
         return [dTc]
 
-    async def transform_obs(self, obs):
+    async def transform_sensors(self, obs):
         return obs
 
     async def filtered_sensor_space(self):

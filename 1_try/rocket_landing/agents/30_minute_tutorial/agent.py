@@ -30,7 +30,7 @@ class ProgrammedSelector(Controller):
         else:
             return [2] #"SpeedControl_skill"
 
-    def transform_obs(self, obs):
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):

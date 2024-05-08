@@ -8,7 +8,7 @@ from sensors import sensors
 
 class OrderController(Controller):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
 
         # Two products at a time
         self.m = GEKKO(remote=False)
@@ -57,18 +57,18 @@ class OrderController(Controller):
 
         self.m.options.IMODE = 6 # optimal control mode
 
-        
-    def transform_obs(self, obs):
+
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
+
     def compute_action(self, obs):
         self.total_time += 1
 
         self.display_mpc_vals = False
-        # solve 
+        # solve
         self.m.solve(disp=self.display_mpc_vals)
 
         x1 = [int(x) for x in self.u1.value]
@@ -80,10 +80,9 @@ class OrderController(Controller):
         #convert into [0,1,2]
 
         return [x1, x2, x3, wt]
-    
+
     def compute_success_criteria(self, transformed_obs, action):
         return False
 
     def compute_termination(self, transformed_obs, action):
         return False
-    

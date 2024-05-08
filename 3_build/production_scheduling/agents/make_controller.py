@@ -7,7 +7,7 @@ class MakeController(SkillController):
         self.total_time = 0
         self.obs_history = []
 
-    async def transform_obs(self, obs):
+    async def transform_sensors(self, obs):
         return obs
 
     async def filtered_observation_space(self):

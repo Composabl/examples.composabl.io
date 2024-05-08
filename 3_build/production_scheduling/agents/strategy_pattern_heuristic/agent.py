@@ -31,7 +31,7 @@ class ProgrammedSelector(Controller):
 
         return action
 
-    def transform_obs(self, obs):
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):

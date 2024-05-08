@@ -8,22 +8,22 @@ from sensors import sensors
 
 class MakeCookieController(Controller):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
+
     def compute_action(self, obs):
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
+
+        action = 0
 
         ## COOKIES
         # MIX
@@ -46,7 +46,7 @@ class MakeCookieController(Controller):
                 action = 12
             elif obs['mixer_2_recipe'] == 1:
                 action = 13
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['mixer_1_recipe'] == 1:
                 action = 14
@@ -61,7 +61,7 @@ class MakeCookieController(Controller):
                 action = 17
             elif obs['oven_3_recipe'] == 1:
                 action = 18
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['oven_1_recipe'] == 1:
                 action = 19
@@ -77,9 +77,9 @@ class MakeCookieController(Controller):
                 action = 23
             elif obs['oven_3_recipe'] == 1:
                 action = 24
-        
+
         return action
-    
+
     def compute_success_criteria(self, transformed_obs, action):
         return False
 
@@ -89,22 +89,22 @@ class MakeCookieController(Controller):
 
 class MakeCupcakeController(Controller):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
+
     def compute_action(self, obs):
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
+
+        action = 0
 
         ## CUPCAKES
         # MIX
@@ -127,7 +127,7 @@ class MakeCupcakeController(Controller):
                 action = 12
             elif obs['mixer_2_recipe'] == 2:
                 action = 13
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['mixer_1_recipe'] == 2:
                 action = 14
@@ -142,7 +142,7 @@ class MakeCupcakeController(Controller):
                 action = 17
             elif obs['oven_3_recipe'] == 2:
                 action = 18
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['oven_1_recipe'] == 2:
                 action = 19
@@ -158,34 +158,34 @@ class MakeCupcakeController(Controller):
                 action = 23
             elif obs['oven_3_recipe'] == 2:
                 action = 24
-        
+
         return action
-    
+
     def compute_success_criteria(self, transformed_obs, action):
         return False
 
     def compute_termination(self, transformed_obs, action):
         return False
-    
+
 
 class MakeCakeController(Controller):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
+
     def compute_action(self, obs):
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
+
+        action = 0
 
         ## CAKES
         # MIX
@@ -208,7 +208,7 @@ class MakeCakeController(Controller):
                 action = 12
             elif obs['mixer_2_recipe'] == 3:
                 action = 13
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['mixer_1_recipe'] == 3:
                 action = 14
@@ -223,7 +223,7 @@ class MakeCakeController(Controller):
                 action = 17
             elif obs['oven_3_recipe'] == 3:
                 action = 18
-                
+
         elif obs['baker_3_time_remaining'] == 0: #eclair
             if obs['oven_1_recipe'] == 3:
                 action = 19
@@ -240,36 +240,36 @@ class MakeCakeController(Controller):
             elif obs['oven_3_recipe'] == 3:
                 action = 24
 
-        
+
         return action
-    
+
     def compute_success_criteria(self, transformed_obs, action):
         return False
 
     def compute_termination(self, transformed_obs, action):
         return False
-    
+
 class WaitController(Controller):
     def __init__(self):
-        self.total_time = 0 
+        self.total_time = 0
         self.obs_history = []
- 
-    def transform_obs(self, obs):
+
+    def transform_sensors(self, obs):
         return obs
 
     def filtered_observation_space(self):
         return [s.name for s in sensors]
-    
+
     def compute_action(self, obs):
         self.total_time += 1
 
         #obs = dict(map(lambda i,j : (i,j), sensors_name, obs))
         self.obs_history.append(obs)
-        
-        action = 0 
-        
+
+        action = 0
+
         return action
-    
+
     def compute_success_criteria(self, transformed_obs, action):
         return False
 

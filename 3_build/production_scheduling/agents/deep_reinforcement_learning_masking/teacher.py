@@ -33,7 +33,7 @@ class BaseTeacher(SkillTeacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    async def transform_obs(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
     async def transform_action(self, transformed_obs, action):
