@@ -10,7 +10,7 @@ class MakeController(SkillController):
     async def transform_sensors(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     async def compute_action(self, obs):

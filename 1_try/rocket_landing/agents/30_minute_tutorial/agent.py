@@ -22,18 +22,18 @@ class ProgrammedSelector(Controller):
 
     def compute_action(self, obs):
         if abs(float(obs['angle'])) > 0.5:
-            return [1] #"Stabilization_skill"
+            return 1 #"Stabilization_skill"
 
         elif abs(float(obs['x'])) > 10:
-            return [0] #"Navigation_skill"
+            return 0 #"Navigation_skill"
 
         else:
-            return [2] #"SpeedControl_skill"
+            return 2 #"SpeedControl_skill"
 
     def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_success_criteria(self, transformed_obs, action):

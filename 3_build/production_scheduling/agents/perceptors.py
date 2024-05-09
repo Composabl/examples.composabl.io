@@ -14,7 +14,7 @@ class DemandPredict():
 
         return {"cookies_demand_predict": co, "cupcake_demand_predict": cp, "cake_demand_predict": ck}
 
-    def filtered_observation_space(self, obs):
+    def filtered_sensor_space(self, obs):
         return [s.name for s in sensors]
 
 

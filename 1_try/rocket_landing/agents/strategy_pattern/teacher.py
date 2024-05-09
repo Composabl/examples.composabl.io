@@ -31,16 +31,16 @@ class BaseTeacher(Teacher):
         except:
             self.df = pd.DataFrame()
 
-    def transform_sensors(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -58,8 +58,8 @@ class BaseTeacher(Teacher):
             + 1 * (error_3) + 1 * (error_4) \
             + 1 * (error_5) + 1 * (error_6))
 
-        self.t += action[0]
-        self.a += action[1]
+        self.t = action[1]
+        self.a = action[0]
 
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)
@@ -79,10 +79,10 @@ class BaseTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.plot:
             if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
                 self.plot_obs('Stabilization')
@@ -100,7 +100,7 @@ class BaseTeacher(Teacher):
 
             return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         if abs(float(transformed_obs['angle'])) > 4:
             return True
         else:
@@ -202,7 +202,7 @@ class BaseTeacher(Teacher):
 
 
 class SelectorTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -245,7 +245,7 @@ class SelectorTeacher(BaseTeacher):
 
 
 class SpeedControlTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -263,8 +263,8 @@ class SpeedControlTeacher(BaseTeacher):
             + 1 * (error_3) + 10 * (error_4) \
             + 1 * (error_5) + 1 * (error_6))
 
-        self.t += action[0]
-        self.a += action[1]
+        self.t = action[1]
+        self.a = action[0]
 
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)
@@ -286,7 +286,7 @@ class SpeedControlTeacher(BaseTeacher):
 
 
 class StabilizationTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -304,8 +304,8 @@ class StabilizationTeacher(BaseTeacher):
             + 1 * (error_3) + 1 * (error_4) \
             + 7 * (error_5) + 5 * (error_6))
 
-        self.t += action[0]
-        self.a += action[1]
+        self.t = action[1]
+        self.a = action[0]
 
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)
@@ -326,7 +326,7 @@ class StabilizationTeacher(BaseTeacher):
         return reward
 
 class NavigationTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -342,8 +342,8 @@ class NavigationTeacher(BaseTeacher):
 
         reward = 1/(10 * (error_1) + 1 * (error_2) + 3 * (error_3) + 1 * (error_4) + 1 * (error_5) + 1 * (error_6))
 
-        self.t += action[0]
-        self.a += action[1]
+        self.t = action[1]
+        self.a = action[0]
 
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)

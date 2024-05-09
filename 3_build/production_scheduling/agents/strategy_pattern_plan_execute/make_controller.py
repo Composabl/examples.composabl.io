@@ -14,7 +14,7 @@ class MakeCookieController(Controller):
     def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_action(self, obs):
@@ -103,7 +103,7 @@ class MakeCupcakeController(Controller):
     def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_action(self, obs):
@@ -192,7 +192,7 @@ class MakeCakeController(Controller):
     def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_action(self, obs):
@@ -282,7 +282,7 @@ class WaitController(Controller):
     def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_action(self, obs):

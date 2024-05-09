@@ -42,7 +42,7 @@ class BaseTeacher(Teacher):
     def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors] + [p.name for p in perceptors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):

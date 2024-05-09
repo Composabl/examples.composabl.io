@@ -34,7 +34,7 @@ class ProgrammedSelector(Controller):
     def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_success_criteria(self, transformed_obs, action):

@@ -10,7 +10,7 @@ class MakeCookieController(SkillController):
     async def transform_sensors(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     async def compute_action(self, obs):
@@ -99,7 +99,7 @@ class MakeCupcakeController(SkillController):
     async def transform_sensors(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     async def compute_action(self, obs):
@@ -188,7 +188,7 @@ class MakeCakeController(SkillController):
     async def transform_sensors(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     async def compute_action(self, obs):
@@ -278,7 +278,7 @@ class WaitController(SkillController):
     async def transform_sensors(self, obs):
         return obs
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     async def compute_action(self, obs):

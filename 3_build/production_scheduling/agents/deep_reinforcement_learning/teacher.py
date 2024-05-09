@@ -39,7 +39,7 @@ class BaseTeacher(SkillTeacher):
     async def transform_action(self, transformed_obs, action):
         return action
 
-    async def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     async def compute_reward(self, transformed_obs, action, sim_reward):

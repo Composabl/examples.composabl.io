@@ -67,8 +67,6 @@ async def run_agent():
         df = pd.concat([df, df_temp])
 
         obs_history.append(obs)
-        #t += action[0]
-        #a += action[1]
         a = action[0]
         t = action[1]
 
@@ -149,6 +147,27 @@ async def run_agent():
     plt.title("Rocket Landing")
 
     anim.save(f"{PATH_BENCHMARKS}/inference_figure.gif", writer='pillow')
+
+    plt.clf()
+    plt.subplot(3, 1, 1)
+    plt.plot(df['time'], df['x'], label='x')
+    plt.plot(df['time'], df['y'], label='y')
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.legend()
+
+    plt.subplot(3, 1, 2)
+    plt.plot(df['time'], df['angle'], label='angle')
+    plt.plot(df['time'], df['ang_speed'], label='angle_speed')
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.legend()
+
+    plt.subplot(3, 1, 3)
+    plt.plot(df['time'], df['y_speed'], label='y_speed')
+    plt.plot(df['time'], df['x_speed'], label='x_speed')
+    plt.axhline(y=0, color='r', linestyle='--')
+    plt.legend()
+
+    plt.savefig(f"{PATH_BENCHMARKS}/inference_data.png")
 
 
 if __name__ == "__main__":

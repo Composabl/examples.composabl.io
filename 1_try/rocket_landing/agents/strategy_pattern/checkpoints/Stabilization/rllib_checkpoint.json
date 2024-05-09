@@ -1,1 +1,1 @@
-{"type": "Algorithm", "checkpoint_version": "1.1", "format": "cloudpickle", "state_file": "/tmp/Stabilization/algorithm_state.pkl", "policy_ids": ["default_policy"], "ray_version": "2.8.0", "ray_commit": "105355bd253d6538ed34d331f6a4bdf0e38ace3a"}
+{"type": "Algorithm", "checkpoint_version": "1.2", "format": "cloudpickle", "state_file": "/tmp/composabl/Stabilization/algorithm_state.pkl", "policy_ids": ["default_policy"], "ray_version": "2.12.0", "ray_commit": "549c4b7694483f6bc9e519b61e6f575e13510343"}

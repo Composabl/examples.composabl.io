@@ -53,7 +53,7 @@ class NavigationTeacher(Teacher):
     def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
     def compute_reward(self, transformed_obs, action, sim_reward):

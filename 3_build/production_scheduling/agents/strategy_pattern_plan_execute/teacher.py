@@ -54,7 +54,7 @@ class BaseTeacher(Teacher):
         action = self.cont.compute_action(transformed_obs)
         return action
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_reward(self, transformed_obs, action, sim_reward):
