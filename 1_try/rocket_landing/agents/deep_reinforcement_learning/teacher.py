@@ -4,6 +4,8 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Teacher
+from composabl_core.agent.skill.goals import CoordinatedGoal, DriveGoal, GoalCoordinationStrategy
+from sensors import sensors
 import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt, rc
 from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
@@ -209,3 +211,34 @@ class NavigationTeacher(Teacher):
         plt.show(block=False)
         plt.pause(duration)
         plt.close("all")
+
+
+class GoalTeacher(CoordinatedGoal):
+    def __init__(self, *args, **kwargs):
+        navigationx_goal = DriveGoal("x", "D", target=0, stop_distance=10)
+        navigationy_goal = DriveGoal("y", "Dr", target=0, stop_distance=0.1)
+        angle_goal = DriveGoal("angle", "Dr", target=0, stop_distance=0.01)
+        y_speed_goal = DriveGoal("y_speed", "Dr", target=2, stop_distance=2)
+
+        super().__init__([navigationx_goal, angle_goal, y_speed_goal], GoalCoordinationStrategy.AND)
+
+    async def transform_sensors(self, obs, action):
+        return obs
+
+    async def transform_action(self, transformed_obs, action):
+        return action
+
+    async def filtered_sensor_space(self):
+        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
+
+    async def compute_action_mask(self, transformed_obs, action):
+        return None
+
+    async def compute_success_criteria(self, transformed_obs, action):
+        return False
+
+    async def compute_termination(self, transformed_obs, action):
+        if abs(float(transformed_obs["angle"])) > 2:
+            return True
+        else:
+            return False
