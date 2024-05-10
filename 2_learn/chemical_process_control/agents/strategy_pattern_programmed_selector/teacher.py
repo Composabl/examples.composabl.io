@@ -10,7 +10,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
 class BaseCSTR(SkillTeacher):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
@@ -35,7 +35,7 @@ class BaseCSTR(SkillTeacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    async def transform_obs(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
     async def transform_action(self, transformed_obs, action):
@@ -62,6 +62,9 @@ class BaseCSTR(SkillTeacher):
             reward = float(1/(math.sqrt(error + 0.00000000001)))
         else:
             reward = float(1/(math.sqrt(error)))
+
+        reward = float(1/rms)
+
         self.reward_history.append(reward)
 
         self.count += 1
@@ -148,7 +151,7 @@ class BaseCSTR(SkillTeacher):
 
 
 class SS1Teacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.title = 'CSTR Live Control - SS1 skill'
         self.history_path = f"{PATH_HISTORY}/ss1_history.pkl"
@@ -170,7 +173,7 @@ class SS1Teacher(BaseCSTR):
 
 
 class SS2Teacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.title = 'CSTR Live Control - SS2 skill'
         self.history_path = f"{PATH_HISTORY}/ss2_history.pkl"
@@ -191,7 +194,7 @@ class SS2Teacher(BaseCSTR):
             return False
 
 class TransitionTeacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.title = 'CSTR Live Control - Transition skill'
         self.history_path = f"{PATH_HISTORY}/transition_history.pkl"
@@ -206,7 +209,7 @@ class TransitionTeacher(BaseCSTR):
             self.df = pd.DataFrame()
 
 class CSTRTeacher(BaseCSTR):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
