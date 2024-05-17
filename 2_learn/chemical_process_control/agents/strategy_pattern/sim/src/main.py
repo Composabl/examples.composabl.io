@@ -1,11 +1,12 @@
 import asyncio
 from argparse import ArgumentParser
 
-from server_impl import ServerImpl
+import grpc
 from composabl_core.networking import server as server_make
+from server_impl import ServerImpl
 
 
-async def start(host, port, protocol, env_init):
+async def start(host, port, protocol, env_init: dict = {}):
     server = server_make.make(
         server_impl=ServerImpl,
         host=host,
@@ -39,4 +40,3 @@ if __name__ == "__main__":
 
     # Run the start function with the parsed arguments
     asyncio.run(start(args.host, args.port, args.protocol, args.env_init))
-

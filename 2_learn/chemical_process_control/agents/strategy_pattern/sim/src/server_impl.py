@@ -1,32 +1,27 @@
-from typing import Any, Dict, SupportsFloat, Tuple, Optional
-
-import composabl_core.utils.logger as logger_util
 from typing import Any, Dict, SupportsFloat, Tuple
 
+import composabl_core.utils.logger as logger_util
 import gymnasium as gym
 
-from composabl_core.agent.scenario.scenario import Scenario
-from composabl_core.examples.demo.sim.sim import Sim
+from composabl_core.agent.scenario import Scenario
 from composabl_core.networking.server_composabl import ServerComposabl
-
-import gymnasium as gym
 from gymnasium.envs.registration import EnvSpec
 
-from sim import Env
+from sim import CSTREnv
 
 logger = logger_util.get_logger(__name__)
 
 
 class ServerImpl(ServerComposabl):
-    def __init__(self, env_init: Optional[Dict] = None) -> None:
-        self.env = Env()
+    def __init__(self, env_init: dict = {}):
+        self.env = CSTREnv()
 
     async def make(self, env_id: str, env_init: dict) -> EnvSpec:
-        spec = {'id': 'starship', 'max_episode_steps': 401}
+        spec = {'id': 'cstr', 'max_episode_steps': 90}
         return spec
 
     async def sensor_space_info(self) -> gym.Space:
-        return self.env.observation_space
+        return self.env.sensor_space
 
     async def action_space_info(self) -> gym.Space:
         return self.env.action_space
@@ -60,4 +55,4 @@ class ServerImpl(ServerComposabl):
         return self.env.render_mode
 
     async def get_render(self):
-        return self.env.get_render_frame()
+        return self.env.render_frame()
