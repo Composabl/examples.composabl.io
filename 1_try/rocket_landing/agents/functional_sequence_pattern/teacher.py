@@ -249,13 +249,15 @@ class SpeedControlTeacher(BaseTeacher):
         error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
         error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
         error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
-        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_4 = ((0 - float(transformed_obs["y_speed"]))/100)**2
         error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
         reward = 1/(1 * (error_1) + 10 * (error_2)\
             + 1 * (error_3) + 10 * (error_4) \
-            + 5 * (error_5) + 5 * (error_6))
+            + 5 * (error_5) + 1 * (error_6))
+
+        reward = 1/(2 * (error_2) + 10 * (error_4))
 
         self.t += action[0]
         self.a += action[1]
@@ -270,11 +272,6 @@ class SpeedControlTeacher(BaseTeacher):
         self.angle_history.append(transformed_obs['angle'])
         self.count += 1
         # history metrics
-        df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
-                               data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
-                                      transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
-        self.df = pd.concat([self.df, df_temp])
-        self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
 
         return reward
 
@@ -294,9 +291,9 @@ class StabilizationTeacher(BaseTeacher):
         error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 1/(1 * (error_1) + 1 * (error_2)\
+        reward = 1/(1 * (error_1) + 10 * (error_2)\
             + 1 * (error_3) + 1 * (error_4) \
-            + 7 * (error_5) + 5 * (error_6))
+            + 10 * (error_5) + 2 * (error_6))
 
         self.t += action[0]
         self.a += action[1]
@@ -335,6 +332,8 @@ class NavigationTeacher(BaseTeacher):
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
         reward = 1/(20 * (error_1) + 1 * (error_2) + 1 * (error_3) + 2 * (error_4) + 1 * (error_5) + 1 * (error_6))
+
+        reward = 1e-6/(1 * (error_1) + 1e-7)
 
         self.t += action[0]
         self.a += action[1]

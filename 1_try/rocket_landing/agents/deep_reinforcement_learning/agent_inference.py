@@ -51,7 +51,7 @@ async def run_agent():
     print("Initialized")
 
     # Set scenario
-    await sim.set_scenario(Navigation_scenarios)
+    await sim.set_scenario(Scenario(Navigation_scenarios[0]))
     obs_history = []
     thrust_history = []
     t = 0

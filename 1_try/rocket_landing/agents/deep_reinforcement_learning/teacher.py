@@ -74,8 +74,8 @@ class NavigationTeacher(Teacher):
 
         reward = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
 
-        self.t += action[0]
-        self.a += action[1]
+        self.t = action[1]
+        self.a = action[0]
         self.t = np.clip(self.t,0.4,1)
         self.a = np.clip(self.a, -3.15, 3.15)
 
@@ -215,10 +215,10 @@ class NavigationTeacher(Teacher):
 
 class GoalTeacher(CoordinatedGoal):
     def __init__(self, *args, **kwargs):
-        navigationx_goal = DriveGoal("x", "D", target=0, stop_distance=10)
-        navigationy_goal = DriveGoal("y", "Dr", target=0, stop_distance=0.1)
-        angle_goal = DriveGoal("angle", "Dr", target=0, stop_distance=0.01)
-        y_speed_goal = DriveGoal("y_speed", "Dr", target=2, stop_distance=2)
+        navigationx_goal = DriveGoal("x", "Drive x coordinate to center", target=0, stop_distance=10)
+        navigationy_goal = DriveGoal("y", " ", target=0, stop_distance=0.1)
+        angle_goal = DriveGoal("angle", " ", target=0, stop_distance=0.01)
+        y_speed_goal = DriveGoal("y_speed", " ", target=2, stop_distance=2)
 
         super().__init__([navigationx_goal, angle_goal, y_speed_goal], GoalCoordinationStrategy.AND)
 

@@ -9,6 +9,7 @@ from IPython.display import display
 import numpy as np
 import pandas as pd
 import pickle
+from mpc_actions import thrust_optm, angle_optm
 
 class DRLMPCTeacher(Teacher):
     def __init__(self, *args, **kwargs):
@@ -18,12 +19,25 @@ class DRLMPCTeacher(Teacher):
         self.action_history = []
         self.thrust_history = []
         self.angle_history = []
+        self.error_history = []
         self.t = 0.4
         self.a = -3.14/2
+
+        self.t = 0.0
+        self.a = 0.0
+
         self.count = 0
         self.cnt_mpc = 0
         self.plot = False
         self.metrics = 'none' #standard, fast
+
+        self.min_thrust = 880 * 1000 #N
+        self.max_thrust = 1 * 2210 * 1000 #kN
+
+        deg_to_rad = 0.01745329252
+
+        self.max_gimble = 20 * deg_to_rad
+        self.min_gimble = self.max_gimble
 
         with open('./data/data_mpc.pkl', 'rb') as file:
             self.mpc_values = pickle.load(file)
@@ -31,6 +45,9 @@ class DRLMPCTeacher(Teacher):
 
         self.a_model = pickle.load(open('./data/angle_model.pkl', 'rb'))
         self.t_model = pickle.load(open('./data/thrust_model.pkl','rb'))
+
+        self.thrust_optm = thrust_optm
+        self.angle_optm =  angle_optm
 
         # create metrics db
         try:
@@ -40,10 +57,10 @@ class DRLMPCTeacher(Teacher):
         except:
             self.df = pd.DataFrame()
 
-    def transform_sensors(self, obs, action):
-        return obs
+    async def filtered_sensor_space(self):
+        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         if type(transformed_obs) != dict:
             X = transformed_obs
         else:
@@ -54,17 +71,30 @@ class DRLMPCTeacher(Teacher):
                 float(transformed_obs['y_speed']), float(transformed_obs['angle']), float(transformed_obs['ang_speed'])]],
                 columns=['x_obs','x_speed', 'y_obs', 'y_speed', 'angle', 'ang_speed'])
 
-        t = self.t_model.predict(X)[0] + action[0]
-        a = self.a_model.predict(X)[0] + action[1]
 
-        action = [t, a]
+
+        if self.count == 0:
+            t = self.thrust_optm[self.count] - 0
+            a = self.angle_optm[self.count] - 0
+        else:
+            t = self.thrust_optm[self.count] - self.thrust_optm[self.count-1]
+            a = self.angle_optm[self.count] - self.angle_optm[self.count-1]
+
+        #t = self.t_model.predict(X)[0] + action[1]
+        #a = self.a_model.predict(X)[0] + action[0]
+        t = action[1]
+        a = action[0]
+
+        action = [a, t]
+        print('Action: ', action)
+        #print('MPC: ', [self.thrust_optm[self.count], self.angle_optm[self.count]])
         #action = [self.mpc_values['angle'][self.cnt_mpc+1],self.mpc_values['angle'][self.cnt_mpc+1]]
         return action
 
-    def filtered_sensor_space(self):
+    async def filtered_observation_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -89,20 +119,40 @@ class DRLMPCTeacher(Teacher):
 
         reward_goal = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
 
-        reward = float(1e5*reward_mimic + 1*reward_goal)
+        reward = float(1e3*reward_mimic + 0.01*reward_goal)
 
-        print('REWARDS: ',reward, reward_mimic, reward_goal)
+        reward = reward_mimic
 
+        #print('REWARDS: ',reward, 1e5*reward_mimic, 0.01*reward_goal)
         #self.t += action[0]
         #self.a += action[1]
-        self.t = action[0]
-        self.a = action[1]
+        self.t = action[1]
+        self.a = action[0]
 
-        self.t = np.clip(self.t,0.4,1)
-        self.a = np.clip(self.a, -3.15, 3.15)
+        #self.t = np.clip(self.t,0.4,1)
+        #self.t = np.clip(self.t, self.min_thrust, self.max_thrust)
+        #self.a = np.clip(self.a, -self.max_gimble, self.max_gimble)
+        #self.a = np.clip(self.a, self.min_gimble, self.max_gimble)
+        #print('action: ', [self.t, self.a])
+        #print('MPC: ', [self.thrust_optm[self.count], self.angle_optm[self.count]])
 
         self.action_history.append(action)
         self.thrust_history.append([self.t, self.a])
+
+        ######### REWARD
+        #self.t_error = (self.t - self.mpc_values['thrust'][self.cnt_mpc+1])**2
+        self.t_error = (self.t - self.thrust_optm[self.count])**2
+        self.a_error = (self.a - self.angle_optm[self.count])**2
+
+        reward_action = (math.e ** (-self.t_error)) + (math.e ** (-self.a_error))
+        self.error_history.append(self.t_error + 100*self.a_error)
+        rms = np.mean(self.error_history)
+        #reward_action = 1/(self.t_error + self.a_error + 1e-5)
+        reward_action = (1e-3/(rms + 1e-5))
+        #reward_action = 1/self.a_error
+        #reward_action = 10* (1/(self.t_error + self.a_error))
+
+        reward = float(reward_action)
 
         self.reward_history.append(reward)
         self.angle_history.append(transformed_obs['angle'])
@@ -117,10 +167,10 @@ class DRLMPCTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.plot:
             if len(self.obs_history) > 100 and len(self.obs_history) % 10 == 100:
                 self.plot_obs('Rocket Landing')
@@ -138,8 +188,8 @@ class DRLMPCTeacher(Teacher):
 
             return success
 
-    def compute_termination(self, transformed_obs, action):
-        if abs(transformed_obs['angle']) > 5:
+    async def compute_termination(self, transformed_obs, action):
+        if self.count >= 100:
             return True
         else:
             return False

@@ -10,7 +10,7 @@ from composabl import Agent, Trainer, Scenario
 from composabl_core.networking.client import make
 from sensors import sensors
 from config import config
-from scenarios import Navigation_scenarios
+from scenarios import Navigation_scenarios, Variable_scenarios
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -51,7 +51,7 @@ async def run_agent():
     print("Initialized")
 
     # Set scenario
-    await sim.set_scenario(Navigation_scenarios)
+    await sim.set_scenario(Scenario(Navigation_scenarios[0]))
     obs_history = []
     thrust_history = []
     t = 0
@@ -74,7 +74,7 @@ async def run_agent():
         a = np.clip(a, -3.15, 3.15)
         thrust_history.append([t, a])
 
-        if done:
+        if done or truncated:
             break
 
     print("Closing")
