@@ -9,140 +9,7 @@ import numpy as np
 import pandas as pd
 import pickle
 
-
-class SelectorTeacher(Teacher):
-    def __init__(self):
-        self.obs_history = None
-        self.reward_history = []
-        self.last_reward = 0
-
-    def transform_obs(self, obs, action):
-        return obs
-
-    def transform_action(self, transformed_obs, action):
-        return action
-
-    def filtered_observation_space(self):
-        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
-
-    def compute_reward(self, transformed_obs, action):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-        normalized_x = abs(transformed_obs["x"] / 400) + .00001
-        normalized_x_speed = abs(transformed_obs["x_speed"] / 100) + .00001
-        normalized_y = abs(transformed_obs["y"] / 1000) + .00001
-        normalized_y_speed = abs(transformed_obs["y_speed"] / 1000) + .00001
-        normalized_angle = abs(transformed_obs["angle"] / 3.15) + .00001
-        normalized_angle_speed = abs(transformed_obs["ang_speed"] / 1) + .00001
-
-        reward = 0.3 * (1 - normalized_x) + 0.1 * (1 - normalized_x_speed) + 0.3 * (1 - normalized_y) + 0.1 * (1 - normalized_y_speed) + 0.1 * (1 - normalized_angle) + 0.1 * (1 - normalized_angle_speed)
-        #before correct angle and align
-        #after 200 y center and stop
-        return reward
-
-    def compute_action_mask(self, transformed_obs, action):
-        return None
-
-    def compute_success_criteria(self, transformed_obs, action):
-        return len(self.obs_history) > 100
-
-    def compute_termination(self, transformed_obs, action):
-        return False
-
-
-class AlignmentTeacher(Teacher):
-    def __init__(self):
-        self.obs_history = None
-        self.reward_history = []
-        self.last_reward = 0
-
-    def transform_obs(self, obs, action):
-        return obs
-
-    def transform_action(self, transformed_obs, action):
-        return action
-
-    def filtered_observation_space(self):
-        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
-
-    def compute_reward(self, transformed_obs, action):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-        normalized_x = abs(transformed_obs["x"] / 400) + .00001
-        normalized_x_speed = abs(transformed_obs["x_speed"] / 100) + .00001
-        normalized_y = abs(transformed_obs["y"] / 1000) + .00001
-        normalized_y_speed = abs(transformed_obs["y_speed"] / 1000) + .00001
-        normalized_angle = abs(transformed_obs["angle"] / 3.15) + .00001
-        normalized_angle_speed = abs(transformed_obs["ang_speed"] / 1) + .00001
-
-        reward = 0.4 * (1/normalized_x) + 0.05 * (1/normalized_x_speed)\
-            + 0.4 * (1/normalized_y) + 0.05 * (1/normalized_y_speed) \
-            + 0.05 * (1/normalized_angle) + 0.05 * (1/normalized_angle_speed)
-        return reward
-
-    def compute_action_mask(self, transformed_obs, action):
-        return None
-
-    def compute_success_criteria(self, transformed_obs, action):
-        return len(self.obs_history) > 100
-
-    def compute_termination(self, transformed_obs, action):
-        return False
-
-
-class SpeedControlTeacher(Teacher):
-    def __init__(self):
-        self.obs_history = None
-        self.reward_history = []
-        self.last_reward = 0
-
-    def transform_obs(self, obs, action):
-        return obs
-
-    def transform_action(self, transformed_obs, action):
-        return action
-
-    def filtered_observation_space(self):
-        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
-
-    def compute_reward(self, transformed_obs, action):
-        if self.obs_history is None:
-            self.obs_history = [transformed_obs]
-            return 0.0
-        else:
-            self.obs_history.append(transformed_obs)
-
-        normalized_x = abs(transformed_obs["x"] / 400) + .00001
-        normalized_x_speed = abs(transformed_obs["x_speed"] / 100) + .00001
-        normalized_y = abs(transformed_obs["y"] / 1000) + .00001
-        normalized_y_speed = abs(transformed_obs["y_speed"] / 1000) + .00001
-        normalized_angle = abs(transformed_obs["angle"] / 3.15) + .00001
-        normalized_angle_speed = abs(transformed_obs["ang_speed"] / 1) + .00001
-
-        reward = 0.05 * (1/normalized_x) + 0.4 * (1/normalized_x_speed)\
-            + 0.05 * (1/normalized_y) + 0.4 * (1/normalized_y_speed) \
-            + 0.05 * (1/normalized_angle) + 0.05 * (1/normalized_angle_speed)
-        return reward
-
-    def compute_action_mask(self, transformed_obs, action):
-        return None
-
-    def compute_success_criteria(self, transformed_obs, action):
-        return len(self.obs_history) > 100
-
-    def compute_termination(self, transformed_obs, action):
-        return False
-
-
-class StabilizationTeacher(Teacher):
+class BaseTeacher(Teacher):
     def __init__(self):
         self.obs_history = None
         self.reward_history = []
@@ -153,17 +20,12 @@ class StabilizationTeacher(Teacher):
         self.t = 0.4
         self.a = -3.14/2
         self.count = 0
-        self.plot = True
-        self.metrics = 'fast' #standard, fast
-
-        if not self.plot:
-            plt.close("all")
-            plt.figure(figsize=(10,7))
-            plt.ion()
+        self.plot = False
+        self.metrics = 'none' #standard, fast
 
         # create metrics db
         try:
-            self.df = pd.read_pickle('./starship/history.pkl')
+            self.df = pd.read_pickle('./history/history.pkl')
             if self.metrics == 'fast':
                 self.plot_metrics()
         except:
@@ -178,23 +40,23 @@ class StabilizationTeacher(Teacher):
     def filtered_observation_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action):
+    def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
         else:
             self.obs_history.append(transformed_obs)
 
-        normalized_x = abs(transformed_obs["x"] / 400) + .00001
-        normalized_x_speed = abs(transformed_obs["x_speed"] / 100) + .00001
-        normalized_y = abs(transformed_obs["y"] / 1000) + .00001
-        normalized_y_speed = abs(transformed_obs["y_speed"] / 1000) + .00001
-        normalized_angle = abs(transformed_obs["angle"] / 3.15) + .00001
-        normalized_angle_speed = abs(transformed_obs["ang_speed"] / 1) + .00001
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 0.05 * (1/normalized_x) + 0.05 * (1/normalized_x_speed)\
-            + 0.05 * (1/normalized_y) + 0.05 * (1/normalized_y_speed) \
-            + 0.4 * (1/normalized_angle) + 0.4 * (1/normalized_angle_speed)
+        reward = 1/(1 * (error_1) + 1 * (error_2)\
+            + 1 * (error_3) + 1 * (error_4) \
+            + 1 * (error_5) + 1 * (error_6))
 
         self.t += action[0]
         self.a += action[1]
@@ -239,7 +101,7 @@ class StabilizationTeacher(Teacher):
             return success
 
     def compute_termination(self, transformed_obs, action):
-        if abs(transformed_obs['angle']) > 2:
+        if abs(float(transformed_obs['angle'])) > 4:
             return True
         else:
             return False
@@ -270,7 +132,7 @@ class StabilizationTeacher(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self, title='Starship'):
+    def plot_obs(self, title='Rocket Landing'):
         #x = [ x["x"] for x in self.obs_history[:]]
         x = np.array([ list(x.values()) for x in self.obs_history[:]])
         u = np.array(self.thrust_history[:])
@@ -338,21 +200,8 @@ class StabilizationTeacher(Teacher):
         plt.pause(duration)
         plt.close("all")
 
-class NavigationTeacher(Teacher):
-    def __init__(self):
-        self.obs_history = None
-        self.reward_history = []
-        self.last_reward = 0
 
-    def transform_obs(self, obs, action):
-        return obs
-
-    def transform_action(self, transformed_obs, action):
-        return action
-
-    def filtered_observation_space(self):
-        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
-
+class SelectorTeacher(BaseTeacher):
     def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
@@ -360,21 +209,156 @@ class NavigationTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
 
-        normalized_x = abs(transformed_obs["x"] / 400)
-        normalized_x_speed = abs(transformed_obs["x_speed"] / 100)
-        normalized_y = transformed_obs["y"] / 1000
-        normalized_y_speed = abs(transformed_obs["y_speed"] / 1000)
-        normalized_angle = abs(transformed_obs["angle"] / 3.15)
-        normalized_angle_speed = abs(transformed_obs["ang_speed"] / 1)
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 0.3 * (1 - normalized_x) + 0.1 * (1 - normalized_x_speed) + 0.3 * (1 - normalized_y) + 0.1 * (1 - normalized_y_speed) + 0.1 * (1 - normalized_angle) + 0.1 * (1 - normalized_angle_speed)
+        #reward = 1/(0.3 * error_1 + 0.1 * error_2 + 0.3 * error_3 + 0.1 * error_4 + 0.1 * error_5 + 0.1 * error_6)
+
+        reward = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
+
+
+        #TODO: selector teacher is returning the action as discrete and not the sub action
+        #self.t += action[0]
+        #self.a += action[1]
+
+        #self.t = np.clip(self.t,0.4,1)
+        #self.a = np.clip(self.a, -3.15, 3.15)
+
+        #self.action_history.append(action)
+        #self.thrust_history.append([self.t, self.a])
+
+        self.reward_history.append(reward)
+        self.angle_history.append(transformed_obs['angle'])
+        self.count += 1
+        # history metrics
+        #df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+        #                       data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+        #                              transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        #self.df = pd.concat([self.df, df_temp])
+        #self.df.to_pickle("./history/history.pkl")
+
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
-        return None
 
-    def compute_success_criteria(self, transformed_obs, action):
-        return False
+class SpeedControlTeacher(BaseTeacher):
+    def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
 
-    def compute_termination(self, transformed_obs, action):
-        return False
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
+
+        reward = 1/(1 * (error_1) + 5 * (error_2)\
+            + 1 * (error_3) + 10 * (error_4) \
+            + 1 * (error_5) + 1 * (error_6))
+
+        self.t += action[0]
+        self.a += action[1]
+
+        self.t = np.clip(self.t,0.4,1)
+        self.a = np.clip(self.a, -3.15, 3.15)
+
+        self.action_history.append(action)
+        self.thrust_history.append([self.t, self.a])
+
+        self.reward_history.append(reward)
+        self.angle_history.append(transformed_obs['angle'])
+        self.count += 1
+        # history metrics
+        df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+                               data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+                                      transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle("./history/history.pkl")
+
+        return reward
+
+
+class StabilizationTeacher(BaseTeacher):
+    def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
+
+        reward = 1/(1 * (error_1) + 1 * (error_2)\
+            + 1 * (error_3) + 1 * (error_4) \
+            + 7 * (error_5) + 5 * (error_6))
+
+        self.t += action[0]
+        self.a += action[1]
+
+        self.t = np.clip(self.t,0.4,1)
+        self.a = np.clip(self.a, -3.15, 3.15)
+
+        self.action_history.append(action)
+        self.thrust_history.append([self.t, self.a])
+
+        self.reward_history.append(reward)
+        self.angle_history.append(transformed_obs['angle'])
+        self.count += 1
+        # history metrics
+        df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+                               data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+                                      transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle("./history/history.pkl")
+
+        return reward
+
+class NavigationTeacher(BaseTeacher):
+    def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
+
+        reward = 1/(10 * (error_1) + 1 * (error_2) + 3 * (error_3) + 1 * (error_4) + 1 * (error_5) + 1 * (error_6))
+
+        self.t += action[0]
+        self.a += action[1]
+
+        self.t = np.clip(self.t,0.4,1)
+        self.a = np.clip(self.a, -3.15, 3.15)
+
+        self.action_history.append(action)
+        self.thrust_history.append([self.t, self.a])
+
+        self.reward_history.append(reward)
+        self.angle_history.append(transformed_obs['angle'])
+        self.count += 1
+        # history metrics
+        df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+                               data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+                                      transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        self.df = pd.concat([self.df, df_temp])
+        self.df.to_pickle("./history/history.pkl")
+
+        return reward

@@ -1,3 +1,4 @@
+import re
 from composabl import Teacher
 import math
 import matplotlib.pyplot as plt
@@ -22,7 +23,7 @@ class DRLMPCTeacher(Teacher):
         self.count = 0
         self.cnt_mpc = 0
         self.plot = False
-        self.metrics = 'fast' #standard, fast
+        self.metrics = 'none' #standard, fast
 
         with open('./data/data_mpc.pkl', 'rb') as file:
             self.mpc_values = pickle.load(file)
@@ -30,11 +31,6 @@ class DRLMPCTeacher(Teacher):
 
         self.a_model = pickle.load(open('./data/angle_model.pkl', 'rb'))
         self.t_model = pickle.load(open('./data/thrust_model.pkl','rb'))
-
-        if not self.plot:
-            plt.close("all")
-            plt.figure(figsize=(10,7))
-            plt.ion()
 
         # create metrics db
         try:
@@ -51,9 +47,12 @@ class DRLMPCTeacher(Teacher):
         if type(transformed_obs) != dict:
             X = transformed_obs
         else:
-            X = pd.DataFrame(data=[[float(transformed_obs['x']), float(transformed_obs['x_speed']), float(transformed_obs['y']),
-            float(transformed_obs['y_speed']), float(transformed_obs['angle']), float(transformed_obs['ang_speed'])]],
-            columns=['x_obs','x_speed', 'y_obs', 'y_speed', 'angle', 'ang_speed'])
+            if 'observation' in transformed_obs.keys():
+                X = [transformed_obs['observation']]
+            else:
+                X = pd.DataFrame(data=[[float(transformed_obs['x']), float(transformed_obs['x_speed']), float(transformed_obs['y']),
+                float(transformed_obs['y_speed']), float(transformed_obs['angle']), float(transformed_obs['ang_speed'])]],
+                columns=['x_obs','x_speed', 'y_obs', 'y_speed', 'angle', 'ang_speed'])
 
         t = self.t_model.predict(X)[0] + action[0]
         a = self.a_model.predict(X)[0] + action[1]
@@ -72,20 +71,27 @@ class DRLMPCTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
 
-        r1 = math.e**(-1*(float(transformed_obs["angle"]) - self.mpc_values['angle'][self.cnt_mpc+1])**2)
-        r2 = math.e**(-1*(float(transformed_obs["ang_speed"]) - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2)
-        r3 = math.e**(-1*(float(transformed_obs["x"]) - self.mpc_values['x'][self.cnt_mpc+1])**2)
-        r4 = math.e**(-1*(float(transformed_obs["x_speed"]) - self.mpc_values['x_speed'][self.cnt_mpc+1])**2)
-        r5 = math.e**(-1*(float(transformed_obs["y"]) - self.mpc_values['y'][self.cnt_mpc+1])**2)
-        r6 = math.e**(-1*(float(transformed_obs["y_speed"]) - self.mpc_values['y_speed'][self.cnt_mpc+1])**2)
+        r1 = (float(transformed_obs["angle"]) - self.mpc_values['angle'][self.cnt_mpc+1])**2
+        r2 = (float(transformed_obs["ang_speed"]) - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2
+        r3 = (float(transformed_obs["x"]) - self.mpc_values['x'][self.cnt_mpc+1])**2
+        r4 = (float(transformed_obs["x_speed"]) - self.mpc_values['x_speed'][self.cnt_mpc+1])**2
+        r5 = (float(transformed_obs["y"]) - self.mpc_values['y'][self.cnt_mpc+1])**2
+        r6 = (float(transformed_obs["y_speed"]) - self.mpc_values['y_speed'][self.cnt_mpc+1])**2
 
-        '''if transformed_obs["y"] <= 300:
-            reward = (r1 + r3 + 2*r4 + 2*r5 + 2*r6) /8
-        elif transformed_obs["y"] > 300 :
-            reward = (2*r1 + 2*r3 + r5 + r6) /6'''
+        reward_mimic = float(1/ ((r1 + r2 + r3 + r4 + r5 + r6)))
 
-        reward = (r1 + r2 + r3 + r4 + r5 + r6) / 6
-        reward = float(reward)
+        error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
+        error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
+        error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
+        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
+        error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
+
+        reward_goal = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
+
+        reward = float(1e5*reward_mimic + 1*reward_goal)
+
+        print('REWARDS: ',reward, reward_mimic, reward_goal)
 
         #self.t += action[0]
         #self.a += action[1]
