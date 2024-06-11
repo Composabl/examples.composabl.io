@@ -1,0 +1,7 @@
+composabl-core-dev
+scipy
+casadi
+control==0.9.4
+pandas
+ipython
+ipywidgets
