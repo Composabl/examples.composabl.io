@@ -11,15 +11,15 @@ config = {
                 #"sim_cpu": "1",
                 #"sim_memory": "512Mi",
             #},
-            #"docker": {"image": "composabl/sim-filament-extruder"},
-            "local": {"address": "localhost:1337"}
+            "docker": {"image": "composabl/sim-filament-extruder"},
+            #"local": {"address": "localhost:1337"}
         },
         "env": {
             "name": "filament-extruder",
         },
         "training": {},
         "trainer": {
-            "workers": 1,
+            "workers": 5,
             "rollout_fragment_length": 60
         }
     }

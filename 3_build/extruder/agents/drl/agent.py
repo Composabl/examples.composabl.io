@@ -13,7 +13,7 @@ from teacher import TemperatureControlTeacher
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
-PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
+PATH_CHECKPOINTS : str = f"{PATH}/model"
 
 def run_agent():
     TemperatureControl_skill = Skill("TemperatureControl", TemperatureControlTeacher)
@@ -26,9 +26,11 @@ def run_agent():
     agent = Agent()
     agent.add_sensors(sensors)
 
+    agent.load(PATH_CHECKPOINTS)
+
     agent.add_skill(TemperatureControl_skill)
 
-    trainer.train(agent, train_cycles=3)
+    trainer.train(agent, train_cycles=100)
 
 
 if __name__ == "__main__":

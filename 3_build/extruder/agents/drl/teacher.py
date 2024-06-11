@@ -11,6 +11,7 @@ class TemperatureControlTeacher(Teacher):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
+        self.count = 0
 
     async def transform_sensors(self, obs, action):
         return obs
@@ -33,6 +34,7 @@ class TemperatureControlTeacher(Teacher):
 
         error = abs(temperature - temperature_setpoint)
         reward = 1 / (error)
+        self.count += 1
         return reward
 
     async def compute_action_mask(self, transformed_obs, action):
@@ -42,4 +44,7 @@ class TemperatureControlTeacher(Teacher):
         return False
 
     async def compute_termination(self, transformed_obs, action):
-        return False
+        if self.count >= 31:
+            return True
+        else:
+            return False

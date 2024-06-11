@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Teacher
-from composabl_core.agent.skill.goals import CoordinatedGoal, DriveGoal, GoalCoordinationStrategy
+from composabl_core.agent.skill.goals import CoordinatedGoal, MaintainGoal, ApproachGoal,  GoalCoordinationStrategy
 from sensors import sensors
 import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt, rc
@@ -31,6 +31,7 @@ class NavigationTeacher(Teacher):
         self.thrust_history = []
         self.reward_history = []
         self.angle_history = []
+        self.error_history = []
 
         self.plot = False
         self.metrics = 'fast' #standard, fast
@@ -76,8 +77,26 @@ class NavigationTeacher(Teacher):
 
         self.t = action[1]
         self.a = action[0]
-        self.t = np.clip(self.t,0.4,1)
-        self.a = np.clip(self.a, -3.15, 3.15)
+        deg_to_rad = 0.01745329
+
+        max_gimble = 20  * deg_to_rad
+        min_gimble = -max_gimble
+        #self.t = np.clip(self.t,0.4,1)
+        self.a = np.clip(self.a, min_gimble, max_gimble)
+
+        ##################
+        error = (1000 - float(transformed_obs["y"])) * (5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6)
+        error = (5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 1 * error_6)
+        self.error_history.append(error)
+        rms = math.sqrt(np.mean(self.error_history))
+        # minimize error
+        reward = 10* math.exp(-1e-1 * np.sum(self.error_history))
+        if len(self.error_history) >= 10:
+            #print('LEN HISTORY: ', self.error_history)
+            reward = 10* math.exp(-1e-1 * np.sum(self.error_history[-10:]))
+        self.reward_history.append(reward)
+
+        ##############
 
         self.action_history.append(action)
         self.thrust_history.append([self.t, self.a])
@@ -87,10 +106,10 @@ class NavigationTeacher(Teacher):
         self.count += 1
 
         # history metrics
-        df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
-                               data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
-                                      transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
-        self.df = pd.concat([self.df, df_temp])
+        #df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+        #                       data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+        #                              transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        #self.df = pd.concat([self.df, df_temp])
         #self.df.to_pickle("./starship/history.pkl")
         return reward
 
@@ -116,7 +135,14 @@ class NavigationTeacher(Teacher):
             return success
 
     async def compute_termination(self, transformed_obs, action):
-        return False
+        if abs(float(transformed_obs["x"])) > 150:
+            return True
+        elif (float(transformed_obs["x_speed"])) < -100:
+            return True
+        elif abs(float(transformed_obs["angle"])) > 2.5:
+            return True
+        else:
+            return False
 
     async def plot_metrics(self):
         plt.clf()
@@ -215,12 +241,12 @@ class NavigationTeacher(Teacher):
 
 class GoalTeacher(CoordinatedGoal):
     def __init__(self, *args, **kwargs):
-        navigationx_goal = DriveGoal("x", "Drive x coordinate to center", target=0, stop_distance=10)
-        navigationy_goal = DriveGoal("y", " ", target=0, stop_distance=0.1)
-        angle_goal = DriveGoal("angle", " ", target=0, stop_distance=0.01)
-        y_speed_goal = DriveGoal("y_speed", " ", target=2, stop_distance=2)
+        navigationx_goal = MaintainGoal("x", "Drive x coordinate to center", target=0, stop_distance=5)
+        navigationy_goal = ApproachGoal("y", " ", target=0, stop_distance=0.1)
+        angle_goal = MaintainGoal("angle", " ", target=0, stop_distance=0.01)
+        y_speed_goal = MaintainGoal("y_speed", " ", target=2, stop_distance=2)
 
-        super().__init__([navigationx_goal, angle_goal, y_speed_goal], GoalCoordinationStrategy.AND)
+        super().__init__([navigationx_goal, angle_goal, y_speed_goal, navigationy_goal], GoalCoordinationStrategy.AND)
 
     async def transform_sensors(self, obs, action):
         return obs
@@ -239,6 +265,153 @@ class GoalTeacher(CoordinatedGoal):
 
     async def compute_termination(self, transformed_obs, action):
         if abs(float(transformed_obs["angle"])) > 2:
+            return True
+        else:
+            return False
+
+
+class LandTeacher(Teacher):
+    def __init__(self, *args, **kwargs):
+        self.obs_history = None
+        self.reward_history = []
+        self.last_reward = 0
+        self.count = 0
+        self.t = 0
+        self.a = 0
+        self.action_history = []
+        self.thrust_history = []
+        self.reward_history = []
+        self.angle_history = []
+        self.error_history = []
+
+    async def transform_sensors(self, obs, action):
+        return obs
+
+    async def transform_action(self, transformed_obs, action):
+        #constraint delta action
+        '''if self.count > 1:
+            last_t = self.action_history[-1][0]
+            last_a = self.action_history[-1][1]
+            delta_t = action[0] - last_t
+            delta_a = action[1] - last_a
+
+            delta_t = np.clip(delta_t, -0.1, 0.1)
+            delta_a = np.clip(delta_a, -0.1, 0.1)
+
+            action = [last_t + delta_t, last_a + delta_a]'''
+        return action
+
+    async def filtered_sensor_space(self):
+        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
+
+    async def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        # dist between agent and target point
+        self.target_x = 0
+        self.target_y = 0
+        dist_x = abs(transformed_obs['x'] - self.target_x)
+        dist_y = abs(transformed_obs['y'] - self.target_y)
+        dist_norm = dist_x / 400 + dist_y / 1000
+
+        dist_reward = 0.1*(1.0 - dist_norm)
+
+        if abs(transformed_obs['angle']) <= np.pi / 6.0:
+            pose_reward = 0.1
+        else:
+            pose_reward = abs(transformed_obs['angle']) / (0.5*np.pi)
+            pose_reward = 0.1 * (1.0 - pose_reward)
+
+        reward = 10 * (dist_reward + pose_reward)
+
+        '''if self.task == 'hover' and (dist_x**2 + dist_y**2)**0.5 <= 2*self.target_r:  # hit target
+            reward = 0.25
+        if self.task == 'hover' and (dist_x**2 + dist_y**2)**0.5 <= 1*self.target_r:  # hit target
+            reward = 0.5
+        if self.task == 'hover' and abs(transformed_obs['angle']) > 90 / 180 * np.pi:
+            reward = 0'''
+
+        v = (transformed_obs['x_speed'] ** 2 + transformed_obs['y_speed'] ** 2) ** 0.5
+
+        '''if self.already_crash:
+            reward = (reward + 5*np.exp(-1*v/10.)) * (self.max_steps - self.step_id)
+        if self.already_landing:
+            reward = (1.0 + 5*np.exp(-1*v/10.))*(self.max_steps - self.step_id)'''
+
+        ##### Landing zone
+        # x value
+        if float(transformed_obs['y']) <= 200 and abs(float(transformed_obs['x'])) <= 100:
+            reward += 0.1
+        if float(transformed_obs['y']) <= 200 and abs(float(transformed_obs['x'])) <= 50:
+            reward += 0.5
+        if float(transformed_obs['y']) <= 200 and abs(float(transformed_obs['x'])) <= 10:
+            reward += 1
+
+        # angle
+        if float(transformed_obs['y']) <= 600 and abs(float(transformed_obs['angle'])) <= 1:
+            reward += 0.1
+        if float(transformed_obs['y']) <= 400 and abs(float(transformed_obs['angle'])) <= 0.4:
+            reward += 0.5
+        if float(transformed_obs['y']) <= 200 and abs(float(transformed_obs['angle'])) <= 0.4:
+            reward += 0.5
+        if float(transformed_obs['y']) <= 200 and abs(float(transformed_obs['angle'])) <= 0.2:
+            reward += 1
+        if float(transformed_obs['y']) <= 100 and abs(float(transformed_obs['angle'])) <= 0.2:
+            reward += 5
+
+        # speed
+        if float(transformed_obs['y']) <= 400 and abs(float(transformed_obs['y_speed'])) < 100:
+            reward += 0.1
+        if float(transformed_obs['y']) <= 200 and abs(float(transformed_obs['y_speed'])) < 80:
+            reward += 0.5
+        if float(transformed_obs['y']) <= 100 and abs(float(transformed_obs['y_speed'])) < 50:
+            reward += 1.0
+        if float(transformed_obs['y']) <= 20 and abs(float(transformed_obs['y_speed'])) <= 10:
+            reward += 10
+        if float(transformed_obs['y']) <= 10 and abs(float(transformed_obs['y_speed'])) <= 5:
+            reward += 10
+
+        self.reward_history.append(reward)
+
+        ##############
+
+        self.action_history.append(action)
+        self.thrust_history.append([self.t, self.a])
+        self.reward_history.append(reward)
+        self.angle_history.append(transformed_obs['angle'])
+
+        self.count += 1
+
+        # history metrics
+        #df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+        #                       data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+        #                              transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        #self.df = pd.concat([self.df, df_temp])
+        #self.df.to_pickle("./starship/history.pkl")
+        return reward
+
+    async def compute_action_mask(self, transformed_obs, action):
+        return None
+
+    async def compute_success_criteria(self, transformed_obs, action):
+        if self.obs_history == None:
+            return False
+        else:
+            success = False
+        return success
+
+    async def compute_termination(self, transformed_obs, action):
+        if abs(float(transformed_obs["x"])) > 150:
+            return True
+        elif (float(transformed_obs["x_speed"])) < -100:
+            return True
+        elif abs(float(transformed_obs["angle"])) > 2.5:
+            return True
+        elif abs(float(transformed_obs["y"])) < 400 and abs(float(transformed_obs["angle"])) > 1.0:
             return True
         else:
             return False
