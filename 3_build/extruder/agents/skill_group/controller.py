@@ -92,7 +92,7 @@ class PIDController(SkillController):
         #print("OBS: ", obs)
         self.y1ref = obs['y1ref']
         self.y1 = obs['y1']
-        bias = 120
+        bias = float(action[0])
 
         if self.count > 0:
             self.Δu1 = PID(self.y1,TSP=self.y1ref,Kp=0.3, Ki=0.07, Kd =0.1,

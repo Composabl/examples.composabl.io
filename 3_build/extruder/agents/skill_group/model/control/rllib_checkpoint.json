@@ -1,0 +1,1 @@
+{"type": "Algorithm", "checkpoint_version": "1.2", "format": "cloudpickle", "state_file": "/tmp/composabl/control/algorithm_state.pkl", "policy_ids": ["default_policy"], "ray_version": "2.12.0", "ray_commit": "549c4b7694483f6bc9e519b61e6f575e13510343"}

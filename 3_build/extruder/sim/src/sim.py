@@ -20,7 +20,8 @@ class Env(gym.Env):
         }
 
         self.action_constraints = {
-            "du1": {'low': -40, 'high': 40},
+            #"du1": {'low': -40, 'high': 40},
+            "du1": {'low': -200, 'high': 200},
         }
 
         low_list = [x['low'] for x in self.obs_space_constraints.values()]
@@ -82,10 +83,10 @@ class Env(gym.Env):
 
             for key in list(sample.keys()):
                 setattr(self, key, sample[key])
-        else:
-            self.y1ref = 170
-            self.time_delay = 0.028
-            self.noise_percentage = 0
+        #else:
+        #    self.y1ref = 170
+        #    self.time_delay = 0.028
+        #    self.noise_percentage = 0
 
         # initial conditions
         y10: float = 0

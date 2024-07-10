@@ -19,7 +19,7 @@ config = {
         },
         "training": {},
         "trainer": {
-            "workers": 5,
+            "workers": 8,
             "rollout_fragment_length": 60
         }
     }

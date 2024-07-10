@@ -30,7 +30,10 @@ def run_agent():
 
     agent.add_skill(TemperatureControl_skill)
 
-    trainer.train(agent, train_cycles=100)
+    trainer.train(agent, train_cycles=500)
+
+    # Save the trained agent
+    agent.export(PATH_CHECKPOINTS, dir_exist_ok = True)
 
 
 if __name__ == "__main__":

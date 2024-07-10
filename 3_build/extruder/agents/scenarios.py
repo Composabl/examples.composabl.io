@@ -1,6 +1,6 @@
 TemperatureControl_scenarios = [
         {
-            "y1_SP": 170,
+            "y1ref": 170,
             "time_delay": 0.028
         }
     ]
