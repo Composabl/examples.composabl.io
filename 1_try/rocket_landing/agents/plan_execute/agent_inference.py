@@ -66,7 +66,7 @@ async def run_agent():
     obs, info = await sim.reset()
     obs_history.append(obs)
 
-    for i in range(100):
+    for i in range(400):
         action = await trained_agent._execute(obs)
         print(action)
         #print( angle_optm[i],thrust_optm[i])

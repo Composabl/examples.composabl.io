@@ -44,7 +44,7 @@ async def start():
     await sim.init()
     #"Initialized"
     await sim.set_scenario(Scenario({
-            "y1ref": 100, #170
+            "y1ref": 170, #170
             "time_delay": 0.028
         }))
     df = pd.DataFrame()

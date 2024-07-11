@@ -11,7 +11,7 @@ from teacher import CSTRTeacher
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
-PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
+PATH_CHECKPOINTS : str = f"{PATH}/model"
 
 DELETE_OLD_HISTORY_FILES: bool = True
 
@@ -29,14 +29,14 @@ def run_agent():
     agent.add_skill(reaction_skill)
 
     # Load a pre-trained agent
-    try:
-        if len(os.listdir(PATH_CHECKPOINTS)) > 0:
-            agent.load(PATH_CHECKPOINTS)
-    except Exception:
-        print("|-- No checkpoints found. Training from scratch...")
+    #try:
+    #    if len(os.listdir(PATH_CHECKPOINTS)) > 0:
+    #        agent.load(PATH_CHECKPOINTS)
+    #except Exception:
+    #    print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    trainer.train(agent, train_cycles=100)
+    trainer.train(agent, train_cycles=10)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

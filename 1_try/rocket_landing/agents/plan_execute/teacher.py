@@ -101,27 +101,27 @@ class DRLMPCTeacher(Teacher):
         else:
             self.obs_history.append(transformed_obs)
 
-        r1 = (float(transformed_obs["angle"]) - self.mpc_values['angle'][self.cnt_mpc+1])**2
-        r2 = (float(transformed_obs["ang_speed"]) - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2
-        r3 = (float(transformed_obs["x"]) - self.mpc_values['x'][self.cnt_mpc+1])**2
-        r4 = (float(transformed_obs["x_speed"]) - self.mpc_values['x_speed'][self.cnt_mpc+1])**2
-        r5 = (float(transformed_obs["y"]) - self.mpc_values['y'][self.cnt_mpc+1])**2
-        r6 = (float(transformed_obs["y_speed"]) - self.mpc_values['y_speed'][self.cnt_mpc+1])**2
+        #r1 = (float(transformed_obs["angle"]) - self.mpc_values['angle'][self.cnt_mpc+1])**2
+        #r2 = (float(transformed_obs["ang_speed"]) - self.mpc_values['angle_speed'][self.cnt_mpc+1])**2
+        #r3 = (float(transformed_obs["x"]) - self.mpc_values['x'][self.cnt_mpc+1])**2
+        #r4 = (float(transformed_obs["x_speed"]) - self.mpc_values['x_speed'][self.cnt_mpc+1])**2
+        #r5 = (float(transformed_obs["y"]) - self.mpc_values['y'][self.cnt_mpc+1])**2
+        #r6 = (float(transformed_obs["y_speed"]) - self.mpc_values['y_speed'][self.cnt_mpc+1])**2
 
-        reward_mimic = float(1/ ((r1 + r2 + r3 + r4 + r5 + r6)))
+        #reward_mimic = float(1/ ((r1 + r2 + r3 + r4 + r5 + r6)))
 
         error_1 = ((0 - float(transformed_obs["x"]) )/400)**2
         error_2 = ((0 - float(transformed_obs["x_speed"]))/100)**2
         error_3 = ((0 - float(transformed_obs["y"]) )/1000)**2
-        error_4 = ((5 - float(transformed_obs["y_speed"]))/1000)**2
+        error_4 = ((0 - float(transformed_obs["y_speed"]))/100)**2
         error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
         reward_goal = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
 
-        reward = float(1e3*reward_mimic + 0.01*reward_goal)
+        #reward = float(1e3*reward_mimic + 0.01*reward_goal)
 
-        reward = reward_mimic
+        #reward = reward_mimic
 
         #print('REWARDS: ',reward, 1e5*reward_mimic, 0.01*reward_goal)
         #self.t += action[0]
@@ -149,10 +149,15 @@ class DRLMPCTeacher(Teacher):
         rms = np.mean(self.error_history)
         #reward_action = 1/(self.t_error + self.a_error + 1e-5)
         reward_action = (1e-3/(rms + 1e-5))
+        reward_action = math.exp(-1e-1 * np.sum(self.error_history))
         #reward_action = 1/self.a_error
         #reward_action = 10* (1/(self.t_error + self.a_error))
 
-        reward = float(reward_action)
+        reward_goal = math.exp(-0.1* (5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
+        #print('REWARDS: ', reward_action, reward_goal)
+        reward = 0.8 * reward_action + 0.2 * reward_goal
+        reward = reward_action
+        reward = float(reward)
 
         self.reward_history.append(reward)
         self.angle_history.append(transformed_obs['angle'])
@@ -189,7 +194,7 @@ class DRLMPCTeacher(Teacher):
             return success
 
     async def compute_termination(self, transformed_obs, action):
-        if self.count >= 100:
+        if self.count >= 398:
             return True
         else:
             return False
@@ -294,3 +299,80 @@ class DRLMPCTeacher(Teacher):
         plt.show(block=False)
         plt.pause(duration)
         plt.close("all")
+
+
+class DRLHighSkillTeacher(Teacher):
+    def __init__(self, *args, **kwargs):
+        self.obs_history = None
+        self.reward_history = []
+        self.last_reward = 0
+        self.action_history = []
+        self.thrust_history = []
+        self.angle_history = []
+        self.error_history = []
+        self.t = 0.4
+        self.a = -3.14/2
+
+        self.t = 0.0
+        self.a = 0.0
+
+        self.count = 0
+        self.cnt_mpc = 0
+        self.plot = False
+        self.metrics = 'none' #standard, fast
+
+        self.min_thrust = 880 * 1000 #N
+        self.max_thrust = 1 * 2210 * 1000 #kN
+
+        deg_to_rad = 0.01745329252
+
+        self.max_gimble = 20 * deg_to_rad
+        self.min_gimble = self.max_gimble
+
+        with open('./data/data_mpc.pkl', 'rb') as file:
+            self.mpc_values = pickle.load(file)
+        file.close()
+
+        self.a_model = pickle.load(open('./data/angle_model.pkl', 'rb'))
+        self.t_model = pickle.load(open('./data/thrust_model.pkl','rb'))
+
+        self.thrust_optm = thrust_optm
+        self.angle_optm =  angle_optm
+
+        # create metrics db
+        try:
+            self.df = pd.read_pickle('./mpc_history.pkl')
+            if self.metrics == 'fast':
+                self.plot_metrics()
+        except:
+            self.df = pd.DataFrame()
+
+    async def filtered_sensor_space(self):
+        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
+
+    async def transform_action(self, transformed_obs, action):
+        return action
+
+    async def filtered_observation_space(self):
+        return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
+
+    async def compute_reward(self, transformed_obs, action, sim_reward):
+        if self.obs_history is None:
+            self.obs_history = [transformed_obs]
+            return 0.0
+        else:
+            self.obs_history.append(transformed_obs)
+
+        reward = 0.0
+
+        return reward
+
+    async def compute_action_mask(self, transformed_obs, action):
+        return None
+
+    async def compute_success_criteria(self, transformed_obs, action):
+        success = False
+        return success
+
+    async def compute_termination(self, transformed_obs, action):
+        return False

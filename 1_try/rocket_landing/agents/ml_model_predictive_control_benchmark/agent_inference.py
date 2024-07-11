@@ -113,7 +113,7 @@ sol = opti.solve()
 ##PLOT
 
 # Plot state
-plt.subplot(211)
+plt.subplot(511)
 plt.plot(sol.value(x)[:, 0], label = "x")
 plt.plot(sol.value(x)[:, 1], label = "x_dot")
 plt.plot(sol.value(x)[:, 2], label = "y")
@@ -121,13 +121,26 @@ plt.plot(sol.value(x)[:, 3], label = "y_dot")
 plt.plot(sol.value(x)[:, 4], label = "theta")
 plt.plot(sol.value(x)[:, 5], label = "theta_dot")
 plt.legend()
-plt.show()
 
 # Plot control input
-plt.subplot(212)
+plt.subplot(512)
 plt.plot(sol.value(u)[:, 0], label = "thrust %")
 plt.plot(sol.value(u)[:, 1], label = "angle")
 plt.legend()
+
+plt.subplot(513)
+plt.plot(sol.value(x)[:, 1], label = "x_dot")
+plt.plot(sol.value(x)[:, 3], label = "y_dot")
+plt.legend()
+
+plt.subplot(514)
+plt.plot(sol.value(x)[:, 2],sol.value(x)[:, 4], label = "theta vs y")
+plt.legend()
+
+plt.subplot(515)
+plt.plot(sol.value(x)[:, 2],sol.value(x)[:, 3], label = "y_dot vs y")
+plt.legend()
+
 plt.show()
 
 final_time_step = sol.value(t_step);

@@ -62,6 +62,15 @@ class CSTRTeacher(Teacher):
             reward = float(1/(math.sqrt(error)))
         self.reward_history.append(reward)
 
+        tolerance = 0.5
+        # instataneous yield regardless of time, it has to be in spec
+        yield_inst = 1 if abs(transformed_obs['Ca'] - transformed_obs['Cref']) <= tolerance else 0
+        # yield percentage over the episode - % time that the product is in spec
+        episode_yield_pct = sum([ 1 if abs(x['Ca'] - x['Cref']) <= tolerance else 0 for x in self.obs_history]) / len(self.obs_history)
+        #product needs to be in spec after 76 iterations to produce yield
+        product_Cb_inst = (10 - float(transformed_obs['Ca'])) if (self.count >= 76 and abs(transformed_obs['Ca'] - transformed_obs['Cref']) <= tolerance) else 0
+        production_Cb_total = sum([ (10 - x['Ca']) if abs(x['Ca'] - x['Cref']) <= tolerance else 0 for x in self.obs_history])
+
         self.count += 1
 
         # history metrics

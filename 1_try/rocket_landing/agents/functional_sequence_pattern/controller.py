@@ -11,7 +11,10 @@ class ProgrammedSelector(SkillController):
         self.counter = 0
 
     async def compute_action(self, obs, action):
-        if abs(float(obs['angle'])) > 0.9:
+        if abs(float(obs['x'])) > 50:
+            return 0 #"Navigation_skill"
+
+        elif abs(float(obs['x'])) > 10 and abs(float(obs['angle'])) > 0.5:
             return 1 #"Stabilization_skill"
 
         elif abs(float(obs['x'])) > 10:
