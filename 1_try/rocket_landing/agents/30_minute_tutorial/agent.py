@@ -17,23 +17,23 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 # Change here to define how the agent will orchestrate each skill
 # Define the Programmed Selector and how it selects the each skill
 class ProgrammedSelector(Controller):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.counter = 0
 
     def compute_action(self, obs):
         if abs(float(obs['angle'])) > 0.5:
-            return [1] #"Stabilization_skill"
+            return 1 #"Stabilization_skill"
 
         elif abs(float(obs['x'])) > 10:
-            return [0] #"Navigation_skill"
+            return 0 #"Navigation_skill"
 
         else:
-            return [2] #"SpeedControl_skill"
+            return 2 #"SpeedControl_skill"
 
-    def transform_obs(self, obs):
+    def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return [s.name for s in sensors]
 
     def compute_success_criteria(self, transformed_obs, action):
@@ -77,7 +77,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_iters=100)
+    runtime.train(agent, train_cycles=100)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

@@ -10,7 +10,7 @@ import pandas as pd
 import pickle
 
 class BaseTeacher(Teacher):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
@@ -31,13 +31,13 @@ class BaseTeacher(Teacher):
         except:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    def transform_sensors(self, obs, action):
         return obs
 
     def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    def filtered_sensor_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
     def compute_reward(self, transformed_obs, action, sim_reward):
