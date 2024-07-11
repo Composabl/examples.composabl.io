@@ -8,7 +8,7 @@ import gymnasium as gym
 
 
 class Env(gym.Env):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_space_constraints = {
             "x": {'low': -400, 'high': 400},
             "x_speed": {'low': -100, 'high': 100},
@@ -18,9 +18,14 @@ class Env(gym.Env):
             "angle_speed": {'low': -3, 'high': 3},
         }
 
+        deg_to_rad = 0.01745329
+
+        max_gimble = 20  * deg_to_rad
+        min_gimble = -max_gimble
+
         self.action_constraints = {
-            "delta_angle": {'low': -1, 'high': 1},
-            "delta_thrust": {'low': -1, 'high': 1}
+            "delta_angle": {'low': min_gimble, 'high': max_gimble},
+            "delta_thrust": {'low': 0.4, 'high': 1}
         }
 
         low_list = [x['low'] for x in self.obs_space_constraints.values()]
@@ -149,7 +154,7 @@ class Env(gym.Env):
         self.angle = self.x[self.cnt, 4]
         self.ang_speed = self.x[self.cnt, 5]
 
-        self.t = 0
+        self.t = 0.4
         self.a = 0
         self.reward_value = 0
 
@@ -178,12 +183,14 @@ class Env(gym.Env):
             v = sum([x**2 for x in lt])
             return v
 
-        thrust = action[0]
-        angle = action[1]
+        angle = action[0]
+        thrust = action[1]
 
         actuator_noise = 0
-        self.t += thrust + random.uniform(-actuator_noise * thrust, actuator_noise * thrust)
-        self.a += angle + random.uniform(-actuator_noise * angle, actuator_noise * angle)
+        #self.t += thrust + random.uniform(-actuator_noise * thrust, actuator_noise * thrust)
+        #self.a += angle + random.uniform(-actuator_noise * angle, actuator_noise * angle)
+        self.t = thrust + random.uniform(-actuator_noise * thrust, actuator_noise * thrust)
+        self.a = angle + random.uniform(-actuator_noise * angle, actuator_noise * angle)
 
         self.t = np.clip(self.t, 0.4, 1)
         self.a = np.clip(self.a, self.min_gimble, self.max_gimble)
@@ -245,4 +252,3 @@ class Env(gym.Env):
 
     def render(self, mode='auto'):
         pass
-
