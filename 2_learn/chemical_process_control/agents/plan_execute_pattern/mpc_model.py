@@ -1,18 +1,9 @@
-import json
-import os
-import random
 import math
-import pandas as pd
-
-import numpy as np
-import sys
-from casadi import *
-from scipy import interpolate
 
 import do_mpc
-
-import matplotlib.pyplot as plt
-
+import numpy as np
+from casadi import *
+from scipy import interpolate
 
 # time step (seconds) between state updates
 Δt = 1
@@ -32,7 +23,7 @@ def mpc(noise, CrSP, Ca0, T0, Tc0):
     UA = 150 #Overall heat transfer coefficient multiplied by tank area (kcal/(K·h))
     Cafin = 10 #kmol/m3
     Tf = 298.2 #K
-        
+
     #MPC MODEL
     model_type = 'continuous' # either 'discrete' or 'continuous'
     model = do_mpc.model.Model(model_type)
@@ -90,7 +81,7 @@ def mpc(noise, CrSP, Ca0, T0, Tc0):
     # bounds of the states
     mpc.bounds['lower', '_x', 'Ca'] = 0.1
     mpc.bounds['upper', '_x', 'Ca'] = 12
-    
+
     mpc.bounds['upper', '_x', 'T'] = 400 #
     mpc.bounds['lower', '_x', 'T'] = 100
 
@@ -145,7 +136,7 @@ def mpc(noise, CrSP, Ca0, T0, Tc0):
     }
 
     simulator.set_param(**params_simulator)
-    
+
 
     #uncertain parameters
     p_num = simulator.get_p_template()
@@ -191,8 +182,8 @@ def mpc(noise, CrSP, Ca0, T0, Tc0):
     for k in range(time):
         if k > 1:
             u0_old = u0[0][0]
-           
-            
+
+
         u0 = mpc.make_step(x0)
         #fix from -10 to 10
         if k > 1:
@@ -205,14 +196,14 @@ def mpc(noise, CrSP, Ca0, T0, Tc0):
                 u0 = np.array([[Tc0 + 10]])
             elif u0[0][0] - Tc0 <= -10:
                 u0 = np.array([[Tc0 - 10]])
-            
+
         #Add Noise
         error_var = noise
         σ_max1 = error_var * (8.5698 -2)
         σ_max2 = error_var * ( 373.1311 - 311.2612)
         mu = 0
         v0 = np.array([mu + σ_max1* np.random.randn(1, 1)[0],mu + σ_max2* np.random.randn(1, 1)[0]])
-        
+
         y_next = simulator.make_step(u0,v0=v0) # MPC
 
         #get all state values
@@ -236,11 +227,11 @@ def mpc(noise, CrSP, Ca0, T0, Tc0):
         else:
             Cref = 2
             Tref = 373.1311
-            
+
         x0 = estimator.make_step(y_next) # MPC
 
     return u0
 
 
-        
+
 

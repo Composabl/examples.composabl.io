@@ -3,11 +3,12 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Skill, Sensor, Scenario, Controller, Runtime
-from teacher import CSTRTeacher
-from sensors import sensors
+from composabl import Agent, Scenario, Skill, SkillGroup, Trainer
 from config import config
 from scenarios import reaction_scenarios
+from sensors import sensors
+from teacher import CSTRTeacher
+from controller import MPCController
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -18,11 +19,15 @@ def run_agent():
     for scenario_dict in reaction_scenarios:
         control_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    mpc_skill = Skill("mpc", MPCController)
+
+    trainer = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
     agent.add_skill(control_skill)
+    skill_group = SkillGroup(control_skill, mpc_skill)
+    agent.add_skill_group(skill_group)
 
     files = os.listdir(PATH_CHECKPOINTS)
 
@@ -33,7 +38,7 @@ def run_agent():
     if len(files) > 0:
         agent.load(PATH_CHECKPOINTS)
 
-    runtime.train(agent, train_iters=1)
+    trainer.train(agent, train_cycles=10)
 
     #save agent
     agent.export(PATH_CHECKPOINTS)

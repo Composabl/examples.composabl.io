@@ -1,24 +1,15 @@
 import os
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from chemical_process_control.agents.config import config
+from chemical_process_control.agents.sensors import sensors
+from chemical_process_control.sim.src.sim import CSTREnv
+from composabl import Agent, Scenario, Skill, Trainer
 from teacher import CSTRTeacher
 
-from cstr.external_sim.sim import CSTREnv
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-
 license_key = os.environ["COMPOSABL_LICENSE"]
-
-
-T = Sensor("T", "")
-Tc = Sensor("Tc", "")
-Ca = Sensor("Ca", "")
-Cref = Sensor("Cref", "")
-Tref = Sensor("Tref", "")
-
-sensors = [T, Tc, Ca, Cref, Tref]
 
 # Cref_signal is a configuration variable for Concentration and Temperature setpoints
 control_scenarios = [
@@ -32,25 +23,7 @@ control_skill = Skill("control", CSTRTeacher)
 for scenario_dict in control_scenarios:
     control_skill.add_scenario(Scenario(scenario_dict))
 
-
-config = {
-    "license": license_key,
-    "target": {
-        "docker": {
-            "image": "composabl/sim-cstr:latest"
-        }
-    },
-    "env": {
-        "name": "sim-cstr",
-    },
-    "runtime": {
-        "ray": {
-            "workers": 1
-        }
-    }
-}
-
-runtime = Runtime(config)
+trainer = Trainer(config)
 agent = Agent()
 agent.add_sensors(sensors)
 
@@ -62,7 +35,7 @@ checkpoint_path = './cstr/skill_group_drl_mpc/saved_agents/'
 agent.load(checkpoint_path)
 
 #save agent
-trained_agent = runtime.package(agent)
+trained_agent = trainer.package(agent)
 
 noise = 0.05
 sim = CSTREnv()

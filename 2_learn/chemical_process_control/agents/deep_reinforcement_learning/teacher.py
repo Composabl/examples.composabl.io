@@ -10,7 +10,7 @@ PATH_HISTORY = f"{PATH}/history"
 
 
 class CSTRTeacher(Teacher):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.last_reward = 0
@@ -33,16 +33,16 @@ class CSTRTeacher(Teacher):
         except Exception:
             self.df = pd.DataFrame()
 
-    def transform_obs(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -62,6 +62,15 @@ class CSTRTeacher(Teacher):
             reward = float(1/(math.sqrt(error)))
         self.reward_history.append(reward)
 
+        tolerance = 0.5
+        # instataneous yield regardless of time, it has to be in spec
+        yield_inst = 1 if abs(transformed_obs['Ca'] - transformed_obs['Cref']) <= tolerance else 0
+        # yield percentage over the episode - % time that the product is in spec
+        episode_yield_pct = sum([ 1 if abs(x['Ca'] - x['Cref']) <= tolerance else 0 for x in self.obs_history]) / len(self.obs_history)
+        #product needs to be in spec after 76 iterations to produce yield
+        product_Cb_inst = (10 - float(transformed_obs['Ca'])) if (self.count >= 76 and abs(transformed_obs['Ca'] - transformed_obs['Cref']) <= tolerance) else 0
+        production_Cb_total = sum([ (10 - x['Ca']) if abs(x['Ca'] - x['Cref']) <= tolerance else 0 for x in self.obs_history])
+
         self.count += 1
 
         # history metrics
@@ -71,10 +80,10 @@ class CSTRTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             success = False
         else:
@@ -88,10 +97,10 @@ class CSTRTeacher(Teacher):
 
         return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.figure(1, figsize=(7, 5))
         plt.clf()
         plt.subplot(3, 1, 1)
@@ -117,7 +126,7 @@ class CSTRTeacher(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self):
+    async def plot_obs(self):
         plt.figure(2,figsize=(7,5))
         plt.clf()
         plt.subplot(3,1,1)

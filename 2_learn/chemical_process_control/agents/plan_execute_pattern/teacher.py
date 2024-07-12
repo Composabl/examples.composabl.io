@@ -1,20 +1,18 @@
+import math
 import os
 
-import math
-import numpy as np
-
-from composabl import Teacher
-from mpc_model import mpc
-
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+from composabl import SkillTeacher
+from mpc_model import mpc
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
 PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
-class CSTRTeacher(Teacher):
-    def __init__(self):
+class CSTRTeacher(SkillTeacher):
+    def __init__(self, *args, **kwargs):
         self.obs_history = None
         self.reward_history = []
         self.error_history = []
@@ -31,40 +29,16 @@ class CSTRTeacher(Teacher):
             self.df = pd.DataFrame()
 
 
-    def transform_obs(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
-        if type(transformed_obs) == dict:
-            if 'observation' in list(transformed_obs.keys()):
-                transformed_obs = transformed_obs['observation']
-                #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-                MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2],
-                                                        transformed_obs[0], transformed_obs[1] + action[0])
-                dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
-                dTc_MPC = 0
-            else:
-                #Import MPC
-                MPC_Tc = mpc(0, float(transformed_obs['Cref']), float(transformed_obs['Ca']),
-                                                        float(transformed_obs['T']), float(transformed_obs['Tc']) + action[0])
-                dTc_MPC = MPC_Tc[0][0] - float(transformed_obs['Tc'])
-
-        else:
-            #Import MPC (self.T, self.Tc, self.Ca, self.Cref, self.Tref)
-            MPC_Tc = mpc(0, transformed_obs[3], transformed_obs[2],
-                                                    transformed_obs[0], transformed_obs[1] + action[0])
-            dTc_MPC = MPC_Tc[0][0] - transformed_obs[1]
-
-        #limit MPC actions between -10 and 10 degrees Celsius
-        dTc_MPC = np.clip(dTc_MPC,-10,10)
-        action = [dTc_MPC]
-
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -85,10 +59,10 @@ class CSTRTeacher(Teacher):
         self.df.to_pickle(f"{PATH_HISTORY}/history.pkl")
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history is None:
             return False
         else:
@@ -101,7 +75,7 @@ class CSTRTeacher(Teacher):
 
             return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False
 
     def plot_metrics(self):

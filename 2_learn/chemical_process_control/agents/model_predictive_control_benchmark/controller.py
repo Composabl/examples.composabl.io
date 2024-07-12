@@ -1,22 +1,21 @@
+import copy
+import math
 import os
+import random
 
-from composabl import Controller
-
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
+import numpy as np
+import pandas as pd
+from composabl import SkillController
 from gekko import GEKKO
 from scipy import interpolate
-import math
-import random
-import pandas as pd
-import copy
+from scipy.integrate import odeint
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 
-class MPCController(Controller):
-    def __init__(self):
+class MPCController(SkillController):
+    def __init__(self, *args, **kwargs):
         self.count = 0
         # create metrics db
         try:
@@ -101,15 +100,8 @@ class MPCController(Controller):
         T_ = interpolate.interp1d([0,p1,p2,time,time+1], [311.2612,311.2612,373.1311,373.1311,373.1311])
         C = interpolate.interp1d([0,p1,p2,time, time+1], [8.57,8.57,2,2,2])
 
-    def compute_action(self, obs):
-        #print(obs) #self.T, self.Tc, self.Ca, self.Cref, self.Tref
-        obs = {
-            'T': obs[0],
-            'Tc': obs[1],
-            'Ca': obs[2],
-            'Cref': obs[3],
-            'Tref': obs[4]
-        }
+    async def compute_action(self, obs, action):
+        #self.T, self.Tc, self.Ca, self.Cref, self.Tref
 
         df = pd.DataFrame()
         t = self.t
@@ -158,14 +150,14 @@ class MPCController(Controller):
         dTc = float(newTc) - float(obs['Tc'])
         return [dTc]
 
-    def transform_obs(self, obs):
+    async def transform_sensors(self, obs):
         return obs
 
-    def filtered_observation_space(self):
+    async def filtered_sensor_space(self):
         return ['T', 'Tc', 'Ca', 'Cref', 'Tref']
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         return False
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         return False

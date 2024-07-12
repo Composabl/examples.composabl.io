@@ -1,64 +1,77 @@
+from asyncore import loop
 import os
 import sys
+import asyncio
+from typing import Protocol
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from composabl_core.grpc.client.client import make
-from controller import MPCController
+from composabl import Agent, Trainer, Scenario
+from composabl_core.networking.client import make
 from sensors import sensors
 from config import config
-from scenarios import reaction_scenarios
-
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
 PATH_CHECKPOINTS = f"{PATH}/checkpoints"
 PATH_BENCHMARKS = f"{PATH}/benchmarks"
 
-def start():
-    reaction_skill = Skill("reaction", MPCController)
-    for scenario_dict in reaction_scenarios:
-        reaction_skill.add_scenario(Scenario(scenario_dict))
+async def run_agent():
+    # Start Runtime
+    trainer = Trainer(config)
 
-    runtime = Runtime(config)
-    agent = Agent()
-    agent.add_sensors(sensors)
+    # Load the pre trained agent
+    agent = Agent.load(PATH_CHECKPOINTS)
 
-    agent.add_skill(reaction_skill)
+    # Prepare the loaded agent for inference
+    trained_agent = await trainer._package(agent)
 
     # Inference
-    noise = 0.0
-    cont = MPCController()
+    print("Creating Environment")
     sim = make(
-        "run-benchmark",
-        "sim-benchmark",
-        "",
-        "localhost:1337",
-        {
-            "render_mode": "rgb_array"
-        },
+        run_id="run-benchmark",
+        sim_id="sim-benchmark",
+        env_id="sim",
+        address="localhost:1337",
+        env_init={},
+        init_client=False,
+        #protocol = Protocol
     )
-    sim.init()
-    sim.set_scenario(Scenario({
+
+    print("Initializing Environment")
+    await sim.init()
+    print("Initialized")
+
+    # Set scenario
+    noise = 0.0
+    await sim.set_scenario(Scenario({
             "Cref_signal": "complete",
             "noise_percentage": noise
         }))
-    df = pd.DataFrame()
-    obs, info= sim.reset()
 
-    for i in range(90-1):
-        action = cont.compute_action(obs)
-        obs, reward, done, truncated, info = sim.step(action)
-        df_temp = pd.DataFrame(columns=['T','Tc','Ca','Cref','Tref','time'],data=[list(obs) + [i]])
+    obs_history = []
+    df = pd.DataFrame()
+    print("Resetting Environment")
+    obs, info = await sim.reset()
+    obs_history.append(obs)
+    for i in range(89):
+        action = await trained_agent._execute(obs)
+        obs, reward, done, truncated, info = await sim.step(action)
+        df_temp = pd.DataFrame(columns=[s.name for s in sensors] + ['time'],data=[list(obs) + [i]])
         df = pd.concat([df, df_temp])
+
+        obs_history.append(obs)
 
         if done:
             break
 
-    sim.close()
+    print("Closing")
+    await sim.close()
+
     # save history data
     df.to_pickle(f"{PATH_HISTORY}/inference_data.pkl")
 
@@ -68,7 +81,7 @@ def start():
     plt.plot(df.reset_index()['time'],df.reset_index()['Tc'])
     plt.ylabel('Tc')
     plt.legend(['reward'],loc='best')
-    plt.title('Agent Inference Linear MPC' + f" - Noise: {noise}")
+    plt.title('Agent Inference DRL' + f" - Noise: {noise}")
 
     plt.subplot(3,1,2)
     plt.plot(df.reset_index()['time'],df.reset_index()['T'])
@@ -87,4 +100,5 @@ def start():
 
 
 if __name__ == "__main__":
-    start()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_agent())
