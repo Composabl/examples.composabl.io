@@ -1,0 +1,3 @@
+composabl-core-dev
+scipy
+pandas
