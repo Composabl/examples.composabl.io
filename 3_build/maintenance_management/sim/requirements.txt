@@ -1,0 +1,5 @@
+composabl-core-dev
+scipy
+simpy
+statsmodels
+matplotlib

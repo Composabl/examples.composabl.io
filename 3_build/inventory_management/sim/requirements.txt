@@ -1,0 +1,6 @@
+composabl-core-dev
+scipy
+casadi
+control
+pandas
+simpy

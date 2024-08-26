@@ -9,10 +9,6 @@ from composabl_core.agent.scenario import Scenario
 class Env(gym.Env):
     def __init__(self):
         '''
-        observation_variables = 6 :
-        actions = 2 :
-            de: elevator angle variation
-
         '''
         #print files
         #print(os.listdir())
@@ -22,7 +18,7 @@ class Env(gym.Env):
         self.select_vars = str(self.vars).replace('[', '').replace(']','').replace("'","")
         self.target = 'isFraud'
         self.select_target = str(self.target).replace("'", "")
-        self.conn = sqlite3.connect('src/fraud_detection_db.db')
+        self.conn = sqlite3.connect('fraud_detection_db.db')
 
         obs_space = {}
         for var in self.vars:

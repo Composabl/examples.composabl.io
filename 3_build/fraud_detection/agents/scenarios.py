@@ -1,7 +1,23 @@
-# `Cref_signal` is a configuration variable for concentration
-# and temperature set points.
+fraud_scenarios = [
+    {
+        "step": 1,
+        "amount": 1000,
+        "oldbalanceOrg": 1000,
+        "newbalanceOrig": 0,
+        "oldbalanceDEst": 1000,
+        "newbalanceDest": 0,
+        "isFraud": 1
+    }
+]
 
-reaction_scenarios = [{
-    "Cref_signal": "complete",
-    "noise_percentage": 0.00
-    }]
+normal_scenarios = [
+    {
+        "step": 1,
+        "amount": 1000,
+        "oldbalanceOrg": 1000,
+        "newbalanceOrig": 0,
+        "oldbalanceDEst": 1000,
+        "newbalanceDest": 0,
+        "isFraud": 0
+    }
+]
