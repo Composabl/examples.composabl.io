@@ -16,27 +16,6 @@ class TextTeacher(SkillTeacher):
         self.sensor_name = sensor_name  # depends on the space type (see classes below)
 
     async def compute_reward(self, transformed_sensors: Dict, action, sim_reward):
-        """
-        The reward increases the closer it gets to 10, but decreases the further it gets from 10
-        it decreases faster the further it gets
-
-        note: we do this through a piecewise function, where the reward is 100 if the counter is 10
-        and 0 if the counter is 0 everything above 10 gets a steep decrease and everything below 10
-        gets a small increase
-
-        ASCII of the Piecewise Graph
-
-                      ***********
-                 *****           ***
-              ***                   **
-            **                        **
-         ***                            **
-        *                                 *
-                                           **
-                                             *
-                                              *
-                                               *
-        """
         counter = transformed_sensors[self.sensor_name]
         assert "text" in transformed_sensors
         assert "text_reversed" in transformed_sensors
