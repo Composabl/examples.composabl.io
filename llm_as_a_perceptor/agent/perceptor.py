@@ -1,4 +1,4 @@
-from fake_llm import llm_client
+# from fake_llm import llm_client
 from composabl_core import PerceptorImpl
 
 class TextPerceptor(PerceptorImpl):
