@@ -1,0 +1,12 @@
+[project]
+name = "chemical_engineer_llm"
+version = "0.1.0"
+description = "A perceptor that acts as a chemical engineer for a CSTR plant"
+authors = [{ name = "John Doe", email = "john.doe@composabl.com" }]
+dependencies = [
+    "composabl-core"
+]
+
+[composabl]
+type = "perceptor"
+entrypoint = "chemical_engineer_llm.perceptor:DemoPerceptor"
