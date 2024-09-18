@@ -5,7 +5,7 @@
 from fake_llm import llm_client
 from composabl_core import PerceptorImpl
 
-class TextPerceptor(PerceptorImpl):
+class ChemicalEngineerPerceptor(PerceptorImpl):
     """
     The perceptor for the text agent
     """

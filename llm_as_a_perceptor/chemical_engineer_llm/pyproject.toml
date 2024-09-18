@@ -9,4 +9,4 @@ dependencies = [
 
 [composabl]
 type = "perceptor"
-entrypoint = "chemical_engineer_llm.perceptor:DemoPerceptor"
+entrypoint = "chemical_engineer_llm.perceptor:ChemicalEngineerPerceptor"
