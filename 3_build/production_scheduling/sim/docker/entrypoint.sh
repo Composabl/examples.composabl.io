@@ -76,6 +76,8 @@ if [[ "$MODE" == "standalone" && "$IS_HISTORIAN_ENABLED" == "true" ]]; then
     echo "[Dapr] - PATH: '$APP_PATH'"
     echo "[Dapr] - CMD: '$APP_CMD'"
     echo '===================================================================='
+    HOST=${HOST:-"0.0.0.0"}
+    PORT=${PORT:-"1337"}
 
     dapr run --app-id "$SIM_ID" --app-port 50051 --dapr-http-port 3500 --app-protocol grpc \
         --resources-path /docker/dapr/components \
@@ -84,6 +86,9 @@ if [[ "$MODE" == "standalone" && "$IS_HISTORIAN_ENABLED" == "true" ]]; then
 else
     echo "Starting $APP_NAME"
     echo '===================================================================='
+
+    HOST=${HOST:-"0.0.0.0"}
+    PORT=${PORT:-"1337"}
 
     $APP_CMD --host $HOST --port $PORT
 fi

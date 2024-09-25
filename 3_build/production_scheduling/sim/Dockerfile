@@ -65,4 +65,6 @@ COPY . .
 COPY docker/entrypoint.sh /usr/local/bin/composabl-sim-entrypoint.sh
 RUN chmod +x /usr/local/bin/composabl-sim-entrypoint.sh
 
+EXPOSE 1337
+
 CMD ["composabl-sim-entrypoint.sh"]

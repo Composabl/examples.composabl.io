@@ -15,7 +15,7 @@ async def start(host, port, protocol, env_init: dict = {}):
         host=host,
         port=port,
         protocol=protocol,
-        env_init=env_init,
+        env_init=env_init
     )
 
     await server.start()

@@ -1,4 +1,4 @@
-composabl-core-dev
+composabl
 scipy
 casadi
 control

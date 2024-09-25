@@ -1,4 +1,4 @@
-#!/bin/bash
+    #!/bin/bash
 V_COMPOSABL_SIM=${V_COMPOSABL_SIM:-"1.1.0"}
 
 ######################################################
@@ -71,5 +71,8 @@ cd "$APP_PATH"
 
 echo "Starting $APP_NAME"
 echo '===================================================================='
+
+HOST=${HOST:-"0.0.0.0"}
+PORT=${PORT:-"1337"}
 
 $APP_CMD --host $HOST --port $PORT
