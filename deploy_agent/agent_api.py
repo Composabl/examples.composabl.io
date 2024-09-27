@@ -66,15 +66,21 @@ async def predict():
     # Extract the observation from the request's JSON body
     obs = request.json.get("observation")
 
-    obs = dict(obs)
-    obs = np.array( [float(x) for x in list(obs.values())] )
-
     # Validate that the observation was provided in the request
     if obs is None:
         return jsonify({"error": "No observation provided"}), 400
 
-    # Asynchronously process the observation to generate the action
-    action = await trained_agent._execute(obs)
+    obs = dict(obs)
+
+    try:
+        # Convert the observation to a numpy array for sims that requires array as input
+        obs = np.array( [float(x) for x in list(obs.values())] )
+        # Asynchronously process the observation to generate the action
+        action = await trained_agent._execute(obs)
+    except:
+        # Use dictionary input for sims that requires dictionary as input
+        # Asynchronously process the observation to generate the action
+        action = await trained_agent._execute(obs)
 
     # Return the generated action in the response
     return jsonify({"action": str(action)})
