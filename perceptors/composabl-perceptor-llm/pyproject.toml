@@ -1,0 +1,15 @@
+[project]
+name = "composabl-perceptor-llm"
+version = "0.1.0"
+description = "A Composabl Demo Portable Perceptor that uses an LLM to generate an insight from the entire observation"
+authors = [{ name = "Xavier Geerinck", email = "xavier@composabl.io" }]
+dependencies = [
+    "composabl-core",
+    "aiohttp",
+    "numpy",
+    "gymnasium",
+]
+
+[composabl]
+type = "perceptor"
+entrypoint = "composabl_perceptor_llm.perceptor:PerceptorOpenAI"

@@ -1,0 +1,12 @@
+[project]
+name = "composabl-perceptor-derivative"
+version = "0.1.0"
+description = "A Composabl Demo Portable Perceptor that takes the derivative of the value in the observation"
+authors = [{ name = "Xavier Geerinck", email = "xavier@composabl.io" }]
+dependencies = [
+    "composabl-core"
+]
+
+[composabl]
+type = "perceptor"
+entrypoint = "composabl_perceptor_derivative.perceptor:DerivativePerceptor"
