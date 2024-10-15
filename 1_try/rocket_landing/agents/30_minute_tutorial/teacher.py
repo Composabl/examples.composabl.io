@@ -1,13 +1,16 @@
-from composabl import Teacher
 import math
+import pickle
+
 import matplotlib.pyplot as plt
-from matplotlib import pyplot as plt, rc
-from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
-from ipywidgets import IntProgress
-from IPython.display import display
 import numpy as np
 import pandas as pd
-import pickle
+from composabl import Teacher
+from IPython.display import display
+from ipywidgets import IntProgress
+from matplotlib import pyplot as plt
+from matplotlib import rc
+from matplotlib.animation import FFMpegWriter, FuncAnimation, PillowWriter
+
 
 class BaseTeacher(Teacher):
     def __init__(self, *args, **kwargs):
@@ -31,16 +34,16 @@ class BaseTeacher(Teacher):
         except:
             self.df = pd.DataFrame()
 
-    def transform_sensors(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_sensor_space(self):
+    async def filtered_sensor_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -79,10 +82,10 @@ class BaseTeacher(Teacher):
 
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.plot:
             if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
                 self.plot_obs('Stabilization')
@@ -100,7 +103,7 @@ class BaseTeacher(Teacher):
 
             return success
 
-    def compute_termination(self, transformed_obs, action):
+    async def compute_termination(self, transformed_obs, action):
         if abs(float(transformed_obs['angle'])) > 4:
             return True
         else:
@@ -202,7 +205,7 @@ class BaseTeacher(Teacher):
 
 
 class SelectorTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -226,7 +229,7 @@ class SelectorTeacher(BaseTeacher):
 
 
 class SpeedControlTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -267,7 +270,7 @@ class SpeedControlTeacher(BaseTeacher):
 
 
 class StabilizationTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -307,7 +310,7 @@ class StabilizationTeacher(BaseTeacher):
         return reward
 
 class NavigationTeacher(BaseTeacher):
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0

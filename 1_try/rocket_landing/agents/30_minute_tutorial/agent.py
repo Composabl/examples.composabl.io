@@ -3,12 +3,11 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill, Controller
+from composabl import Agent, Scenario, Skill, SkillController, Trainer
 from config import config
-from sensors import sensors
 from scenarios import Navigation_scenarios
-from teacher import (NavigationTeacher, SpeedControlTeacher,
-                     StabilizationTeacher)
+from sensors import sensors
+from teacher import NavigationTeacher, SpeedControlTeacher, StabilizationTeacher
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -16,7 +15,7 @@ PATH_CHECKPOINTS : str = f"{PATH}/checkpoints"
 
 # Change here to define how the agent will orchestrate each skill
 # Define the Programmed Selector and how it selects the each skill
-class ProgrammedSelector(Controller):
+class ProgrammedSelector(SkillController):
     def __init__(self, *args, **kwargs):
         self.counter = 0
 
@@ -57,7 +56,7 @@ def run_agent():
         Stabilization_skill.add_scenario(scenario)
         selector_skill.add_scenario(scenario)
 
-    runtime = Runtime(config)
+    runtime = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
 
@@ -77,7 +76,7 @@ def run_agent():
         print("|-- No checkpoints found. Training from scratch...")
 
     # Start training the agent
-    runtime.train(agent, train_cycles=100)
+    runtime.train(agent, train_cycles=2)
 
     # Save the trained agent
     agent.export(PATH_CHECKPOINTS)

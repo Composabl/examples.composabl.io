@@ -3,15 +3,17 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Teacher
-import matplotlib.pyplot as plt
-from matplotlib import pyplot as plt, rc
-from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
-from ipywidgets import IntProgress
-from IPython.display import display
 import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from composabl import Teacher
+from IPython.display import display
+from ipywidgets import IntProgress
+from matplotlib import pyplot as plt
+from matplotlib import rc
+from matplotlib.animation import FFMpegWriter, FuncAnimation, PillowWriter
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -29,14 +31,15 @@ class NavigationTeacher(Teacher):
         self.thrust_history = []
         self.reward_history = []
         self.angle_history = []
+        self.error_history = []
 
-        self.plot = True
+        self.plot = False
         self.metrics = 'fast' #standard, fast
 
-        if not self.plot:
-            plt.close("all")
-            plt.figure(figsize=(10,7))
-            plt.ion()
+        #if self.plot:
+        #    plt.close("all")
+        #    plt.figure(figsize=(10,7))
+        #    plt.ion()
 
         # create metrics db
         try:
@@ -47,16 +50,16 @@ class NavigationTeacher(Teacher):
             self.df = pd.DataFrame()
 
 
-    def transform_sensors(self, obs, action):
+    async def transform_sensors(self, obs, action):
         return obs
 
-    def transform_action(self, transformed_obs, action):
+    async def transform_action(self, transformed_obs, action):
         return action
 
-    def filtered_sensor_space(self):
+    async def filtered_sensor_space(self):
         return ['x', 'x_speed', 'y', 'y_speed', 'angle', 'ang_speed']
 
-    def compute_reward(self, transformed_obs, action, sim_reward):
+    async def compute_reward(self, transformed_obs, action, sim_reward):
         if self.obs_history is None:
             self.obs_history = [transformed_obs]
             return 0.0
@@ -70,12 +73,30 @@ class NavigationTeacher(Teacher):
         error_5 = ((0 - float(transformed_obs["angle"]))/3.15)**2
         error_6 = ((0 - float(transformed_obs["ang_speed"]))/1)**2
 
-        reward = 1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6)
+        reward = (1000 - float(transformed_obs["y"])) * (1/(5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6))
 
-        self.t += action[0]
-        self.a += action[1]
-        self.t = np.clip(self.t,0.4,1)
-        self.a = np.clip(self.a, -3.15, 3.15)
+        self.t = action[1]
+        self.a = action[0]
+        deg_to_rad = 0.01745329
+
+        max_gimble = 20  * deg_to_rad
+        min_gimble = -max_gimble
+        #self.t = np.clip(self.t,0.4,1)
+        self.a = np.clip(self.a, min_gimble, max_gimble)
+
+        ##################
+        error = (1000 - float(transformed_obs["y"])) * (5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 3 * error_6)
+        error = (5 * error_1 + 1 * error_2 + 1 * error_3 + 5 * error_4 + 5 * error_5 + 1 * error_6)
+        self.error_history.append(error)
+        rms = math.sqrt(np.mean(self.error_history))
+        # minimize error
+        reward = 10* math.exp(-1e-1 * np.sum(self.error_history))
+        if len(self.error_history) >= 10:
+            #print('LEN HISTORY: ', self.error_history)
+            reward = 10* math.exp(-1e-1 * np.sum(self.error_history[-10:]))
+        self.reward_history.append(reward)
+
+        ##############
 
         self.action_history.append(action)
         self.thrust_history.append([self.t, self.a])
@@ -85,25 +106,25 @@ class NavigationTeacher(Teacher):
         self.count += 1
 
         # history metrics
-        df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
-                               data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
-                                      transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
-        self.df = pd.concat([self.df, df_temp])
+        #df_temp = pd.DataFrame(columns=['time','x','y','x_speed', 'y_speed', 'angle', 'angle_speed','reward'],
+        #                       data=[[self.count,transformed_obs['x'], transformed_obs['y'],transformed_obs['x_speed'], transformed_obs['y_speed'],
+        #                              transformed_obs['angle'], transformed_obs['ang_speed'], reward]])
+        #self.df = pd.concat([self.df, df_temp])
         #self.df.to_pickle("./starship/history.pkl")
         return reward
 
-    def compute_action_mask(self, transformed_obs, action):
+    async def compute_action_mask(self, transformed_obs, action):
         return None
 
-    def compute_success_criteria(self, transformed_obs, action):
-        if self.plot:
-            if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
-                self.plot_obs('Stabilization')
-
+    async def compute_success_criteria(self, transformed_obs, action):
         if self.obs_history == None:
             return False
         else:
             success = False
+
+            if self.plot:
+                if len(self.obs_history) > 100 and len(self.obs_history) % 100 == 0:
+                    self.plot_obs('Stabilization')
 
             if self.metrics == 'standard':
                 try:
@@ -113,10 +134,17 @@ class NavigationTeacher(Teacher):
 
             return success
 
-    def compute_termination(self, transformed_obs, action):
-        return False
+    async def compute_termination(self, transformed_obs, action):
+        if abs(float(transformed_obs["x"])) > 150:
+            return True
+        elif (float(transformed_obs["x_speed"])) < -100:
+            return True
+        elif abs(float(transformed_obs["angle"])) > 2.5:
+            return True
+        else:
+            return False
 
-    def plot_metrics(self):
+    async def plot_metrics(self):
         plt.clf()
         plt.subplot(3,1,1)
         plt.plot(self.reward_history, 'r.-')
@@ -142,7 +170,7 @@ class NavigationTeacher(Teacher):
         plt.draw()
         plt.pause(0.001)
 
-    def plot_obs(self, title='Starship'):
+    async def plot_obs(self, title='Starship'):
         #x = [ x["x"] for x in self.obs_history[:]]
         x = np.array([ list(x.values()) for x in self.obs_history[:]])
         u = np.array(self.thrust_history[:])

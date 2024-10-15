@@ -3,3 +3,4 @@ scipy
 casadi
 ipython
 ipywidgets
+scikit-learn
