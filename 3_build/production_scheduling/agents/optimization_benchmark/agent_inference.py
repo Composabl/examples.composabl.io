@@ -3,14 +3,14 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
+import pickle
 
+import matplotlib.pyplot as plt
+from composabl import Agent, Scenario, Sensor, Skill, Trainer
 from composabl_core.grpc.client.client import make
 from gymnasium import spaces
-import matplotlib.pyplot as plt
-import pickle
 from order_controller import OrderController
+from sensors import sensors
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
