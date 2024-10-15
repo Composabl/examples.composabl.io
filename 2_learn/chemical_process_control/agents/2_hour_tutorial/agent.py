@@ -1,12 +1,14 @@
 import os
 
-from composabl import Agent, Runtime, Scenario, Sensor, Skill
-from sensors import sensors
-#Add the 2 additional teachers below once you have created them in the teacher.py file in the previous step
-from teacher import StartReactionTeacher, CSTRTeacher
-#Add the 2 additional scenarios below once you have created them in the scenarios.py file in the previous step
-from scenarios import start_reaction_scenarios, selector_scenarios
+from composabl import Agent, Scenario, Skill, Trainer
 from config import config
+
+#Add the 2 additional scenarios below once you have created them in the scenarios.py file in the previous step
+from scenarios import selector_scenarios, start_reaction_scenarios
+from sensors import sensors
+
+#Add the 2 additional teachers below once you have created them in the teacher.py file in the previous step
+from teacher import CSTRTeacher, StartReactionTeacher
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY = f"{PATH}/history"
@@ -26,7 +28,7 @@ def run_agent():
     for scenario_dict in selector_scenarios:
         selector_skill.add_scenario(Scenario(scenario_dict))
 
-    runtime = Runtime(config)
+    runtime = Trainer(config)
     agent = Agent()
     agent.add_sensors(sensors)
     #Copy this skill (start_reaction_skill) 2 times and paste below. Update to reflect the names of the skills created above.

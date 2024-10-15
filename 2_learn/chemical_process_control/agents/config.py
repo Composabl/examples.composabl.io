@@ -17,6 +17,5 @@ config = {
     },
     "trainer": {
         "workers": 4,
-        "num_gpus": 0
     }
 }

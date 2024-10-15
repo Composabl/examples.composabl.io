@@ -5,10 +5,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from composabl import Agent, Scenario, Skill, SkillGroup, Trainer
 from config import config
+from controller import MPCController
 from scenarios import reaction_scenarios
 from sensors import sensors
 from teacher import CSTRTeacher
-from controller import MPCController
 
 PATH: str = os.path.dirname(os.path.realpath(__file__))
 PATH_HISTORY: str = f"{PATH}/history"
@@ -29,14 +29,14 @@ def run_agent():
     skill_group = SkillGroup(control_skill, mpc_skill)
     agent.add_skill_group(skill_group)
 
-    files = os.listdir(PATH_CHECKPOINTS)
+    # files = os.listdir(PATH_CHECKPOINTS)
 
-    if '.DS_Store' in files:
-        files.remove('.DS_Store')
-        os.remove(PATH_CHECKPOINTS + '/.DS_Store')
+    # if '.DS_Store' in files:
+    #     files.remove('.DS_Store')
+    #     os.remove(PATH_CHECKPOINTS + '/.DS_Store')
 
-    if len(files) > 0:
-        agent.load(PATH_CHECKPOINTS)
+    # if len(files) > 0:
+    #     agent.load(PATH_CHECKPOINTS)
 
     trainer.train(agent, train_cycles=10)
 
