@@ -1,0 +1,4 @@
+composabl-core
+scipy
+simpy==4.0.2
+matplotlib
