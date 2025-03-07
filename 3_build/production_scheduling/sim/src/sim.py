@@ -28,7 +28,7 @@ class Env(gym.Env):
         '''self.action_space = gym.spaces.Dict({'mix_bake_decorate': gym.spaces.Discrete(3),
                                              'chip_coco_eclair_wait': gym.spaces.Discrete(3),
                                              'product_equip': gym.spaces.Discrete(3)
-                             
+
                              })'''
 
         obs_space_constraints = {
@@ -61,6 +61,10 @@ class Env(gym.Env):
             low_list += llist
             high_list += hlist
 
+        # add profit
+        low_list.append(-1e6)
+        high_list.append(1e6)
+
         self.cookies_price = 5
         self.cupcake_price = 7
         self.cake_price = 10
@@ -85,6 +89,8 @@ class Env(gym.Env):
             else:
                 ss = list(state[key])
             new_state += ss
+
+        new_state.append(self.profit)
 
         return np.array(new_state)
 
@@ -118,7 +124,7 @@ class Env(gym.Env):
         self.cookies_demand_real = self.cookies_demand * (1 + random.uniform(-0.3, 1))
         self.cupcakes_demand_real = self.cupcake_demand * (1 + random.uniform(-0.3, 1))
         self.cakes_demand_real = self.cake_demand * (1 + random.uniform(-0.3, 1))
-        
+
         self.profit = 0
 
         obs, info = self.business_env.reset()
@@ -148,11 +154,11 @@ class Env(gym.Env):
                 '21' :8, #"Eclair_mix_cupcakes",
                 '22' :9, #"Eclair_mix_cakes"
             },
-        
+
             1: {
                 '00':10,#"Chip_bake_from_Mixer_1",
                 '01':11,#"Chip_bake_from_Mixer_2",
-                '02':0, 
+                '02':0,
                 '10':12,#"Coco_bake_from_Mixer_1",
                 '11':13,#"Coco_bake_from_Mixer_2",
                 '12':0,
@@ -191,7 +197,6 @@ class Env(gym.Env):
         self.business_env.cake_cost = self.cake_cost
 
         self.obs, reward, terminate, done, info = self.business_env.step(action)
-        self.obs = self.process_state(self.obs)
 
         # Calculate Profit
         completed_cookies = self.obs[44]
@@ -209,7 +214,7 @@ class Env(gym.Env):
 
         if completed_cupcakes <= self.cupcakes_demand_real:
             cost_of_opportunity = (self.cupcakes_demand_real - completed_cupcakes) * (self.cupcake_price - self.cupcake_cost)
-            cupcakes_revenue = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost)) 
+            cupcakes_revenue = (completed_cupcakes * (self.cupcake_price - self.cupcake_cost))
             cupcakes_profit = cupcakes_revenue - cost_of_opportunity
         else:
             waste  = -(self.cupcakes_demand_real - completed_cupcakes) * self.cupcake_cost
@@ -224,10 +229,12 @@ class Env(gym.Env):
             waste  = -(self.cakes_demand_real - completed_cakes) * self.cake_cost
             cakes_revenue = (self.cakes_demand_real * (self.cake_price - self.cake_cost))
             cakes_profit = cakes_revenue - waste
-        
+
         self.profit = cookies_profit + cupcakes_profit + cakes_profit
         reward = self.profit
-        
+
+        self.obs = self.process_state(self.obs)
+
         debug = False
         if debug:
             # Debug

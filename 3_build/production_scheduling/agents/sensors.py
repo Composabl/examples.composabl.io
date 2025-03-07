@@ -81,3 +81,6 @@ for d in sensors_dict_list:
     for key in list(d.keys()):
         globals()[d[key]] = Sensor(d[key], "")
         sensors.append(globals()[d[key]])
+
+
+sensors.append(Sensor("profit", ""))
