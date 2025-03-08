@@ -197,6 +197,7 @@ class Env(gym.Env):
         self.business_env.cake_cost = self.cake_cost
 
         self.obs, reward, terminate, done, info = self.business_env.step(action)
+        self.obs = self.process_state(self.obs)
 
         # Calculate Profit
         completed_cookies = self.obs[44]
