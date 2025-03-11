@@ -39,7 +39,7 @@ reward_fn = callable
 bakery_reward = MixerUtilGoal.reward_fn
 
 class Machine_Teaching(DefaultCallbacks):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.goals = [MixerUtilGoal, DecorationStationUtilGoal, RevenueUtilGoal]
         self.active_goal = self.goals[0]
 
@@ -55,10 +55,10 @@ class Machine_Teaching(DefaultCallbacks):
 
         self.goal_metric = goal_metric
 
-    def on_episode_end(self, worker,base_env,policies,episode,env_index,**kwargs):       
+    def on_episode_end(self, worker,base_env,policies,episode,env_index,**kwargs):
         for goal_metric in self.goal_metric:
             episode.custom_metrics["episode_"+str(goal_metric[0])+"_metric"] = goal_metric[1]
-    
+
     def on_evaluate_end(self, algorithm, evaluation_metrics, **kwargs):
         goal_success = []
         for goal in self.goals:
@@ -68,7 +68,7 @@ class Machine_Teaching(DefaultCallbacks):
             if goal == False:
                 self.active_goal = self.goals[i]
 
-        
+
         bakery_reward = self.active_goal.reward_fn
 
         algorithm.workers.foreach_worker(
@@ -93,7 +93,7 @@ config = (
             .environment(
                 WhiskeyBusinessEnv,
                 env_config=dqn_config)
-            .training(   
+            .training(
                 hiddens=[],
                 dueling=False,
                 model={
@@ -109,7 +109,7 @@ config = (
             .callbacks(MultiCallbacks(
                 [Machine_Teaching,
                 Log]
-    
+
             ) )
         )
 

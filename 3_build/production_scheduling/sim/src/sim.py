@@ -1,16 +1,13 @@
-import math
 import random
-import numpy as np
 
-from composabl_core.agent.scenario import Scenario
 import gymnasium as gym
-
+import numpy as np
+from composabl_core.agent.scenario import Scenario
 from rllib.whisky_business_env import WhiskeyBusinessEnv
-from simulation.sim_controller import SimController
-import simpy
 
-class Env(gym.Env):
-    def __init__(self):
+
+class ProductionSchedulingEnv(gym.Env):
+    def __init__(self, *args, **kwargs):
         '''
         actions =
         observation_variables =
@@ -234,7 +231,7 @@ class Env(gym.Env):
         self.profit = cookies_profit + cupcakes_profit + cakes_profit
         reward = self.profit
 
-        self.obs = self.process_state(self.obs)
+        self.obs[-1] = self.profit
 
         debug = False
         if debug:
