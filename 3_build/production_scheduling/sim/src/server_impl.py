@@ -6,7 +6,7 @@ from typing import Any, Dict, SupportsFloat, Tuple
 
 import gymnasium as gym
 from composabl_core.agent.scenario.scenario import Scenario
-from composabl_core.networking.server_composabl import ServerComposabl
+from composabl_core.networking.sim.server_composabl import ServerComposabl
 from sim import ProductionSchedulingEnv
 
 
